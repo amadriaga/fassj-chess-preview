@@ -1,6 +1,6 @@
 # FASSJ Chess Club website
 
-**https://chess.fassj.org** (not live yet) · review copy: **https://chess.fassj.o2bot.com**
+**https://chess.fassj.o2bot.com** (not live yet) · review copy: **https://chess.fassj.o2bot.com**
 
 The website of the FASSJ Chess Club, the chess club of the Filipino American Society of South Jersey (FASSJ). Hosted on GitHub Pages. The main FASSJ site (fassj.org) is in `../website/`.
 
