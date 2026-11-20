@@ -70,23 +70,115 @@
     });
   }
 
-  // Bigger picture in a pop-up: any element with data-lightbox="<image>" (Pay & Donate T-shirt card).
+  // Bigger picture in a pop-up: any element with data-lightbox="<image>" (also gallery items added later).
   var box = document.querySelector('dialog.lightbox');
   if (box && box.showModal) {
     var last = null, img = box.querySelector('img'), cap = box.querySelector('.lightbox-caption');
-    var openers = document.querySelectorAll('[data-lightbox]');
-    for (var lb = 0; lb < openers.length; lb++) {
-      openers[lb].addEventListener('click', function (e) {
-        last = e.currentTarget;
-        img.src = last.getAttribute('data-lightbox');
-        img.alt = (last.querySelector('img') || {}).alt || '';
-        cap.textContent = last.getAttribute('data-caption') || '';
-        box.showModal();
-      });
-    }
+    document.addEventListener('click', function (e) {
+      var opener = e.target.closest && e.target.closest('[data-lightbox]');
+      if (!opener) return;
+      last = opener;
+      img.src = opener.getAttribute('data-lightbox');
+      img.alt = (opener.querySelector('img') || {}).alt || '';
+      cap.textContent = opener.getAttribute('data-caption') || '';
+      box.showModal();
+    });
     box.querySelector('.lightbox-close').addEventListener('click', function () { box.close(); });
     box.addEventListener('click', function (e) { if (e.target === box) box.close(); });   // click outside the picture
     box.addEventListener('close', function () { if (last) last.focus(); });
+  }
+
+  // 2028 shirt contest page: gallery + vote, entry form (spec §25). The address comes from <main data-contest-api>.
+  var cmain = document.querySelector('main[data-contest-api]');
+  if (cmain) {
+    var api = cmain.getAttribute('data-contest-api'), pending = api.indexOf('SHEET_URL_PENDING') !== -1;
+    var status = document.getElementById('contest-status'), grid = document.getElementById('contest-grid');
+    var state = { entriesOpen: false, votingOpen: false, choice: null, choiceTitle: '' };
+    var esc = function (t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+    var post = function (data) {
+      return fetch(api, { method: 'POST', body: new URLSearchParams(data) }).then(function (r) { return r.json(); });
+    };
+    var note = function (el, msg, ok) { el.textContent = msg; el.classList.toggle('notice--ok', !!ok); el.classList.add('is-visible'); el.focus(); };
+    var showStatus = function () {
+      if (pending) { status.innerHTML = 'The contest opens soon. Check back here, or follow our <a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener">Facebook page</a>.'; return; }
+      status.innerHTML = '<b>Entries:</b> ' + (state.entriesOpen ? 'open' : 'not open yet') + ' &middot; <b>Voting:</b> ' + (state.votingOpen ? 'open' : 'not open yet');
+    };
+    var castBtn = document.getElementById('v-cast'), codeIn = document.getElementById('v-code');
+    var syncCast = function () { castBtn.disabled = !(state.votingOpen && state.choice && /^\d{6}$/.test(codeIn.value.trim())); };
+    var render = function (list) {
+      if (!list.length) { grid.innerHTML = '<p class="note">No designs in the gallery yet. They appear here once a club officer has checked them.</p>'; return; }
+      grid.innerHTML = list.map(function (x) {
+        return '<article class="card contest-card">' +
+          '<button class="contest-pic" type="button" data-lightbox="' + esc(x.img) + '" data-caption="' + esc(x.title + ' by ' + x.name) + '"><img src="' + esc(x.img) + '" alt="' + esc('T-shirt design: ' + x.title) + '" loading="lazy"></button>' +
+          '<h3>' + esc(x.title) + '</h3><p>by ' + esc(x.name) + '</p>' +
+          (state.votingOpen ? '<label class="check vote-tick"><input type="radio" name="entry" value="' + esc(x.id) + '" data-title="' + esc(x.title) + '"> Vote for this design</label>' : '') +
+          '</article>';
+      }).join('');
+      grid.querySelectorAll('input[name=entry]').forEach(function (r) {
+        r.addEventListener('change', function () {
+          state.choice = r.value; state.choiceTitle = r.getAttribute('data-title');
+          document.getElementById('vote-choice').innerHTML = 'Your choice: <b>' + esc(state.choiceTitle) + '</b>';
+          syncCast();
+        });
+      });
+    };
+    var load = function () {
+      if (pending) { showStatus(); return; }
+      fetch(api + '?action=gallery').then(function (r) { return r.json(); }).then(function (res) {
+        state.entriesOpen = !!res.entriesOpen; state.votingOpen = !!res.votingOpen;
+        showStatus(); render(res.entries || []);
+        document.getElementById('vote-form').classList.toggle('hidden', !state.votingOpen);
+      }).catch(function () { status.textContent = 'We couldn\u2019t load the gallery right now. Please try again later.'; });
+    };
+    load();
+
+    // Entry form
+    var ef = document.getElementById('entry-form'), emsg = document.getElementById('entry-msg');
+    var eg = document.getElementById('e-guardian'), egIn = ef.querySelectorAll('[data-eg]');
+    ef.querySelectorAll('input[name=age_group]').forEach(function (r) { r.addEventListener('change', function () {
+      var minor = !!ef.querySelector('#e-minor:checked'); eg.classList.toggle('hidden', !minor); egIn.forEach(function (i) { i.required = minor; });
+    }); });
+    var fileIn = document.getElementById('e-file'), prev = document.getElementById('e-preview'), dataUrl = '';
+    fileIn.addEventListener('change', function () {
+      dataUrl = ''; prev.classList.add('hidden');
+      var f = fileIn.files[0]; if (!f) return;
+      if (!/^image\/(png|jpeg)$/.test(f.type)) { note(emsg, 'Please choose a PNG or JPG image.'); fileIn.value = ''; return; }
+      if (f.size > 5 * 1024 * 1024) { note(emsg, 'That image is larger than 5 MB. Please make it smaller.'); fileIn.value = ''; return; }
+      var rd = new FileReader(); rd.onload = function () { dataUrl = rd.result; prev.src = dataUrl; prev.classList.remove('hidden'); }; rd.readAsDataURL(f);
+    });
+    ef.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (pending || !state.entriesOpen) { note(emsg, 'Contest entries are not open yet.'); return; }
+      if (!ef.checkValidity()) { ef.reportValidity(); return; }
+      if (!dataUrl) { note(emsg, 'Please choose your design image.'); return; }
+      var btn = ef.querySelector('button[type=submit]'); btn.disabled = true;
+      var data = new URLSearchParams(new FormData(ef)); data.set('form', 'entry'); data.set('image', dataUrl); data.set('source', location.hostname);
+      fetch(api, { method: 'POST', body: data }).then(function (r) { return r.json(); }).then(function (res) {
+        if (res.ok) { ef.reset(); dataUrl = ''; prev.classList.add('hidden'); eg.classList.add('hidden'); note(emsg, 'Thank you! Your design was received. It will appear in the gallery once a club officer has checked it.', true); }
+        else note(emsg, res.error || 'Something went wrong. Please try again.');
+      }).catch(function () { note(emsg, 'We couldn\u2019t send your design. Please try again.'); }).then(function () { btn.disabled = false; });
+    });
+
+    // Vote: email -> code -> cast
+    var vf = document.getElementById('vote-form'), vmsg = document.getElementById('vote-msg'), vEmail = document.getElementById('v-email');
+    document.getElementById('v-send').addEventListener('click', function () {
+      var em = vEmail.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { note(vmsg, 'Please enter the email you registered with.'); return; }
+      post({ form: 'code', email: em, source: location.hostname }).then(function (res) {
+        if (res.ok) { document.getElementById('v-code-field').classList.remove('hidden'); note(vmsg, 'We emailed you a 6-digit code. It works for 15 minutes (check your spam folder too).', true); codeIn.focus(); }
+        else note(vmsg, res.error || 'Something went wrong. Please try again.');
+      }).catch(function () { note(vmsg, 'We couldn\u2019t send the code. Please try again.'); });
+    });
+    codeIn.addEventListener('input', syncCast);
+    vf.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!state.choice) { note(vmsg, 'Please tick a design in the gallery first.'); return; }
+      castBtn.disabled = true;
+      post({ form: 'vote', email: vEmail.value.trim(), code: codeIn.value.trim(), entry: state.choice, source: location.hostname }).then(function (res) {
+        if (res.ok) { note(vmsg, 'Thank you! Your vote for \u201c' + state.choiceTitle + '\u201d is in. Results are announced when voting closes.', true); vf.querySelectorAll('input,button').forEach(function (x) { x.disabled = true; }); }
+        else { note(vmsg, res.error || 'Something went wrong. Please try again.'); syncCast(); }
+      }).catch(function () { note(vmsg, 'We couldn\u2019t record your vote. Please try again.'); syncCast(); });
+    });
   }
 
   // Partners page tabs (Partners / Donors / Advertise). Without this script all three sections simply show in turn.
