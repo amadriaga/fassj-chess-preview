@@ -29,6 +29,17 @@
     sync();
   }
 
+  // Register: the "sizes for the extra shirts" box appears (and is required) only when extra shirts > 0.
+  var extra = document.getElementById('r-extra'), extraBox = document.getElementById('extra-sizes');
+  if (extra && extraBox) {
+    var syncExtra = function () {
+      var more = Number(extra.value) > 0;
+      extraBox.classList.toggle('hidden', !more);
+      extraBox.querySelector('input').required = more;
+    };
+    extra.addEventListener('change', syncExtra); syncExtra();
+  }
+
   // Register and Partners/Advertise forms go to the club's Google Sheet (no email). A form stays "not open yet"
   // until its address replaces SHEET_URL_PENDING (scripts/set-chess-links.py).
   var sheetForms = document.querySelectorAll('form[data-sheet]');
@@ -50,6 +61,7 @@
             f.reset();
             var g = document.getElementById('guardian-section');
             if (g && f.contains(g)) { g.classList.add('hidden'); f.querySelectorAll('[data-guardian]').forEach(function (i) { i.required = false; }); }
+            if (extraBox && f.contains(extraBox)) { extraBox.classList.add('hidden'); extraBox.querySelector('input').required = false; }
             say('form-done');
           } else say('form-error', res.error || 'Something went wrong. Please try again.');
         })
