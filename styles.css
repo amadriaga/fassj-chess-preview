@@ -323,3 +323,13 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .fb-qr:hover { box-shadow: 0 0 0 2px var(--gold); }
 .fb-qr--light { margin-top: 28px; border: 1px solid var(--line); box-shadow: var(--shadow); }
 @media (max-width: 780px) { .cta-actions { justify-content: flex-start; } .fb-qr img { width: 88px; height: 88px; } }
+
+/* Pay with Zelle card (2026-11-20). The QR slot stays hidden until FASSJ's bank-app code is added */
+.zelle { margin-top: 24px; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+.zelle-to { margin-top: 14px !important; font-size: 1.05rem; color: var(--text) !important; }
+.zelle-steps { margin: 12px 0 14px; padding-left: 1.3em; color: var(--muted); }
+.zelle-steps li { margin: 6px 0; }
+.zelle-qr { margin: 0; text-align: center; }
+.zelle-qr img { width: 180px; height: 180px; display: block; background: #fff; padding: 8px; border: 1px solid var(--line); border-radius: 10px; }
+.zelle-qr figcaption { font-size: .82rem; color: var(--muted); margin-top: 8px; }
+@media (max-width: 780px) { .zelle { grid-template-columns: 1fr; } }
