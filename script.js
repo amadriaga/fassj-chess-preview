@@ -29,6 +29,30 @@
     sync();
   }
 
+  // Register: sign-ups go to the club's Google Sheet (no email). Nothing is sent until the address replaces SHEET_URL_PENDING.
+  var sheetForm = document.querySelector('form[data-sheet]');
+  if (sheetForm) {
+    var show = function (id, msg) {
+      ['form-notice', 'form-done', 'form-error'].forEach(function (n) { var el = document.getElementById(n); if (el) el.classList.remove('is-visible'); });
+      var el = document.getElementById(id); if (msg) el.textContent = msg; el.classList.add('is-visible'); el.focus();
+    };
+    sheetForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var url = sheetForm.getAttribute('action');
+      if (url.indexOf('SHEET_URL_PENDING') !== -1) { show('form-notice'); return; }
+      var btn = sheetForm.querySelector('button[type=submit]'); btn.disabled = true;
+      var body = new URLSearchParams(new FormData(sheetForm));
+      fetch(url, { method: 'POST', body: body })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.ok) { sheetForm.reset(); sheetForm.querySelectorAll('[data-guardian]').forEach(function (i) { i.required = false; }); document.getElementById('guardian-section').classList.add('hidden'); show('form-done'); }
+          else show('form-error', res.error || 'Something went wrong. Please try again.');
+        })
+        .catch(function () { show('form-error', 'We couldn\u2019t send your sign-up. Please try again, or register on our Facebook page.'); })
+        .then(function () { btn.disabled = false; });
+    });
+  }
+
   // Forms send to Formspree; until a real form ID replaces FORM_ID_PENDING, nothing is sent.
   var forms = document.querySelectorAll('form[data-formspree]');
   for (var k = 0; k < forms.length; k++) {

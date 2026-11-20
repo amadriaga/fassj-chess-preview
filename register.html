@@ -61,10 +61,10 @@
     </section>
     <section class="section">
       <div class="container split split--form">
-        <form class="form-card" id="register-form" data-formspree="register" action="https://formspree.io/f/FORM_ID_PENDING" method="POST">
+        <form class="form-card" id="register-form" data-sheet action="SHEET_URL_PENDING" method="POST">
           <h2 style="font-size:1.5rem">Sign up online</h2>
           <p class="form-intro">A short sign-up so we can contact you. The full membership form and waiver are signed on paper at your first club night.</p>
-          <input type="hidden" name="_subject" value="FASSJ Chess Club registration">
+          <input type="hidden" name="source" value="chess.fassj.org">
           <div class="hp" aria-hidden="true"><label for="gotcha">Leave this empty</label><input type="text" id="gotcha" name="_gotcha" tabindex="-1" autocomplete="off"></div>
           <div class="form-grid">
             <div class="field field--full"><label for="r-name">Player&rsquo;s full name <span class="req">*</span></label><input type="text" id="r-name" name="name" autocomplete="name" required></div>
@@ -81,6 +81,8 @@
             <div class="field field--full"><label class="consent"><input type="checkbox" name="agreement" value="yes" required> <span><b>I agree</b> that the club may contact me about membership. I understand the membership form and waiver are signed on paper at the first club night. <span class="req">*</span></span></label></div>
           </div>
           <div class="form-actions"><button class="btn btn-primary" type="submit">Sign up</button><p>Your sign-up goes only to the club officers. See <a href="/privacy.html">Privacy</a>.</p></div>
+          <div class="notice" id="form-done" tabindex="-1" role="status"><b>Thank you, you&rsquo;re signed up!</b> A club officer will contact you about membership.</div>
+          <div class="notice" id="form-error" tabindex="-1" role="alert"></div>
           <div class="notice" id="form-notice" tabindex="-1" role="status">Online sign-up isn&rsquo;t open yet. Please register on our <a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener">Facebook page</a> or bring the printed form to a club night.</div>
         </form>
         <aside>
