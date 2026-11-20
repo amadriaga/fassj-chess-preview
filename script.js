@@ -53,6 +53,37 @@
     });
   }
 
+  // Partners page tabs (Partners / Donors / Advertise). Without this script all three sections simply show in turn.
+  var tabs = document.querySelectorAll('.tab[role=tab]');
+  if (tabs.length) {
+    var show = function (id, focus) {
+      for (var i = 0; i < tabs.length; i++) {
+        var on = tabs[i].getAttribute('aria-controls') === id;
+        tabs[i].setAttribute('aria-selected', on ? 'true' : 'false'); tabs[i].tabIndex = on ? 0 : -1;
+        document.getElementById(tabs[i].getAttribute('aria-controls')).hidden = !on;
+        if (on && focus) tabs[i].focus();
+      }
+    };
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].addEventListener('click', function (e) { var id = e.currentTarget.getAttribute('aria-controls'); show(id); history.replaceState(null, '', '#' + id); });
+      tabs[t].addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var list = Array.prototype.slice.call(tabs), i = list.indexOf(e.currentTarget);
+        var next = list[(i + (e.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
+        show(next.getAttribute('aria-controls'), true);
+      });
+    }
+    var fromHash = function () { var id = (location.hash || '').slice(1); show(document.getElementById(id) && document.getElementById('tab-' + id) ? id : tabs[0].getAttribute('aria-controls')); };
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+  }
+
+  // Contact page: ?topic=advertising (from the Partners page and its QR code) pre-fills the message.
+  var msg = document.getElementById('c-message');
+  if (msg && /[?&]topic=advertising\b/.test(location.search) && !msg.value) {
+    msg.value = 'Hello, I would like to advertise my business on the FASSJ Chess Club website. Business name: \nWebsite: \nPhone: \n';
+  }
+
   // Forms send to Formspree in the background and say thank you on the same page.
   // Until a real form ID replaces FORM_ID_PENDING, nothing is sent. Without this script, Formspree's own thank-you page is the fallback.
   var forms = document.querySelectorAll('form[data-formspree]');
