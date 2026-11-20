@@ -127,15 +127,40 @@
             </article>
           </div>
           <h2 class="featured-head">Your business here</h2>
-          <article class="card partner partner--wide">
-            <div>
-              <h3>Advertise with the FASSJ Chess Club</h3>
-              <p>Local businesses can support the club and reach Filipino-American families across South Jersey. For a small fee, set by the club, your business can appear on this page with your logo, a short description and a link to your website.</p>
-              <p style="margin-top:12px">Interested? Send us a message and we&rsquo;ll get back to you with the details.</p>
-              <p style="margin-top:18px"><a class="btn btn-primary" href="/contact.html?topic=advertising">Ask about advertising</a></p>
-            </div>
-            <figure class="partner-qr"><img src="/assets/qr-advertise.svg" width="120" height="120" alt="QR code to ask about advertising"><figcaption>Scan to ask about advertising</figcaption></figure>
-          </article>
+          <div class="split split--form">
+            <form class="form-card" id="advertiser-form" data-sheet="advertiser" action="SHEET_URL_PENDING" method="POST">
+              <h3 style="margin:0">Advertise with the FASSJ Chess Club</h3>
+              <p class="form-intro">Tell us about your business and we&rsquo;ll get back to you with the details. There&rsquo;s a small fee, set by the club.</p>
+              <input type="hidden" name="form" value="advertiser">
+              <input type="hidden" name="source" value="chess.fassj.org">
+              <div class="hp" aria-hidden="true"><label for="a-gotcha">Leave this empty</label><input type="text" id="a-gotcha" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+              <div class="form-grid">
+                <div class="field"><label for="a-business">Business name <span class="req">*</span></label><input type="text" id="a-business" name="business_name" autocomplete="organization" required></div>
+                <div class="field"><label for="a-contact">Contact person <span class="req">*</span></label><input type="text" id="a-contact" name="contact_name" autocomplete="name" required></div>
+                <div class="field"><label for="a-email">Email <span class="req">*</span></label><input type="email" id="a-email" name="email" autocomplete="email" required></div>
+                <div class="field"><label for="a-phone">Phone</label><input type="tel" id="a-phone" name="phone" autocomplete="tel"></div>
+                <div class="field"><label for="a-website">Business website</label><input type="text" id="a-website" name="website" inputmode="url" placeholder="www.example.com"></div>
+                <div class="field"><label for="a-facebook">Business Facebook page</label><input type="text" id="a-facebook" name="facebook" inputmode="url" placeholder="facebook.com/yourbusiness"></div>
+                <div class="field"><label for="a-type">Type of business</label><input type="text" id="a-type" name="business_type" placeholder="e.g. bakery, travel agency"></div>
+                <fieldset class="field field--full"><legend>Interested in</legend><div class="checks checks--3"><label class="check"><input type="checkbox" name="interest" value="Ad on the website"> Ad on the website</label><label class="check"><input type="checkbox" name="interest" value="Sponsor a club event"> Sponsor a club event</label><label class="check"><input type="checkbox" name="interest" value="Other"> Other</label></div></fieldset>
+                <div class="field field--full"><label for="a-message">Message</label><textarea id="a-message" name="message" placeholder="Anything you&rsquo;d like us to know"></textarea></div>
+                <div class="field field--full"><label class="consent"><input type="checkbox" name="agreement" value="yes" required> <span><b>I agree</b> that the club may contact me about advertising. I understand there is a small fee, set by the club. <span class="req">*</span></span></label></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" type="submit">Send</button><p>Goes only to the club officers. See <a href="/privacy.html">Privacy</a>.</p></div>
+              <div class="notice" id="form-done" tabindex="-1" role="status"><b>Thank you!</b> A club officer will contact you about advertising.</div>
+              <div class="notice" id="form-error" tabindex="-1" role="alert"></div>
+              <div class="notice" id="form-notice" tabindex="-1" role="status">This form isn&rsquo;t open yet. Please <a href="/contact.html?topic=advertising">send us a message</a> instead.</div>
+            </form>
+            <aside>
+              <p class="eyebrow">What you get</p>
+              <ol class="aside-list">
+                <li><span class="dot">1</span><div><b>Your logo and a short description</b>On this page, seen by club members and their families.</div></li>
+                <li><span class="dot">2</span><div><b>A link to your website</b>So members can find you.</div></li>
+                <li><span class="dot">3</span><div><b>Support a local club</b>Your fee helps buy chess sets and clocks and run events for all ages.</div></li>
+              </ol>
+              <figure class="partner-qr" style="margin-top:28px"><img src="/assets/qr-advertise.svg" width="120" height="120" alt="QR code for this advertising form"><figcaption>Share this form</figcaption></figure>
+            </aside>
+          </div>
         </div>
       </div>
     </section>
@@ -166,6 +191,6 @@
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=206afcc08d"></script>
+  <script src="/script.js?v=7da827b3f0"></script>
 </body>
 </html>
