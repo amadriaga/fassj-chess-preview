@@ -412,3 +412,14 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .promo-actions .btn-ghost:hover { background: rgba(255,255,255,.1); }
 .ltd-ribbon { position: absolute; top: 14px; left: -6px; background: var(--gold); color: var(--ink); font-weight: 700; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; padding: 6px 12px; border-radius: 0 4px 4px 0; box-shadow: 0 4px 10px rgba(0,0,0,.25); }
 @media (max-width: 780px) { .promo-inner { grid-template-columns: 1fr; gap: 24px; } .promo-pic { max-width: 340px; } }
+
+/* About: the story behind the crest (2026-11-20) */
+.crest-story { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 48px; align-items: center; }
+.crest-fig { margin: 0; }
+.crest-fig img { width: 100%; height: auto; display: block; }
+.crest-story p { color: var(--muted); }
+.crest-list-intro { margin: 18px 0 6px; }
+.crest-list { margin: 0; padding-left: 1.2em; color: var(--muted); }
+.crest-list li { margin: 6px 0; }
+.crest-list b { color: var(--ink); }
+@media (max-width: 780px) { .crest-story { grid-template-columns: 1fr; gap: 24px; } .crest-fig { max-width: 240px; } }
