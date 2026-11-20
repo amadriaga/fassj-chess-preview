@@ -390,9 +390,9 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .shirt-zoom { position: relative; display: block; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 10px; }
 .shirt-zoom:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .zoom-hint { position: absolute; right: 8px; bottom: 8px; background: rgba(15, 27, 45, .78); color: #fff; font-size: .75rem; padding: 4px 8px; border-radius: 6px; }
-.lightbox { border: 0; border-radius: 14px; padding: 18px 18px 12px; max-width: min(92vw, 560px); background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+.lightbox { border: 0; border-radius: 14px; padding: 18px 18px 12px; max-width: min(92vw, 880px); background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
 .lightbox::backdrop { background: rgba(15, 27, 45, .72); }
-.lightbox img { display: block; width: 100%; max-width: 502px; height: auto; margin: 0 auto; }
+.lightbox img { display: block; width: 100%; max-width: 860px; max-height: 82vh; object-fit: contain; height: auto; margin: 0 auto; }
 .lightbox-caption { text-align: center; margin: 10px 0 0; color: var(--ink); font-weight: 600; }
 .lightbox-close { position: absolute; top: 6px; right: 8px; width: 40px; height: 40px; border: 0; background: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: var(--ink); }
 .lightbox-close:focus-visible { outline: 2px solid var(--gold); }
