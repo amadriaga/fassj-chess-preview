@@ -5,11 +5,11 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Register | FASSJ Chess Club</title>
-  <meta name="description" content="Register your interest and become a founding member of the FASSJ Chess Club.">
+  <meta name="description" content="Sign up for the FASSJ Chess Club online, on Facebook or with the printed form.">
   <link rel="canonical" href="https://chess.fassj.o2bot.com/register.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Register | FASSJ Chess Club">
-  <meta property="og:description" content="Register your interest and become a founding member of the FASSJ Chess Club.">
+  <meta property="og:description" content="Sign up for the FASSJ Chess Club online, on Facebook or with the printed form.">
   <meta property="og:url" content="https://chess.fassj.o2bot.com/register.html">
   <meta name="theme-color" content="#0f1b2d">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
@@ -36,7 +36,9 @@
         <li><a href="/about.html">About Us</a></li>
         <li><a href="/schedule.html">Schedule</a></li>
         <li><a href="/downloads.html">Downloads</a></li>
-        <li><a class="btn btn-primary" href="/register.html">Register</a></li>
+        <li><a href="/pay.html">Pay &amp; Donate</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+        <li><a class="btn btn-primary" href="/register.html" aria-current="page">Register</a></li>
       </ul>
     </div>
     <div class="tricolor" aria-hidden="true"></div>
@@ -54,31 +56,46 @@
       <div class="container">
         <p class="eyebrow">Registration</p>
         <h1>Become a founding member</h1>
-        <p class="lead">Registration opens <b style="color:#fff">Monday, November 23, 2026</b>, on our <a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener" style="color:#fff">Facebook page</a> and in person. We'll be in touch with membership details.</p>
+        <p class="lead">Sign up online in a minute, on our <a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener" style="color:#fff">Facebook page</a>, or with the printed form. Registration opens <b style="color:#fff">Monday, November 23, 2026</b>.</p>
       </div>
     </section>
-
     <section class="section">
       <div class="container split split--form">
-        <div class="form-card">
-          <h2 style="font-size:1.5rem">How to register</h2>
-          <p>Registration for the FASSJ Chess Club is on our Facebook page, or in person with the printed membership form and waiver.</p>
-          <div class="hero-actions">
+        <form class="form-card" id="register-form" data-formspree="register" action="https://formspree.io/f/FORM_ID_PENDING" method="POST">
+          <h2 style="font-size:1.5rem">Sign up online</h2>
+          <p class="form-intro">A short sign-up so we can contact you. The full membership form and waiver are signed on paper at your first club night.</p>
+          <input type="hidden" name="_subject" value="FASSJ Chess Club registration">
+          <div class="hp" aria-hidden="true"><label for="gotcha">Leave this empty</label><input type="text" id="gotcha" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+          <div class="form-grid">
+            <div class="field field--full"><label for="r-name">Player&rsquo;s full name <span class="req">*</span></label><input type="text" id="r-name" name="name" autocomplete="name" required></div>
+            <fieldset class="field field--full"><legend>Age group <span class="req">*</span></legend><div class="checks">
+              <label class="check"><input type="radio" name="age_group" value="Adult (18+)" required> Adult (18 or older)</label>
+              <label class="check"><input type="radio" name="age_group" value="Under 18" id="r-minor"> Under 18</label>
+            </div></fieldset>
+            <div class="field field--full hidden" id="guardian-section"><label for="r-guardian">Parent or guardian&rsquo;s full name <span class="req">*</span></label><input type="text" id="r-guardian" name="guardian_name" autocomplete="name" data-guardian><span class="note" style="margin-top:2px">For players under 18, please give the parent or guardian&rsquo;s email and phone below.</span></div>
+            <div class="field"><label for="r-email">Email <span class="req">*</span></label><input type="email" id="r-email" name="email" autocomplete="email" required></div>
+            <div class="field"><label for="r-phone">Phone</label><input type="tel" id="r-phone" name="phone" autocomplete="tel"></div>
+            <fieldset class="field field--full"><legend>Chess experience</legend><div class="checks"><label class="check"><input type="radio" name="experience" value="New to chess"> New to chess</label><label class="check"><input type="radio" name="experience" value="Casual player"> Casual player</label><label class="check"><input type="radio" name="experience" value="Club player"> Club player</label><label class="check"><input type="radio" name="experience" value="Rated player"> Rated player</label></div></fieldset>
+            <div class="field field--full"><label for="r-heard">How did you hear about us?</label><input type="text" id="r-heard" name="heard_about_us"></div>
+            <div class="field field--full"><label for="r-note">Anything we should know?</label><textarea id="r-note" name="note" placeholder="Questions, preferred club night, etc. Please don&rsquo;t include medical details here."></textarea></div>
+            <div class="field field--full"><label class="consent"><input type="checkbox" name="agreement" value="yes" required> <span><b>I agree</b> that the club may contact me about membership. I understand the membership form and waiver are signed on paper at the first club night. <span class="req">*</span></span></label></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-primary" type="submit">Sign up</button><p>Your sign-up goes only to the club officers. See <a href="/privacy.html">Privacy</a>.</p></div>
+          <div class="notice" id="form-notice" tabindex="-1" role="status">Online sign-up isn&rsquo;t open yet. Please register on our <a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener">Facebook page</a> or bring the printed form to a club night.</div>
+        </form>
+        <aside>
+          <p class="eyebrow">Other ways to register</p>
+          <div class="hero-actions" style="margin-top:0">
             <a class="btn btn-primary" href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener">Register on Facebook</a>
             <a class="btn btn-outline" href="/downloads/fassj-chess-club-membership-form-and-waiver-black-and-white.pdf" download>Printable form (PDF)</a>
           </div>
-          <p class="note">Print both pages, sign them, and bring them to any club night. Members under 18 need a parent or guardian to sign.</p>
-        </div>
-
-        <aside>
-          <p class="eyebrow">What happens next</p>
-          <h2 style="font-size:1.6rem">Three simple steps</h2>
+          <p class="eyebrow" style="margin-top:36px">What happens next</p>
           <ol class="aside-list">
-            <li><span class="dot">1</span><div><b>We receive your registration</b>On Facebook or on the printed form; your details go only to the club officers.</div></li>
-            <li><span class="dot">2</span><div><b>We get in touch</b>We'll email you membership details as they're finalised.</div></li>
-            <li><span class="dot">3</span><div><b>You're invited</b>Founding members hear about the inaugural club night first.</div></li>
+            <li><span class="dot">1</span><div><b>We receive your sign-up</b>Online, on Facebook or on the printed form; your details go only to the club officers.</div></li>
+            <li><span class="dot">2</span><div><b>We get in touch</b>We&rsquo;ll email you membership details and the membership fee.</div></li>
+            <li><span class="dot">3</span><div><b>Sign the form at your first club night</b>The membership form and waiver are signed on paper. Members under 18 need a parent or guardian to sign.</div></li>
           </ol>
-          <p class="note" style="margin-top:28px">Walk-ins are welcome at club sessions.</p>
+          <p class="note" style="margin-top:28px">Walk-ins are welcome at club sessions. Fees and donations: <a href="/pay.html">Pay &amp; Donate</a>.</p>
         </aside>
       </div>
     </section>
@@ -96,7 +113,7 @@
         </div>
         <div>
           <h4>Club</h4>
-          <ul><li><a href="/about.html">About Us</a></li><li><a href="/schedule.html">Schedule</a></li><li><a href="/downloads.html">Downloads</a></li><li><a href="/register.html">Register</a></li><li><a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener">Facebook</a></li></ul>
+          <ul><li><a href="/about.html">About Us</a></li><li><a href="/schedule.html">Schedule</a></li><li><a href="/downloads.html">Downloads</a></li><li><a href="/register.html">Register</a></li><li><a href="/pay.html">Pay &amp; Donate</a></li><li><a href="/contact.html">Contact</a></li><li><a href="https://www.facebook.com/profile.php?id=61596920540950" rel="noopener">Facebook</a></li></ul>
         </div>
         <div>
           <h4>Location</h4>
