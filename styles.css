@@ -397,3 +397,18 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .lightbox-close { position: absolute; top: 6px; right: 8px; width: 40px; height: 40px; border: 0; background: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: var(--ink); }
 .lightbox-close:focus-visible { outline: 2px solid var(--gold); }
 .shirt-credit { margin-top: 14px !important; padding: 10px 14px; border-left: 3px solid var(--gold); background: var(--ivory); border-radius: 0 8px 8px 0; color: var(--text) !important; font-size: .95rem; }
+
+/* Limited-edition inaugural T-shirt promo (2026-11-20) */
+.promo-shirt { background: linear-gradient(135deg, var(--ink) 0%, #1c2c46 100%); color: #dfe5ee; border-top: 3px solid var(--gold); border-bottom: 3px solid var(--gold); padding: 44px 0; }
+.promo-inner { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 44px; align-items: center; }
+.promo-pic { padding: 0; border: 0; background: #fff; border-radius: 14px; overflow: hidden; cursor: zoom-in; box-shadow: 0 18px 40px rgba(0,0,0,.35); }
+.promo-pic img { display: block; width: 100%; height: auto; }
+.promo-pic:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.promo-ribbon { display: inline-block; margin: 0 0 14px; padding: 6px 14px; background: var(--gold); color: var(--ink); font-weight: 700; font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; border-radius: 4px; transform: rotate(-1.5deg); box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+.promo-text h2 { color: #fff; margin: 0 0 10px; }
+.promo-text p:not(.promo-ribbon) { color: #c9d2df; margin: 0; max-width: 56ch; }
+.promo-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.promo-actions .btn-ghost { font: inherit; cursor: pointer; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.55); }
+.promo-actions .btn-ghost:hover { background: rgba(255,255,255,.1); }
+.ltd-ribbon { position: absolute; top: 14px; left: -6px; background: var(--gold); color: var(--ink); font-weight: 700; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; padding: 6px 12px; border-radius: 0 4px 4px 0; box-shadow: 0 4px 10px rgba(0,0,0,.25); }
+@media (max-width: 780px) { .promo-inner { grid-template-columns: 1fr; gap: 24px; } .promo-pic { max-width: 340px; } }
