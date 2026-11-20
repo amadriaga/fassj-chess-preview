@@ -464,3 +464,9 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .edition-note { margin: 8px 0 0; font-size: .9rem; color: var(--muted); font-style: italic; }
 .edition-card--next { border-style: dashed; }
 .edition-empty { aspect-ratio: 1200 / 1158; display: grid; place-items: center; text-decoration: none; color: var(--gold); font-weight: 700; font-size: 1.2rem; background: repeating-linear-gradient(45deg, #fff, #fff 14px, #faf5e8 14px, #faf5e8 28px); cursor: pointer; }
+
+/* "Who's registered" list (2026-11-20) */
+.roster-count { font-size: 1.1rem; color: var(--ink); margin: 0 0 14px; }
+.roster-wrap { max-width: 640px; overflow-x: auto; }
+.roster-table { min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.note-inline { display: block; margin-top: 4px; color: var(--muted); font-size: .9rem; }

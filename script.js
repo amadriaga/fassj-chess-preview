@@ -40,6 +40,26 @@
     extra.addEventListener('change', syncExtra); syncExtra();
   }
 
+  // Register: "Who's registered" list (opt-in names only, spec §27). Hidden if the list can't load.
+  var roster = document.getElementById('roster'), regForm = document.querySelector('form[data-sheet="register"]');
+  if (roster && regForm) {
+    var minorNote = document.getElementById('list-minor-note');
+    regForm.querySelectorAll('input[name=age_group]').forEach(function (r) { r.addEventListener('change', function () { if (minorNote) minorNote.hidden = !regForm.querySelector('#r-minor:checked'); }); });
+    var rurl = regForm.getAttribute('action');
+    if (rurl.indexOf('SHEET_URL_PENDING') === -1) {
+      fetch(rurl + '?action=roster').then(function (r) { return r.json(); }).then(function (res) {
+        if (!res || !res.ok) return;
+        var body = document.getElementById('roster-body'), list = res.players || [];
+        document.getElementById('roster-count').textContent = res.total === 1 ? '1 player has registered so far.' : res.total + ' players have registered so far.';
+        body.innerHTML = list.length ? list.map(function (p) {
+          var d = document.createElement('tr'), a = document.createElement('td'), b = document.createElement('td');
+          a.textContent = p.name; b.textContent = p.level || '\u2014'; d.appendChild(a); d.appendChild(b); return d.outerHTML;
+        }).join('') : '<tr><td colspan="2">No one has chosen to be listed yet. Be the first!</td></tr>';
+        roster.classList.remove('hidden');
+      }).catch(function () {});
+    }
+  }
+
   // Register and Partners/Advertise forms go to the club's Google Sheet (no email). A form stays "not open yet"
   // until its address replaces SHEET_URL_PENDING (scripts/set-chess-links.py).
   var sheetForms = document.querySelectorAll('form[data-sheet]');

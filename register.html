@@ -18,7 +18,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=2691b9bf71">
+  <link rel="stylesheet" href="/styles.css?v=f362a916d6">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">Review copy for the FASSJ committee &mdash; not the official site</div>
@@ -82,6 +82,7 @@
             <div class="field field--full hidden" id="extra-sizes"><label for="r-extra-sizes">Sizes for the extra shirts <span class="req">*</span></label><input type="text" id="r-extra-sizes" name="extra_sizes" placeholder="e.g. 1 Adult M, 1 Youth S" data-extra></div>
             <div class="field field--full"><label for="r-heard">How did you hear about us?</label><input type="text" id="r-heard" name="heard_about_us"></div>
             <div class="field field--full"><label for="r-note">Anything we should know?</label><textarea id="r-note" name="note" placeholder="Questions, preferred club night, etc. Please don&rsquo;t include medical details here."></textarea></div>
+            <div class="field field--full"><label class="consent"><input type="checkbox" name="show_on_list" value="yes"> <span><b>Show my first name and last initial</b> (e.g. &ldquo;Juan D.&rdquo;) on the &ldquo;Who&rsquo;s registered&rdquo; list below, so friends can see I&rsquo;ve joined. <span class="note-inline" id="list-minor-note" hidden>For players under 18, ticking this means the parent or guardian agrees.</span></span></label></div>
             <div class="field field--full"><label class="consent"><input type="checkbox" name="agreement" value="yes" required> <span><b>I agree</b> that the club may contact me about membership. I understand the membership form and waiver are signed on paper at the first club night. <span class="req">*</span></span></label></div>
           </div>
           <div class="form-actions"><button class="btn btn-primary" type="submit">Sign up</button><p>Your sign-up goes only to the club officers. See <a href="/privacy.html">Privacy</a>.</p></div>
@@ -111,6 +112,17 @@
       <img alt="">
       <p class="lightbox-caption"></p>
     </dialog>
+    <section class="section section--ivory hidden" id="roster">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Who&rsquo;s registered</p>
+          <h2>See who&rsquo;s already joined</h2>
+        </div>
+        <p class="roster-count" id="roster-count"></p>
+        <div class="roster-wrap"><table class="roster-table"><thead><tr><th scope="col">Name</th><th scope="col">Chess experience</th></tr></thead><tbody id="roster-body"></tbody></table></div>
+        <p class="note">Only players who chose to be listed appear here, as first name and last initial. To be added, tick the box when you sign up; to be removed, <a href="/contact.html">contact us</a>.</p>
+      </div>
+    </section>
   </main>
 
   <aside class="contest-strip" aria-label="T-shirt design contest">
@@ -137,10 +149,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 70 · Nov 20, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 71 · Nov 20, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=ba7044657b"></script>
+  <script src="/script.js?v=f3c1e2142d"></script>
 </body>
 </html>
