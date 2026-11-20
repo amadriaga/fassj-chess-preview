@@ -423,3 +423,18 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .crest-list li { margin: 6px 0; }
 .crest-list b { color: var(--ink); }
 @media (max-width: 780px) { .crest-story { grid-template-columns: 1fr; gap: 24px; } .crest-fig { max-width: 240px; } }
+
+/* 2028 T-shirt design contest (2026-11-20) */
+.contest-strip { background: linear-gradient(90deg, #b8913a, #d4b06a); color: var(--ink); }
+.contest-strip-inner { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; font-size: .95rem; text-align: center; }
+.contest-strip a { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.contest-trophy { font-size: 1.3rem; line-height: 1; }
+.contest { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: center; }
+.contest p:not(.eyebrow) { color: var(--muted); max-width: 62ch; }
+.contest .btn-outline { font: inherit; cursor: zoom-in; }
+.contest-badge { display: grid; justify-items: center; gap: 6px; text-align: center; padding: 28px 20px; border-radius: 14px; background: var(--ink); color: #c9d2df; border: 2px solid var(--gold); box-shadow: var(--shadow); }
+.contest-badge .contest-trophy { font-size: 2.6rem; }
+.contest-badge b { color: #fff; font-size: 1.15rem; }
+@media (max-width: 780px) { .contest { grid-template-columns: 1fr; } }
+/* Links that jump to a section (#…) stop below the sticky menu bar */
+section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
