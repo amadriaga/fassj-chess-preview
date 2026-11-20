@@ -470,3 +470,8 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .roster-wrap { max-width: 640px; overflow-x: auto; }
 .roster-table { min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .note-inline { display: block; margin-top: 4px; color: var(--muted); font-size: .9rem; }
+
+/* Extra shirts: one size row per shirt (2026-11-20) */
+.extra-sizes { grid-column: 1 / -1; display: grid; gap: 14px; }
+.extra-sizes.hidden { display: none !important; }
+.extra-grid { gap: 14px 22px; }

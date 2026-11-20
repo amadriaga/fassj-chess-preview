@@ -18,7 +18,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=f362a916d6">
+  <link rel="stylesheet" href="/styles.css?v=a7065679e4">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">Review copy for the FASSJ committee &mdash; not the official site</div>
@@ -78,8 +78,12 @@
             <div class="field"><label for="r-phone">Phone</label><input type="tel" id="r-phone" name="phone" autocomplete="tel"></div>
             <fieldset class="field field--full"><legend>Chess experience</legend><div class="checks"><label class="check"><input type="radio" name="experience" value="New to chess"> New to chess</label><label class="check"><input type="radio" name="experience" value="Casual player"> Casual player</label><label class="check"><input type="radio" name="experience" value="Club player"> Club player</label><label class="check"><input type="radio" name="experience" value="Rated player"> Rated player</label></div></fieldset>
             <div class="field"><label for="r-shirt">T-shirt size <span class="req">*</span></label><select id="r-shirt" name="shirt_size" required><option value="" selected disabled>Choose a size</option><option>Youth S</option><option>Youth M</option><option>Youth L</option><option>Adult S</option><option>Adult M</option><option>Adult L</option><option>Adult XL</option><option>Adult 2XL</option><option>Adult 3XL</option><option>Not sure yet</option></select><span class="note" style="margin-top:2px">The 2027 season club T-shirt is included with membership.</span></div>
-            <div class="field"><label for="r-extra">Extra shirts to buy</label><select id="r-extra" name="extra_shirts"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><span class="note" style="margin-top:2px">Extra shirts cost extra (price to be announced); we&rsquo;ll confirm before you pay.</span></div>
-            <div class="field field--full hidden" id="extra-sizes"><label for="r-extra-sizes">Sizes for the extra shirts <span class="req">*</span></label><input type="text" id="r-extra-sizes" name="extra_sizes" placeholder="e.g. 1 Adult M, 1 Youth S" data-extra></div>
+            <div class="field"><label for="r-extra">Extra shirts to buy</label><select id="r-extra" name="extra_shirts"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option value="5 or more">5 or more</option></select><span class="note" style="margin-top:2px">Extra shirts cost extra (price to be announced); we&rsquo;ll confirm before you pay.</span></div>
+            <div class="field--full extra-sizes hidden" id="extra-sizes">
+              <div class="form-grid extra-grid"><div class="field extra-row hidden" data-extra-row="1"><label for="r-extra-1">Extra shirt 1 size <span class="req">*</span></label><select id="r-extra-1"><option value="" selected disabled>Choose a size</option><option>Youth S</option><option>Youth M</option><option>Youth L</option><option>Adult S</option><option>Adult M</option><option>Adult L</option><option>Adult XL</option><option>Adult 2XL</option><option>Adult 3XL</option></select></div><div class="field extra-row hidden" data-extra-row="2"><label for="r-extra-2">Extra shirt 2 size <span class="req">*</span></label><select id="r-extra-2"><option value="" selected disabled>Choose a size</option><option>Youth S</option><option>Youth M</option><option>Youth L</option><option>Adult S</option><option>Adult M</option><option>Adult L</option><option>Adult XL</option><option>Adult 2XL</option><option>Adult 3XL</option></select></div><div class="field extra-row hidden" data-extra-row="3"><label for="r-extra-3">Extra shirt 3 size <span class="req">*</span></label><select id="r-extra-3"><option value="" selected disabled>Choose a size</option><option>Youth S</option><option>Youth M</option><option>Youth L</option><option>Adult S</option><option>Adult M</option><option>Adult L</option><option>Adult XL</option><option>Adult 2XL</option><option>Adult 3XL</option></select></div><div class="field extra-row hidden" data-extra-row="4"><label for="r-extra-4">Extra shirt 4 size <span class="req">*</span></label><select id="r-extra-4"><option value="" selected disabled>Choose a size</option><option>Youth S</option><option>Youth M</option><option>Youth L</option><option>Adult S</option><option>Adult M</option><option>Adult L</option><option>Adult XL</option><option>Adult 2XL</option><option>Adult 3XL</option></select></div></div>
+              <div class="field extra-many hidden" id="extra-many"><label for="r-extra-many">Sizes for the extra shirts</label><input type="text" id="r-extra-many" value="Please call me for the sizes"></div>
+              <input type="hidden" name="extra_sizes" id="r-extra-sizes">
+            </div>
             <div class="field field--full"><label for="r-heard">How did you hear about us?</label><input type="text" id="r-heard" name="heard_about_us"></div>
             <div class="field field--full"><label for="r-note">Anything we should know?</label><textarea id="r-note" name="note" placeholder="Questions, preferred club night, etc. Please don&rsquo;t include medical details here."></textarea></div>
             <div class="field field--full"><label class="consent"><input type="checkbox" name="show_on_list" value="yes"> <span><b>Show my first name and last initial</b> (e.g. &ldquo;Juan D.&rdquo;) on the &ldquo;Who&rsquo;s registered&rdquo; list below, so friends can see I&rsquo;ve joined. <span class="note-inline" id="list-minor-note" hidden>For players under 18, ticking this means the parent or guardian agrees.</span></span></label></div>
@@ -149,10 +153,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 71 · Nov 20, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 72 · Nov 20, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=f3c1e2142d"></script>
+  <script src="/script.js?v=b940a39730"></script>
 </body>
 </html>

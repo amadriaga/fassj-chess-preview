@@ -29,15 +29,32 @@
     sync();
   }
 
-  // Register: the "sizes for the extra shirts" box appears (and is required) only when extra shirts > 0.
+  // Register: extra shirts. 1-4 = one size drop-down per shirt (each required); "5 or more" = one text box pre-filled
+  // "Please call me for the sizes". The choices are joined into the hidden extra_sizes field (spec §22).
   var extra = document.getElementById('r-extra'), extraBox = document.getElementById('extra-sizes');
   if (extra && extraBox) {
+    var many = document.getElementById('extra-many'), manyIn = document.getElementById('r-extra-many'), joined = document.getElementById('r-extra-sizes');
+    var rows = extraBox.querySelectorAll('[data-extra-row]');
     var syncExtra = function () {
-      var more = Number(extra.value) > 0;
-      extraBox.classList.toggle('hidden', !more);
-      extraBox.querySelector('input').required = more;
+      var v = extra.value, n = v === '5 or more' ? 5 : Number(v);
+      extraBox.classList.toggle('hidden', n === 0);
+      for (var i = 0; i < rows.length; i++) {
+        var on = n >= 1 && n <= 4 && i < n, sel = rows[i].querySelector('select');
+        rows[i].classList.toggle('hidden', !on); sel.required = on;
+      }
+      many.classList.toggle('hidden', n !== 5); manyIn.required = n === 5;
+      if (n === 5 && !manyIn.value.trim()) manyIn.value = 'Please call me for the sizes';
+    };
+    var joinSizes = function () {
+      var v = extra.value, n = v === '5 or more' ? 5 : Number(v), out = [];
+      if (n === 5) { joined.value = manyIn.value.trim(); return; }
+      for (var i = 0; i < n; i++) out.push('Shirt ' + (i + 1) + ': ' + rows[i].querySelector('select').value);
+      joined.value = out.join('; ');
     };
     extra.addEventListener('change', syncExtra); syncExtra();
+    var rf = document.getElementById('register-form');
+    rf.addEventListener('submit', joinSizes, true);            // runs before the form is sent
+    rf.addEventListener('reset', function () { setTimeout(syncExtra, 0); });
   }
 
   // Register: "Who's registered" list (opt-in names only, spec §27). Hidden if the list can't load.
@@ -81,7 +98,7 @@
             f.reset();
             var g = document.getElementById('guardian-section');
             if (g && f.contains(g)) { g.classList.add('hidden'); f.querySelectorAll('[data-guardian]').forEach(function (i) { i.required = false; }); }
-            if (extraBox && f.contains(extraBox)) { extraBox.classList.add('hidden'); extraBox.querySelector('input').required = false; }
+            if (extraBox && f.contains(extraBox)) { extraBox.classList.add('hidden'); }
             say('form-done');
           } else say('form-error', res.error || 'Something went wrong. Please try again.');
         })
