@@ -58,6 +58,25 @@
     });
   }
 
+  // Bigger picture in a pop-up: any element with data-lightbox="<image>" (Pay & Donate T-shirt card).
+  var box = document.querySelector('dialog.lightbox');
+  if (box && box.showModal) {
+    var last = null, img = box.querySelector('img'), cap = box.querySelector('.lightbox-caption');
+    var openers = document.querySelectorAll('[data-lightbox]');
+    for (var lb = 0; lb < openers.length; lb++) {
+      openers[lb].addEventListener('click', function (e) {
+        last = e.currentTarget;
+        img.src = last.getAttribute('data-lightbox');
+        img.alt = (last.querySelector('img') || {}).alt || '';
+        cap.textContent = last.getAttribute('data-caption') || '';
+        box.showModal();
+      });
+    }
+    box.querySelector('.lightbox-close').addEventListener('click', function () { box.close(); });
+    box.addEventListener('click', function (e) { if (e.target === box) box.close(); });   // click outside the picture
+    box.addEventListener('close', function () { if (last) last.focus(); });
+  }
+
   // Partners page tabs (Partners / Donors / Advertise). Without this script all three sections simply show in turn.
   var tabs = document.querySelectorAll('.tab[role=tab]');
   if (tabs.length) {

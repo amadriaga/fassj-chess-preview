@@ -376,7 +376,7 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 @media (max-width: 560px) { .info-table, .info-table tbody, .info-table tr, .info-table th, .info-table td { display: block; width: auto; min-width: 0; } .info-table th { border-bottom: 0; padding-bottom: 2px; } }
 
 /* Club T-shirt (2026-11-20) */
-.shirt { display: grid; grid-template-columns: 260px 1fr; gap: 32px; align-items: center; }
+.shirt { display: grid; grid-template-columns: minmax(0, 502px) minmax(0, 1fr); gap: 40px; align-items: center; }
 .shirt img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
 .shirt h3 { margin-top: 2px; }
 .shirt p:not(.tag) { margin-top: 10px; }
@@ -384,4 +384,15 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .shirt-mini img { width: 88px; height: auto; display: block; }
 .shirt-mini b { display: block; color: var(--ink); }
 .shirt-mini:hover { box-shadow: 0 0 0 2px var(--gold); }
-@media (max-width: 780px) { .shirt { grid-template-columns: 1fr; } .shirt img { max-width: 300px; } }
+@media (max-width: 900px) { .shirt { grid-template-columns: 1fr; gap: 24px; } .shirt-zoom { max-width: 502px; } }
+
+/* Bigger picture pop-up (2026-11-20) */
+.shirt-zoom { position: relative; display: block; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 10px; }
+.shirt-zoom:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.zoom-hint { position: absolute; right: 8px; bottom: 8px; background: rgba(15, 27, 45, .78); color: #fff; font-size: .75rem; padding: 4px 8px; border-radius: 6px; }
+.lightbox { border: 0; border-radius: 14px; padding: 18px 18px 12px; max-width: min(92vw, 560px); background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+.lightbox::backdrop { background: rgba(15, 27, 45, .72); }
+.lightbox img { display: block; width: 100%; max-width: 502px; height: auto; margin: 0 auto; }
+.lightbox-caption { text-align: center; margin: 10px 0 0; color: var(--ink); font-weight: 600; }
+.lightbox-close { position: absolute; top: 6px; right: 8px; width: 40px; height: 40px; border: 0; background: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: var(--ink); }
+.lightbox-close:focus-visible { outline: 2px solid var(--gold); }
