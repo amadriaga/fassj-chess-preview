@@ -380,7 +380,7 @@ legend { font-weight: 600; font-size: .92rem; color: var(--ink); }
 .shirt img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
 .shirt h3 { margin-top: 2px; }
 .shirt p:not(.tag) { margin-top: 10px; }
-.shirt-mini { display: grid; grid-template-columns: 88px 1fr; gap: 14px; align-items: center; margin-top: 28px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; text-decoration: none; color: var(--muted); font-size: .92rem; }
+.shirt-mini { font: inherit; text-align: left; cursor: zoom-in; width: 100%; display: grid; grid-template-columns: 88px 1fr; gap: 14px; align-items: center; margin-top: 28px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; text-decoration: none; color: var(--muted); font-size: .92rem; }
 .shirt-mini img { width: 88px; height: auto; display: block; }
 .shirt-mini b { display: block; color: var(--ink); }
 .shirt-mini:hover { box-shadow: 0 0 0 2px var(--gold); }
