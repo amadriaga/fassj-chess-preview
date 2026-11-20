@@ -53,16 +53,27 @@
     });
   }
 
-  // Forms send to Formspree; until a real form ID replaces FORM_ID_PENDING, nothing is sent.
+  // Forms send to Formspree in the background and say thank you on the same page.
+  // Until a real form ID replaces FORM_ID_PENDING, nothing is sent. Without this script, Formspree's own thank-you page is the fallback.
   var forms = document.querySelectorAll('form[data-formspree]');
   for (var k = 0; k < forms.length; k++) {
     forms[k].addEventListener('submit', function (e) {
       var f = e.currentTarget;
-      if (f.getAttribute('action').indexOf('FORM_ID_PENDING') !== -1) {
-        e.preventDefault();
-        var notice = f.querySelector('.notice');
-        if (notice) { notice.classList.add('is-visible'); notice.focus(); }
-      }
+      e.preventDefault();
+      var say = function (id, msg) {
+        ['form-notice', 'form-done', 'form-error'].forEach(function (n) { var el = f.querySelector('#' + n); if (el) el.classList.remove('is-visible'); });
+        var el = f.querySelector('#' + id); if (!el) return; if (msg) el.textContent = msg; el.classList.add('is-visible'); el.focus();
+      };
+      if (f.getAttribute('action').indexOf('FORM_ID_PENDING') !== -1) { say('form-notice'); return; }
+      var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+      fetch(f.getAttribute('action'), { method: 'POST', body: new FormData(f), headers: { Accept: 'application/json' } })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (res.ok) { f.reset(); say('form-done'); }
+          else say('form-error', (res.j && res.j.errors && res.j.errors.map(function (x) { return x.message; }).join(' ')) || 'Something went wrong. Please try again.');
+        })
+        .catch(function () { say('form-error', 'We couldn\u2019t send your message. Please try again, or message us on Facebook.'); })
+        .then(function () { btn.disabled = false; });
     });
   }
 })();
