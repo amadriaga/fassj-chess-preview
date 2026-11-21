@@ -99,6 +99,70 @@
     }
   }
 
+  // Register: officers sign in with email + Google Authenticator code and approve forms with a tick (spec §28.5a).
+  var obox = document.getElementById('officer-box'), regF = document.getElementById('register-form');
+  if (obox && regF) {
+    var oapi = regF.getAttribute('action'), olog = document.getElementById('officer-login'), opan = document.getElementById('officer-panel');
+    var omsg = document.getElementById('officer-msg'), lmsg = document.getElementById('officer-login-msg'), obody = document.getElementById('officer-body');
+    var tok = function (v) { try { if (v === undefined) return sessionStorage.getItem('fassjOfficer') || ''; if (v) sessionStorage.setItem('fassjOfficer', v); else sessionStorage.removeItem('fassjOfficer'); } catch (e) { return ''; } };
+    var post = function (data) { return fetch(oapi, { method: 'POST', body: new URLSearchParams(data) }).then(function (r) { return r.json(); }); };
+    var say = function (el, m, good) { el.textContent = m || ''; el.classList.toggle('ok', !!good); };
+    var signOut = function (m) { tok(''); opan.classList.add('hidden'); olog.classList.remove('hidden'); say(lmsg, m || ''); };
+    var cell = function (tr, x) { var td = document.createElement('td'); if (typeof x === 'string') td.textContent = x; else if (x) td.appendChild(x); tr.appendChild(td); return td; };
+    var openPdf = function (id, btn) {
+      btn.disabled = true; say(omsg, 'Opening ' + id + '…', true);
+      post({ form: 'officer_pdf', token: tok(), id: id }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) return say(omsg, res.error);
+        var bin = atob(res.pdf), bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        var url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })), a = document.createElement('a');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.download = 'FASSJ-Chess-Club-form-' + id + '.pdf'; document.body.appendChild(a); a.click(); a.remove();
+        say(omsg, '');
+      }).catch(function () { say(omsg, 'Couldn’t open the PDF. Please try again.'); }).then(function () { btn.disabled = false; });
+    };
+    var load = function () {
+      post({ form: 'officer_forms', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) return say(omsg, res.error);
+        document.getElementById('officer-name').textContent = res.name;
+        olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
+        if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
+        res.forms.forEach(function (f) {
+          var tr = document.createElement('tr'), b = document.createElement('button'), box = document.createElement('input'), lab = document.createElement('label'), by = document.createElement('span');
+          cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); cell(tr, f.signedAt.replace(/ at .*/, ''));
+          b.type = 'button'; b.className = 'link'; b.textContent = 'View'; b.addEventListener('click', function () { openPdf(f.id, b); }); cell(tr, b);
+          box.type = 'checkbox'; box.setAttribute('aria-label', 'Approve form ' + f.id); by.className = 'by';
+          var done = function (who) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; };
+          lab.appendChild(box); lab.appendChild(by);
+          if (f.status === 'Approved') done(f.approvedBy);
+          box.addEventListener('change', function () {
+            if (!box.checked) return;
+            if (!window.confirm('Approve form ' + f.id + ' for ' + f.name + '?\n\nThis signs the approval electronically in your name.')) { box.checked = false; return; }
+            box.disabled = true; say(omsg, 'Approving ' + f.id + '…', true);
+            post({ form: 'officer_approve', token: tok(), id: f.id }).then(function (res) {
+              if (res.signedOut) return signOut(res.error);
+              if (!res.ok) { box.checked = false; box.disabled = false; return say(omsg, res.error); }
+              done(res.approvedBy); say(omsg, f.id + ' approved. The approved PDF is saved.', true);
+            }).catch(function () { box.checked = false; box.disabled = false; say(omsg, 'Couldn’t save. Please try again.'); });
+          });
+          cell(tr, lab); obody.appendChild(tr);
+        });
+      }).catch(function () { say(omsg, 'Couldn’t load the forms. Please try again.'); });
+    };
+    document.getElementById('officer-open').addEventListener('click', function () { if (tok()) load(); else olog.classList.toggle('hidden'); });
+    document.getElementById('officer-out').addEventListener('click', function () { signOut('Signed out.'); });
+    olog.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = olog.querySelector('button'); btn.disabled = true; say(lmsg, '');
+      post({ form: 'officer_login', email: olog.email.value, code: olog.code.value }).then(function (res) {
+        if (!res.ok) return say(lmsg, res.error);
+        tok(res.token); olog.reset(); load();
+      }).catch(function () { say(lmsg, 'Couldn’t sign in. Please try again.'); }).then(function () { btn.disabled = false; });
+    });
+    if (tok()) load();
+  }
+
   // Register and Partners/Advertise forms go to the club's Google Sheet (no email). A form stays "not open yet"
   // until its address replaces SHEET_URL_PENDING (scripts/set-chess-links.py).
   var sheetForms = document.querySelectorAll('form[data-sheet]');

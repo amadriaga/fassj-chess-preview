@@ -485,3 +485,21 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .sign-input { font-family: "Brush Script MT", "Segoe Script", cursive; font-size: 1.35rem; }
 .sign-preview { margin: -6px 0 0; font-size: .9rem; color: var(--muted, #5d6676); font-style: italic; }
 .pdf-link { display: inline-block; margin-top: 8px; font-weight: 600; text-decoration: underline; }
+
+/* Register: officers approve forms in "Who's registered" after an authenticator code (spec §28.5a) */
+.officer-box { margin-top: 28px; }
+.officer-open { background: none; border: 0; padding: 0; color: var(--muted); font: inherit; font-size: .85rem; text-decoration: underline; cursor: pointer; }
+.officer-login, .officer-panel { margin-top: 12px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.officer-fields { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.officer-fields label { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; font-weight: 600; flex: 1 1 200px; }
+.officer-msg { margin: 8px 0 0; font-size: .88rem; color: #9b1c1c; min-height: 1em; }
+.officer-msg.ok { color: #1d6b3a; }
+.officer-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.officer-head p { margin: 0; font-size: .9rem; }
+.officer-table { min-width: 0; }
+.officer-table td, .officer-table th { font-size: .88rem; }
+.officer-table input[type=checkbox] { width: 20px; height: 20px; accent-color: #1d6b3a; vertical-align: middle; }
+.officer-table .by { display: block; font-size: .75rem; color: var(--muted); }
+.officer-table button.link { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.officer-panel .roster-wrap { max-width: none; }
+.officer-table .ok-tick { color: #1d6b3a; font-weight: 700; white-space: nowrap; }
