@@ -542,3 +542,12 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .edit-done .form-grid, .edit-done .form-actions, .edit-done #form-intro { display: none; }
 .roster-scroll td:first-child, .roster-scroll th { white-space: nowrap; }
 .roster-scroll td:nth-child(2) { white-space: nowrap; }
+
+/* "Change my registration" call-out, styled like the limited-edition shirt promo (Alex, 2026-11-21) */
+.edit-cta { display: block; position: relative; margin-top: 16px; padding: 26px 18px 16px; border-radius: 10px; text-decoration: none;
+  background: linear-gradient(135deg, var(--ink) 0%, #1c2c46 100%); border: 2px solid var(--gold); color: #fff; box-shadow: 0 10px 24px rgba(15,27,45,.18); transition: transform .15s ease, box-shadow .15s ease; }
+.edit-cta:hover, .edit-cta:focus-visible { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(15,27,45,.28); }
+.edit-cta:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.edit-cta-ribbon { position: absolute; top: -12px; left: 14px; padding: 5px 12px; background: var(--gold); color: var(--ink); font-weight: 700; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; border-radius: 4px; transform: rotate(-1.5deg); box-shadow: 0 4px 10px rgba(0,0,0,.25); }
+.edit-cta b { display: inline-block; padding: 9px 16px; border-radius: 8px; background: var(--gold); color: var(--ink); font-size: 1rem; }
+.edit-cta small { display: block; margin-top: 10px; color: #c9d2df; font-size: .85rem; line-height: 1.45; }
