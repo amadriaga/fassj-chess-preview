@@ -155,9 +155,20 @@
           cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); var sc = cell(tr, f.signedAt.replace(/ at .*/, '')); if (f.revision > 1) { var up = document.createElement('span'); up.className = 'by'; up.textContent = 'Updated ' + f.updatedAt + ' (rev ' + f.revision + ')'; sc.appendChild(up); }
           b.type = 'button'; b.className = 'link'; b.textContent = 'View'; b.addEventListener('click', function () { openPdf(f.id, b); }); cell(tr, b);
           box.type = 'checkbox'; box.setAttribute('aria-label', 'Approve form ' + f.id); by.className = 'by';
-          var done = function (who) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; };
+          var mailNote = document.createElement('span'), mailBtn = document.createElement('button');
+          mailNote.className = 'by'; mailBtn.type = 'button'; mailBtn.className = 'link'; mailBtn.textContent = 'Email copy';
+          mailBtn.addEventListener('click', function () {   // spec §43: send (again) the approved PDF to the form's email
+            if (!window.confirm('Email the approved form ' + f.id + ' to the email on the form?')) return;
+            mailBtn.disabled = true; say(omsg, 'Emailing ' + f.id + '…', true);
+            post({ form: 'officer_email_approved', token: tok(), id: f.id }).then(function (res) {
+              if (res.signedOut) return signOut(res.error);
+              mailBtn.disabled = false; mailNote.textContent = res.emailNote || res.error || '';
+              say(omsg, res.ok ? f.id + ': ' + res.emailNote + '.' : res.error, res.ok);
+            }).catch(function () { mailBtn.disabled = false; say(omsg, 'Couldn’t send. Please try again.'); });
+          });
+          var done = function (who, note) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; mailNote.textContent = note || 'Not emailed yet'; lab.appendChild(mailNote); lab.appendChild(mailBtn); };
           lab.appendChild(box); lab.appendChild(by);
-          if (f.status === 'Approved') done(f.approvedBy);
+          if (f.status === 'Approved') done(f.approvedBy, f.emailed);
           box.addEventListener('change', function () {
             if (!box.checked) return;
             if (!window.confirm('Approve form ' + f.id + ' for ' + f.name + '?\n\nThis signs the approval electronically in your name.')) { box.checked = false; return; }
@@ -165,7 +176,7 @@
             post({ form: 'officer_approve', token: tok(), id: f.id }).then(function (res) {
               if (res.signedOut) return signOut(res.error);
               if (!res.ok) { box.checked = false; box.disabled = false; return say(omsg, res.error); }
-              done(res.approvedBy); say(omsg, f.id + ' approved. The approved PDF is saved.', true);
+              done(res.approvedBy, res.emailNote); say(omsg, f.id + ' approved. The approved PDF is saved. ' + (res.emailNote || '') + '.', true);
             }).catch(function () { box.checked = false; box.disabled = false; say(omsg, 'Couldn’t save. Please try again.'); });
           });
           cell(tr, lab); obody.appendChild(tr);
