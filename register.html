@@ -17,7 +17,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=893f252b20">
+  <link rel="stylesheet" href="/styles.css?v=8b56ad9dc9">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">FASSJ Chess Club website &mdash; fully operational &middot; <a href="/register.html" style="color:#0f1b2d;text-decoration:underline">Registration is now open &rarr;</a></div>
@@ -102,6 +102,15 @@
             <p class="field field--full sign-preview hidden" id="sign-preview" aria-live="polite"></p>
             <div class="field field--full"><label class="consent"><input type="checkbox" name="agreement" value="yes" required> <span><b>I agree</b> that the club may contact me about membership. <span class="req">*</span></span></label></div>
           </div>
+          <div class="secure-box" id="secure">
+            <h3><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3H9z"/></svg> Your information is protected</h3>
+            <ul>
+              <li><b>Encrypted on the way:</b> your form is sent with TLS 1.3 and 256-bit AES encryption, the same standard banks use. Weaker connections (older than TLS 1.2) are refused.</li>
+              <li><b>Kept in the club&rsquo;s own account:</b> it goes straight to the club&rsquo;s Google account, which is protected by 2-step verification, and Google stores it encrypted.</li>
+              <li><b>Seen only by club officers</b>, who sign in with a one-time code from Google Authenticator. Links to change your registration are emailed only to the address on your form and work for 15 minutes.</li>
+              <li><b>Never sold</b>, no advertising, no tracking. The public list shows only first name and last initial, and only if you tick the box.</li>
+            </ul>
+          </div>
           <div class="form-actions"><button class="btn btn-primary" type="submit">Sign and send</button><p>Your form goes only to the club officers. See <a href="/privacy.html">Privacy</a>.</p></div>
           <div class="notice" id="form-done" tabindex="-1" role="status"><b>Thank you, your form is signed and sent!</b> <span id="form-done-id"></span> A club officer will check and approve it, and contact you about membership. <a class="pdf-link hidden" id="form-pdf" download>Download your signed form (PDF)</a></div>
           <div class="notice" id="form-error" tabindex="-1" role="alert"></div>
@@ -162,7 +171,7 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 115 · Nov 21, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 116 · Nov 21, 2026</span></span>
       </div>
     </div>
   </footer>
