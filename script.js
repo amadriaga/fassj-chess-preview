@@ -43,8 +43,28 @@
       preview.classList.toggle('hidden', !match);
       if (match) preview.textContent = 'Signed electronically by ' + typed + ' \u00b7 ' + today();
     };
+    // Under-18s: the parent/guardian is the default emergency contact (spec §28.3b). A field the person edits is left alone.
+    var em = [['r-em-name', function () { return document.getElementById('r-guardian').value; }],
+              ['r-em-rel', function () { return 'Parent/guardian'; }],
+              ['r-em-phone', function () { return document.getElementById('r-phone').value; }]];
+    var emNote = document.getElementById('em-auto-note');
+    var emFill = function () {
+      var minor = isMinor(), any = false;
+      em.forEach(function (e) {
+        var f = document.getElementById(e[0]); if (!f || f.dataset.edited === '1') return;
+        if (minor) { f.value = e[1](); f.dataset.auto = '1'; any = true; }
+        else if (f.dataset.auto === '1') { f.value = ''; delete f.dataset.auto; }
+      });
+      if (emNote) emNote.classList.toggle('hidden', !(minor && any));
+    };
+    em.forEach(function (e) {
+      var f = document.getElementById(e[0]);
+      if (f) f.addEventListener('input', function () { f.dataset.edited = '1'; delete f.dataset.auto; });
+    });
+    ['r-guardian', 'r-phone'].forEach(function (id) { var x = document.getElementById(id); if (x) x.addEventListener('input', emFill); });
+    reg.addEventListener('reset', function () { em.forEach(function (e) { var f = document.getElementById(e[0]); if (f) { delete f.dataset.edited; delete f.dataset.auto; } }); setTimeout(emFill, 0); });
     var age = document.getElementById('r-age');
-    if (age) age.addEventListener('change', sync);
+    if (age) age.addEventListener('change', function () { sync(); emFill(); });
     ['r-name', 'r-guardian', 'r-sign-member', 'r-sign-guardian'].forEach(function (id) { var x = document.getElementById(id); if (x) x.addEventListener('input', sign); });
     reg.addEventListener('reset', function () { setTimeout(sync, 0); });
     sync();
