@@ -14,18 +14,39 @@
   var year = document.querySelector('[data-year]');
   if (year) year.textContent = new Date().getFullYear();
 
-  // Parent / guardian name: shown and required only when "Under 18" is chosen.
+  // Register (spec §28): any age group under 18 shows the parent/guardian name and the parent's signature box;
+  // adults sign for themselves. The typed signature must match the name it signs for (checked again by the sheet script).
   var reg = document.getElementById('register-form');
+  var isMinor = function () { var a = document.getElementById('r-age'); return !!(a && a.value && a.value !== 'Adult (18+)'); };
   if (reg) {
     var guardian = document.getElementById('guardian-section');
     var gInputs = reg.querySelectorAll('[data-guardian]');
+    var sm = document.getElementById('sign-member'), sg = document.getElementById('sign-guardian');
+    var smIn = document.getElementById('r-sign-member'), sgIn = document.getElementById('r-sign-guardian');
+    var preview = document.getElementById('sign-preview'), br = document.getElementById('r-browser');
+    if (br) br.value = navigator.userAgent.slice(0, 300);
+    var norm = function (v) { return String(v || '').trim().replace(/\s+/g, ' ').toLowerCase(); };
+    var today = function () { return new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); };
     var sync = function () {
-      var minor = !!reg.querySelector('#r-minor:checked');
+      var minor = isMinor();
       if (guardian) guardian.classList.toggle('hidden', !minor);
       for (var i = 0; i < gInputs.length; i++) gInputs[i].required = minor;
+      if (sm && sg) { sm.classList.toggle('hidden', minor); sg.classList.toggle('hidden', !minor); smIn.required = !minor; sgIn.required = minor; }
+      sign();
     };
-    var ages = reg.querySelectorAll('input[name="age_group"]');
-    for (var j = 0; j < ages.length; j++) ages[j].addEventListener('change', sync);
+    var sign = function () {
+      if (!preview || !smIn) return;
+      var minor = isMinor(), typed = (minor ? sgIn : smIn).value.trim();
+      var want = minor ? document.getElementById('r-guardian').value : document.getElementById('r-name').value;
+      var match = typed && norm(typed) === norm(want);
+      (minor ? sgIn : smIn).setCustomValidity(typed && !match ? (minor ? 'Please type the parent or guardian\u2019s full name exactly as above.' : 'Please type the player\u2019s full name exactly as above.') : '');
+      preview.classList.toggle('hidden', !match);
+      if (match) preview.textContent = 'Signed electronically by ' + typed + ' \u00b7 ' + today();
+    };
+    var age = document.getElementById('r-age');
+    if (age) age.addEventListener('change', sync);
+    ['r-name', 'r-guardian', 'r-sign-member', 'r-sign-guardian'].forEach(function (id) { var x = document.getElementById(id); if (x) x.addEventListener('input', sign); });
+    reg.addEventListener('reset', function () { setTimeout(sync, 0); });
     sync();
   }
 
@@ -61,7 +82,8 @@
   var roster = document.getElementById('roster'), regForm = document.querySelector('form[data-sheet="register"]');
   if (roster && regForm) {
     var minorNote = document.getElementById('list-minor-note');
-    regForm.querySelectorAll('input[name=age_group]').forEach(function (r) { r.addEventListener('change', function () { if (minorNote) minorNote.hidden = !regForm.querySelector('#r-minor:checked'); }); });
+    var ageSel = document.getElementById('r-age');
+    if (ageSel) ageSel.addEventListener('change', function () { if (minorNote) minorNote.hidden = !isMinor(); });
     var rurl = regForm.getAttribute('action');
     if (rurl.indexOf('SHEET_URL_PENDING') === -1) {
       fetch(rurl + '?action=roster').then(function (r) { return r.json(); }).then(function (res) {
@@ -95,6 +117,15 @@
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res.ok) {
+            var pdfA = f.querySelector('#form-pdf'), idS = f.querySelector('#form-done-id');
+            if (pdfA && res.pdf) {
+              var bin = atob(res.pdf), bytes = new Uint8Array(bin.length);
+              for (var k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+              pdfA.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+              pdfA.setAttribute('download', 'FASSJ-Chess-Club-membership-form-' + (res.formId || 'signed') + '.pdf');
+              pdfA.classList.remove('hidden');
+            }
+            if (idS) idS.textContent = res.formId ? 'Your form number is ' + res.formId + '.' : '';
             f.reset();
             var g = document.getElementById('guardian-section');
             if (g && f.contains(g)) { g.classList.add('hidden'); f.querySelectorAll('[data-guardian]').forEach(function (i) { i.required = false; }); }

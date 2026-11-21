@@ -475,3 +475,13 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .extra-sizes { grid-column: 1 / -1; display: grid; gap: 14px; }
 .extra-sizes.hidden { display: none !important; }
 .extra-grid { gap: 14px 22px; }
+
+/* Register: membership form + waiver online, typed signature (spec §28) */
+.label-like { font-weight: 600; margin: 0 0 6px; }
+.waiver-text { max-height: 300px; overflow-y: auto; border: 1px solid var(--line, #e4ded1); border-radius: 8px; padding: 12px 16px; background: #fffdf8; font-size: .9rem; line-height: 1.5; }
+.waiver-text h3 { font-size: .95rem; margin: 12px 0 4px; }
+.waiver-text h3:first-child { margin-top: 0; }
+.waiver-text p { margin: 0 0 6px; }
+.sign-input { font-family: "Brush Script MT", "Segoe Script", cursive; font-size: 1.35rem; }
+.sign-preview { margin: -6px 0 0; font-size: .9rem; color: var(--muted, #5d6676); font-style: italic; }
+.pdf-link { display: inline-block; margin-top: 8px; font-weight: 600; text-decoration: underline; }
