@@ -111,9 +111,9 @@
         var body = document.getElementById('roster-body'), list = res.players || [];
         document.getElementById('roster-count').textContent = res.total === 1 ? '1 player has registered so far.' : res.total + ' players have registered so far.';
         body.innerHTML = list.length ? list.map(function (p) {
-          var d = document.createElement('tr'), a = document.createElement('td'), b = document.createElement('td');
-          a.textContent = p.name; b.textContent = p.level || '\u2014'; d.appendChild(a); d.appendChild(b); return d.outerHTML;
-        }).join('') : '<tr><td colspan="2">No one has chosen to be listed yet. Be the first!</td></tr>';
+          var d = document.createElement('tr'), a = document.createElement('td'), g = document.createElement('td'), b = document.createElement('td');
+          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = p.level || '\u2014'; d.appendChild(a); d.appendChild(g); d.appendChild(b); return d.outerHTML;
+        }).join('') : '<tr><td colspan="3">No one has chosen to be listed yet. Be the first!</td></tr>';
         roster.classList.remove('hidden');
       }).catch(function () {});
     }
@@ -274,7 +274,8 @@
       fetch(eapi, { method: 'POST', body: new URLSearchParams({ form: 'edit_request', email: ereq.email.value, name: ereq.name.value, site: location.origin }) })
         .then(function (r) { return r.json(); }).then(function (res) {
           emsg2.classList.toggle('ok', !!res.ok);
-          emsg2.textContent = res.ok ? 'If we have a registration for this email and name, we’ve sent you a link. It works for 15 minutes (check your spam folder too).' : res.error;
+          emsg2.textContent = res.ok ? 'We\u2019ve sent a link to ' + (res.sent || ereq.email.value) + '. It works for 15 minutes (check your spam folder too).' : res.error;
+          if (res.notFound) { emsg2.appendChild(document.createTextNode(' ')); var ra = document.createElement('a'); ra.href = '/register.html'; ra.textContent = 'Register now \u2192'; emsg2.appendChild(ra); }
         }).catch(function () { emsg2.classList.remove('ok'); emsg2.textContent = 'Couldn’t send. Please try again.'; })
         .then(function () { btn.disabled = false; });
     });
