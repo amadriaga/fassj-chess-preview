@@ -114,6 +114,17 @@
           var d = document.createElement('tr'), a = document.createElement('td'), g = document.createElement('td'), b = document.createElement('td');
           a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = p.level || '\u2014'; d.appendChild(a); d.appendChild(g); d.appendChild(b); return d.outerHTML;
         }).join('') : '<tr><td colspan="3">No one has chosen to be listed yet. Be the first!</td></tr>';
+        var tally = document.getElementById('age-tally');   // spec §44: sign-ups per age group (numbers only)
+        if (tally && res.byAge) {
+          var short = { 'Early Learners (ages 4–6)': 'Early Learners (4–6)', 'Elementary / Youth (ages 7–11)': 'Elementary / Youth (7–11)', 'Middle & High School (ages 12–17)': 'Middle & High School (12–17)', 'Adult (18+)': 'Adult (18+)' };
+          tally.innerHTML = '';
+          Object.keys(res.byAge).forEach(function (k) {
+            if (!short[k] && !res.byAge[k]) return;
+            var li = document.createElement('li'), n = document.createElement('b'), l = document.createElement('span');
+            n.textContent = res.byAge[k]; l.textContent = short[k] || k; li.appendChild(n); li.appendChild(l); tally.appendChild(li);
+          });
+          tally.classList.remove('hidden');
+        }
         roster.classList.remove('hidden');
       }).catch(function () {});
     }

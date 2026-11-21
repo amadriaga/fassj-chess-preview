@@ -579,3 +579,7 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .doc-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .doc-btns .btn { margin-top: 0; }
 .officer-table td:first-child { white-space: nowrap; }
+.age-tally { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.age-tally li { display: flex; align-items: baseline; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf8; font-size: .82rem; color: var(--muted); }
+.age-tally b { font-family: var(--serif); font-size: 1.25rem; color: var(--ink); }
+.age-tally.hidden { display: none; }
