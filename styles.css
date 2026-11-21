@@ -585,3 +585,5 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .age-tally.hidden { display: none; }
 .split > * { min-width: 0; }
 .roster-scroll { overflow: auto; }
+.roster-scroll th, .roster-scroll td:nth-child(4), .roster-scroll td:nth-child(5) { white-space: normal; }
+.roster-scroll td:nth-child(2) { white-space: nowrap; }
