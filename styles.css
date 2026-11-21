@@ -537,3 +537,6 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 /* Eight menu items incl. "Schedule & Event" and "Membership" (2026-11-21): header row wider than the page text on big screens */
 .site-header .nav { max-width: 1320px; }
 .brand-name { white-space: nowrap; }
+
+/* Edit mode: after saving, only the thank-you message stays */
+.edit-done .form-grid, .edit-done .form-actions, .edit-done #form-intro { display: none; }

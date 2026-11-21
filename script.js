@@ -151,7 +151,7 @@
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.forEach(function (f) {
           var tr = document.createElement('tr'), b = document.createElement('button'), box = document.createElement('input'), lab = document.createElement('label'), by = document.createElement('span');
-          cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); cell(tr, f.signedAt.replace(/ at .*/, ''));
+          cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); var sc = cell(tr, f.signedAt.replace(/ at .*/, '')); if (f.revision > 1) { var up = document.createElement('span'); up.className = 'by'; up.textContent = 'Updated ' + f.updatedAt + ' (rev ' + f.revision + ')'; sc.appendChild(up); }
           b.type = 'button'; b.className = 'link'; b.textContent = 'View'; b.addEventListener('click', function () { openPdf(f.id, b); }); cell(tr, b);
           box.type = 'checkbox'; box.setAttribute('aria-label', 'Approve form ' + f.id); by.className = 'by';
           var done = function (who) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; };
@@ -241,6 +241,7 @@
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res.ok) {
+            if (f.querySelector('input[name=t]')) { f.classList.add('edit-done'); }
             var pdfA = f.querySelector('#form-pdf'), idS = f.querySelector('#form-done-id');
             if (pdfA && res.pdf) {
               var bin = atob(res.pdf), bytes = new Uint8Array(bin.length);
@@ -249,7 +250,7 @@
               pdfA.setAttribute('download', 'FASSJ-Chess-Club-membership-form-' + (res.formId || 'signed') + '.pdf');
               pdfA.classList.remove('hidden');
             }
-            if (idS) idS.textContent = res.formId ? 'Your form number is ' + res.formId + '.' : '';
+            if (idS) idS.textContent = res.formId ? (res.revision ? 'Registration ' + res.formId + ' is updated (revision ' + res.revision + ').' : 'Your form number is ' + res.formId + '.') : '';
             f.reset();
             var g = document.getElementById('guardian-section');
             if (g && f.contains(g)) { g.classList.add('hidden'); f.querySelectorAll('[data-guardian]').forEach(function (i) { i.required = false; }); }
@@ -260,6 +261,55 @@
         .catch(function () { say('form-error', 'We couldn\u2019t send this. Please try again, or message us on our Facebook page.'); })
         .then(function () { btn.disabled = false; });
     });
+  }
+
+
+  // Change my registration (docs/player-edit-workflow.md): request page, and edit mode on the Register page (?edit=<code>).
+  var ereq = document.getElementById('edit-request');
+  if (ereq) {
+    var eapi = document.querySelector('main[data-edit-api]').getAttribute('data-edit-api'), emsg2 = document.getElementById('edit-msg');
+    ereq.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = ereq.querySelector('button'); btn.disabled = true; emsg2.textContent = 'Sending…'; emsg2.classList.add('ok');
+      fetch(eapi, { method: 'POST', body: new URLSearchParams({ form: 'edit_request', email: ereq.email.value, name: ereq.name.value, site: location.origin }) })
+        .then(function (r) { return r.json(); }).then(function (res) {
+          emsg2.classList.toggle('ok', !!res.ok);
+          emsg2.textContent = res.ok ? 'If we have a registration for this email and name, we’ve sent you a link. It works for 15 minutes (check your spam folder too).' : res.error;
+        }).catch(function () { emsg2.classList.remove('ok'); emsg2.textContent = 'Couldn’t send. Please try again.'; })
+        .then(function () { btn.disabled = false; });
+    });
+  }
+  var editCode = new URLSearchParams(location.search).get('edit');
+  if (reg && editCode && /^[0-9a-f]{32}$/.test(editCode)) {
+    var title = document.getElementById('form-title'), intro = document.getElementById('form-intro');
+    var set = function (name, v) {
+      var els = reg.querySelectorAll('[name="' + name + '"]');
+      els.forEach(function (el) {
+        if (el.type === 'radio') el.checked = el.value === v;
+        else if (el.type === 'checkbox') el.checked = name === 'news_by' ? String(v).split(', ').indexOf(el.value) !== -1 : v === 'yes';
+        else el.value = v;
+        el.dispatchEvent(new Event('change', { bubbles: true })); el.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    };
+    title.textContent = 'Change your registration'; intro.textContent = 'Loading your registration…';
+    fetch(reg.getAttribute('action'), { method: 'POST', body: new URLSearchParams({ form: 'edit_load', t: editCode }) })
+      .then(function (r) { return r.json(); }).then(function (res) {
+        if (!res.ok) { intro.innerHTML = ''; intro.textContent = res.error + ' '; var a = document.createElement('a'); a.href = '/edit.html'; a.textContent = 'Ask for a new link'; intro.appendChild(a); reg.querySelector('.form-grid').classList.add('hidden'); reg.querySelector('.form-actions').classList.add('hidden'); return; }
+        title.textContent = 'Change your registration ' + res.formId;
+        intro.textContent = 'Change what you need, then tick the agreements and type the name again to sign. This link works for about ' + res.minutesLeft + ' more minutes. After you save, a club officer approves the form again.';
+        var d = res.data;
+        ['name', 'age_bracket', 'guardian_name', 'email', 'phone', 'experience', 'uscf_id', 'medical', 'emergency_name', 'emergency_relationship', 'emergency_phone', 'shirt_size', 'heard_about_us', 'note', 'photos', 'news_by', 'show_on_list'].forEach(function (k) { set(k, d[k] || ''); });
+        ['r-em-name', 'r-em-rel', 'r-em-phone'].forEach(function (id) { var x = document.getElementById(id); if (x) { x.dataset.edited = '1'; delete x.dataset.auto; } });
+        var ex = document.getElementById('r-extra');
+        if (ex) {
+          ex.value = d.extra_shirts || '0'; ex.dispatchEvent(new Event('change'));
+          if (ex.value === '5 or more') { var m = document.getElementById('r-extra-many'); if (m) m.value = d.extra_sizes || ''; }
+          else (d.extra_sizes || '').split('; ').forEach(function (part, i) { var sel = document.getElementById('r-extra-' + (i + 1)); if (sel) sel.value = part.replace(/^Shirt \d+: /, ''); });
+        }
+        [['form', 'edit_save'], ['t', editCode]].forEach(function (kv) { var h = document.createElement('input'); h.type = 'hidden'; h.name = kv[0]; h.value = kv[1]; reg.appendChild(h); });
+        var b = reg.querySelector('button[type=submit]'); if (b) b.textContent = 'Save and sign';
+        var dn = document.querySelector('#form-done b'); if (dn) dn.textContent = 'Thank you, your changes are signed and saved!';
+      }).catch(function () { intro.textContent = 'Couldn’t load your registration. Please try the link again.'; });
   }
 
   // Bigger picture in a pop-up: any element with data-lightbox="<image>" (also gallery items added later).
