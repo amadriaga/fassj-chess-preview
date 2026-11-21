@@ -521,3 +521,16 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .officer-link { margin-top: 18px; font-size: .85rem; }
 main[data-approve-api] .officer-box { margin-top: 0; }
 main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { margin-top: 0; }
+
+/* Register: "Who's registered" in the right column, scrolling like the waiver text (spec §27, 2026-11-21) */
+.roster-title { font-size: 1.15rem; margin: 2px 0 6px; }
+.roster-side .roster-count { margin: 0 0 8px; font-size: .92rem; }
+.roster-scroll { max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: #fffdf8; }
+.roster-scroll .roster-table { min-width: 0; width: 100%; margin: 0; }
+.roster-scroll .roster-table th, .roster-scroll .roster-table td { font-size: .85rem; padding: 7px 12px; }
+.roster-scroll thead th { position: sticky; top: 0; background: #f6f3ec; z-index: 1; }
+
+/* Menu with "Officers" added (2026-11-21): keep labels on one line; tighter spacing on laptop widths */
+.nav-links a { white-space: nowrap; }
+.brand-sub { white-space: nowrap; }
+@media (max-width: 1400px) { .nav-links { gap: 2px; } .nav-links a { padding: 8px 10px; font-size: .92rem; } .nav-links .btn { margin-left: 6px; } }
