@@ -518,3 +518,6 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .setup-confirm { margin-top: 8px; max-width: 360px; }
 .invite-form { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
 .invite-form h3 { font-size: 1rem; margin: 0 0 6px; }
+.officer-link { margin-top: 18px; font-size: .85rem; }
+main[data-approve-api] .officer-box { margin-top: 0; }
+main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { margin-top: 0; }

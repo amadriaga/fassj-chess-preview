@@ -100,9 +100,9 @@
   }
 
   // Register: officers sign in with email + Google Authenticator code and approve forms with a tick (spec §28.5a).
-  var obox = document.getElementById('officer-box'), regF = document.getElementById('register-form');
-  if (obox && regF) {
-    var oapi = regF.getAttribute('action'), olog = document.getElementById('officer-login'), opan = document.getElementById('officer-panel');
+  var obox = document.getElementById('officer-box'), omain = document.querySelector('main[data-approve-api]');
+  if (obox && omain) {
+    var oapi = omain.getAttribute('data-approve-api'), olog = document.getElementById('officer-login'), opan = document.getElementById('officer-panel');
     var omsg = document.getElementById('officer-msg'), lmsg = document.getElementById('officer-login-msg'), obody = document.getElementById('officer-body');
     var tok = function (v) { try { if (v === undefined) return sessionStorage.getItem('fassjOfficer') || ''; if (v) sessionStorage.setItem('fassjOfficer', v); else sessionStorage.removeItem('fassjOfficer'); } catch (e) { return ''; } };
     var post = function (data) { return fetch(oapi, { method: 'POST', body: new URLSearchParams(data) }).then(function (r) { return r.json(); }); };
@@ -151,7 +151,6 @@
         });
       }).catch(function () { say(omsg, 'Couldn’t load the forms. Please try again.'); });
     };
-    document.getElementById('officer-open').addEventListener('click', function () { if (tok()) load(); else olog.classList.toggle('hidden'); });
     document.getElementById('officer-out').addEventListener('click', function () { signOut('Signed out.'); });
     olog.addEventListener('submit', function (e) {
       e.preventDefault();
