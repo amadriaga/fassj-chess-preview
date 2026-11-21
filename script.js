@@ -147,6 +147,7 @@
         if (!res.ok) return say(omsg, res.error);
         document.getElementById('officer-name').textContent = res.name;
         document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
+        loadEntries();
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.forEach(function (f) {
@@ -180,6 +181,60 @@
         tok(res.token); olog.reset(); load();
       }).catch(function () { say(lmsg, 'Couldn’t sign in. Please try again.'); }).then(function () { btn.disabled = false; });
     });
+    // 2028 shirt contest entries: view, approve, reject (spec §25a).
+    var elist = document.getElementById('entry-list'), emsg3 = document.getElementById('entry-msg');
+    var statusText = function (e) {
+      if (e.status === 'approved') return '✓ Approved' + (e.reviewedBy ? ' by ' + e.reviewedBy : '') + (e.reviewedAt ? ', ' + e.reviewedAt : '');
+      if (e.status === 'rejected') return '✗ Rejected' + (e.reviewedBy ? ' by ' + e.reviewedBy : '') + (e.reviewedAt ? ', ' + e.reviewedAt : '');
+      return 'Waiting for review';
+    };
+    var loadEntries = function () {
+      if (!elist) return;
+      post({ form: 'officer_entries', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) { elist.textContent = res.error || 'Couldn’t load the entries.'; return; }
+        elist.innerHTML = '';
+        if (!res.entries.length) { var none = document.createElement('p'); none.className = 'note'; none.textContent = 'No contest entries yet.'; elist.appendChild(none); return; }
+        res.entries.forEach(function (e) {
+          var card = document.createElement('div'); card.className = 'entry-card entry-' + e.status;
+          var pic = document.createElement('div'); pic.className = 'entry-pic';
+          var vb = document.createElement('button'); vb.type = 'button'; vb.className = 'btn btn-outline btn-sm'; vb.textContent = 'View design'; pic.appendChild(vb);
+          vb.addEventListener('click', function () {
+            vb.disabled = true; vb.textContent = 'Loading…';
+            post({ form: 'officer_entry_image', token: tok(), id: e.id }).then(function (r) {
+              if (r.signedOut) return signOut(r.error);
+              if (!r.ok) { vb.disabled = false; vb.textContent = 'View design'; say(emsg3, r.error); return; }
+              var img = document.createElement('img'); img.alt = 'Design ' + e.id + ': ' + e.title; img.src = 'data:' + r.type + ';base64,' + r.data;
+              img.setAttribute('data-lightbox', img.src); img.setAttribute('data-caption', e.id + ' · ' + e.title);
+              pic.innerHTML = ''; pic.appendChild(img);
+            }).catch(function () { vb.disabled = false; vb.textContent = 'View design'; say(emsg3, 'Couldn’t load the design.'); });
+          });
+          var info = document.createElement('div'); info.className = 'entry-info';
+          var h = document.createElement('h4'); h.textContent = e.id + ' · ' + e.title; info.appendChild(h);
+          [['By', e.name + (e.age ? ' (' + e.age + ')' : '')], ['Parent/guardian', e.guardian ? e.guardian + (e.guardianOk === 'yes' ? ', gave OK' : '') : ''], ['Printed name if it wins', e.credit], ['About', e.about], ['Received', e.received]].forEach(function (kv) {
+            if (!kv[1]) return; var p2 = document.createElement('p'); var b2 = document.createElement('b'); b2.textContent = kv[0] + ': '; p2.appendChild(b2); p2.appendChild(document.createTextNode(kv[1])); info.appendChild(p2);
+          });
+          var st = document.createElement('p'); st.className = 'entry-status'; st.textContent = statusText(e); info.appendChild(st);
+          var acts = document.createElement('div'); acts.className = 'entry-actions';
+          [['approve', 'Approve', 'btn btn-primary btn-sm', 'approved'], ['reject', 'Reject', 'btn btn-outline btn-sm', 'rejected']].forEach(function (d) {
+            if (e.status === d[3]) return;
+            var bt = document.createElement('button'); bt.type = 'button'; bt.className = d[2]; bt.textContent = d[1];
+            bt.addEventListener('click', function () {
+              var q = d[0] === 'approve' ? 'Approve ' + e.id + ' “' + e.title + '”? It will appear in the public gallery straight away.' : 'Reject ' + e.id + ' “' + e.title + '”? It will not be shown' + (e.status === 'approved' ? ' and is taken out of the gallery' : '') + '.';
+              if (!window.confirm(q)) return;
+              acts.querySelectorAll('button').forEach(function (x) { x.disabled = true; }); say(emsg3, 'Saving…', true);
+              post({ form: 'officer_entry_review', token: tok(), id: e.id, decision: d[0] }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) { say(emsg3, r.error); acts.querySelectorAll('button').forEach(function (x) { x.disabled = false; }); return; }
+                say(emsg3, e.id + (r.status === 'approved' ? ' approved: it is now in the gallery.' : ' rejected.'), true); loadEntries();
+              }).catch(function () { say(emsg3, 'Couldn’t save. Please try again.'); acts.querySelectorAll('button').forEach(function (x) { x.disabled = false; }); });
+            });
+            acts.appendChild(bt);
+          });
+          info.appendChild(acts); card.appendChild(pic); card.appendChild(info); elist.appendChild(card);
+        });
+      }).catch(function () { elist.textContent = 'Couldn’t load the entries.'; });
+    };
     var inv = document.getElementById('invite-form'), imsg = document.getElementById('invite-msg');
     inv.addEventListener('submit', function (e) {
       e.preventDefault();

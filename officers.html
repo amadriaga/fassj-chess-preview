@@ -18,7 +18,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=1138178280">
+  <link rel="stylesheet" href="/styles.css?v=893f252b20">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">Review copy for the FASSJ committee &mdash; not the official site</div>
@@ -77,6 +77,12 @@
             <div class="officer-head"><p>Signed in as <b id="officer-name"></b>. Tick <b>Approved</b> to approve a form: that signs the approval electronically in your name.</p><button class="btn btn-outline btn-sm" type="button" id="officer-out">Sign out</button></div>
             <div class="roster-wrap"><table class="roster-table officer-table"><thead><tr><th scope="col">Form</th><th scope="col">Name</th><th scope="col">Age group</th><th scope="col">Signed</th><th scope="col">Form PDF</th><th scope="col">Approved</th></tr></thead><tbody id="officer-body"></tbody></table></div>
             <p class="officer-msg" id="officer-msg" role="status"></p>
+            <div class="entries-review" id="entries-review">
+              <h3>2028 shirt contest entries</h3>
+              <p class="note" style="margin:0 0 10px">Open each design, then approve it (it appears in the public gallery straight away) or reject it (never shown). You can change a decision later.</p>
+              <div class="entry-list" id="entry-list"><p class="note">Loading&hellip;</p></div>
+              <p class="officer-msg" id="entry-msg" role="status"></p>
+            </div>
             <form class="invite-form hidden" id="invite-form" autocomplete="off">
               <h3>Invite an officer</h3>
               <p class="note" style="margin:0 0 10px">They get an email from fassj.admin@gmail.com with a link (valid 48 hours) to set up Google Authenticator; then they can sign in here and approve forms.</p>
@@ -89,6 +95,11 @@
             </form>
           </div>
         </div>
+        <dialog class="lightbox" aria-label="Larger picture">
+          <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+          <img alt="">
+          <p class="lightbox-caption"></p>
+    </dialog>
         <p class="note" style="margin-top:20px">Not an officer? <a href="/register.html">Register for the club</a>.</p>
       </div>
     </section>
@@ -118,10 +129,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 95 · Nov 21, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 96 · Nov 21, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=27fd83ee11"></script>
+  <script src="/script.js?v=bfb64f4659"></script>
 </body>
 </html>
