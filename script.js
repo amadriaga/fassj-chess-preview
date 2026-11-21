@@ -111,9 +111,10 @@
         var body = document.getElementById('roster-body'), list = res.players || [];
         document.getElementById('roster-count').textContent = res.total === 1 ? '1 player has registered so far.' : res.total + ' players have registered so far.';
         body.innerHTML = list.length ? list.map(function (p) {
-          var d = document.createElement('tr'), a = document.createElement('td'), g = document.createElement('td'), b = document.createElement('td');
-          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = p.level || '\u2014'; d.appendChild(a); d.appendChild(g); d.appendChild(b); return d.outerHTML;
-        }).join('') : '<tr><td colspan="3">No one has chosen to be listed yet. Be the first!</td></tr>';
+          var d = document.createElement('tr'), fid = document.createElement('td'), a = document.createElement('td'), g = document.createElement('td'), b = document.createElement('td'), ms = document.createElement('td');
+          fid.textContent = p.id || '\u2014'; ms.textContent = p.since || '\u2014';   // spec §44: Form ID first, Member since last
+          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = p.level || '\u2014'; d.appendChild(fid); d.appendChild(a); d.appendChild(g); d.appendChild(b); d.appendChild(ms); return d.outerHTML;
+        }).join('') : '<tr><td colspan="5">No one has chosen to be listed yet. Be the first!</td></tr>';
         var tally = document.getElementById('age-tally');   // spec §44: sign-ups per age group (numbers only)
         if (tally && res.byAge) {
           var short = { 'Early Learners (ages 4–6)': 'Early Learners (4–6)', 'Elementary / Youth (ages 7–11)': 'Elementary / Youth (7–11)', 'Middle & High School (ages 12–17)': 'Middle & High School (12–17)', 'Adult (18+)': 'Adult (18+)' };
