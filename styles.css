@@ -303,7 +303,7 @@ input[type=date] { font: inherit; font-size: .98rem; color: var(--text); backgro
 .badge--rec { align-self: flex-start; margin-bottom: 12px; background: var(--gold); color: var(--ink); border-color: var(--gold); }
 
 /* Seven menu items (Pay & Donate, Contact added 2026-11-20): one line on desktop, menu button below 1100px */
-@media (min-width: 1101px) and (max-width: 1260px) { .brand-sub { display: none; } .nav-links a { padding: 8px 10px; } }
+@media (min-width: 1101px) and (max-width: 1380px) { .brand-sub { display: none; } .nav-links a { padding: 8px 10px; } }
 @media (max-width: 1100px) {
   .menu-toggle { display: grid; }
   .nav-links { position: absolute; top: 72px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 8px 16px 18px; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 12px 24px rgba(15, 27, 45, .08); display: none; }
@@ -534,3 +534,6 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .nav-links a { white-space: nowrap; }
 .brand-sub { white-space: nowrap; }
 @media (max-width: 1400px) { .nav-links { gap: 2px; } .nav-links a { padding: 8px 10px; font-size: .92rem; } .nav-links .btn { margin-left: 6px; } }
+/* Eight menu items incl. "Schedule & Event" and "Membership" (2026-11-21): header row wider than the page text on big screens */
+.site-header .nav { max-width: 1320px; }
+.brand-name { white-space: nowrap; }
