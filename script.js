@@ -160,6 +160,18 @@
             cell(tr, wait); obody.appendChild(tr); return;
           }
           b.type = 'button'; b.className = 'link'; b.textContent = 'View'; b.addEventListener('click', function () { openPdf(f.id, b); }); cell(tr, b);
+          if (f.pdfOk === false) {   // spec §43: the row's PDF belongs to another form -> rebuild it from the row
+            var warn = document.createElement('span'), rb = document.createElement('button');
+            warn.className = 'by'; warn.textContent = 'PDF belongs to another form'; rb.type = 'button'; rb.className = 'link'; rb.textContent = 'Rebuild PDF';
+            rb.addEventListener('click', function () {
+              rb.disabled = true; say(omsg, 'Rebuilding ' + f.id + '…', true);
+              post({ form: 'officer_rebuild_pdf', token: tok(), id: f.id }).then(function (res) {
+                if (res.signedOut) return signOut(res.error);
+                say(omsg, res.ok ? res.note : res.error, res.ok); if (res.ok) { warn.remove(); rb.remove(); } else rb.disabled = false;
+              }).catch(function () { rb.disabled = false; say(omsg, 'Couldn’t rebuild. Please try again.'); });
+            });
+            b.parentNode.appendChild(warn); b.parentNode.appendChild(rb);
+          }
           box.type = 'checkbox'; box.setAttribute('aria-label', 'Approve form ' + f.id); by.className = 'by';
           var mailNote = document.createElement('span'), mailBtn = document.createElement('button');
           mailNote.className = 'by'; mailBtn.type = 'button'; mailBtn.className = 'link'; mailBtn.textContent = 'Email copy';
