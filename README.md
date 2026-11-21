@@ -2,7 +2,7 @@
 
 **https://chess.fassj.o2bot.com** (not live yet) · review copy: **https://chess.fassj.o2bot.com**
 
-The website of the FASSJ Chess Club, the chess club of the Filipino American Society of South Jersey (FASSJ). Hosted on GitHub Pages. The main FASSJ site (fassj.org) is in `../website/`.
+The website of the FASSJ Chess Club, the chess club of the Filipino American Society of South Jersey (FASSJ). Hosted on GitHub Pages. The main FASSJ site (fassj1974.wixsite.com/fassj) is in `../website/`.
 
 Plans: `../docs/fassj-migration-plan.md`, `../docs/fassj-main-site-spec.md`. History: this repo was the SJFACC site (sjfacc.org) until the 2026-11-19 rename.
 
