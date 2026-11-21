@@ -126,6 +126,7 @@
         if (res.signedOut) return signOut(res.error);
         if (!res.ok) return say(omsg, res.error);
         document.getElementById('officer-name').textContent = res.name;
+        document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.forEach(function (f) {
@@ -160,7 +161,47 @@
         tok(res.token); olog.reset(); load();
       }).catch(function () { say(lmsg, 'Couldn’t sign in. Please try again.'); }).then(function () { btn.disabled = false; });
     });
+    var inv = document.getElementById('invite-form'), imsg = document.getElementById('invite-msg');
+    inv.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = inv.querySelector('button'); btn.disabled = true; say(imsg, 'Sending…', true);
+      post({ form: 'officer_invite', token: tok(), name: inv.name.value, email: inv.email.value, site: location.origin }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) return say(imsg, res.error);
+        say(imsg, 'Invitation sent to ' + inv.email.value + '. The link works for 48 hours.', true); inv.reset();
+      }).catch(function () { say(imsg, 'Couldn’t send. Please try again.'); }).then(function () { btn.disabled = false; });
+    });
     if (tok()) load();
+  }
+
+  // Officer setup page (spec §28.5c): show the invited officer's Google Authenticator QR code, then confirm with one code.
+  var smain = document.querySelector('main[data-officer-api]');
+  if (smain) {
+    var sapi = smain.getAttribute('data-officer-api'), t = new URLSearchParams(location.search).get('t') || '';
+    var smsg = document.getElementById('setup-msg'), scard = document.getElementById('setup-card'), serr = document.getElementById('setup-err');
+    var spost = function (d) { return fetch(sapi, { method: 'POST', body: new URLSearchParams(d) }).then(function (r) { return r.json(); }); };
+    var fail = function (m) { smsg.textContent = m; smsg.classList.add('is-visible'); scard.classList.add('hidden'); };
+    if (!t) fail('This page needs the link from your invitation email. Please open the link in that email.');
+    else spost({ form: 'officer_setup', t: t }).then(function (res) {
+      if (!res.ok) return fail(res.error);
+      document.getElementById('setup-name').textContent = res.name;
+      document.getElementById('setup-email').textContent = res.email;
+      document.getElementById('setup-key').textContent = res.key.replace(/(.{4})/g, '$1 ').trim();
+      var q = qrcode(0, 'M'); q.addData(res.uri); q.make();
+      document.getElementById('setup-qr').innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+      smsg.classList.add('hidden'); smsg.classList.remove('is-visible'); scard.classList.remove('hidden');
+      try { history.replaceState(null, '', location.pathname + '?t=' + t); } catch (e) {}
+    }).catch(function () { fail('Couldn’t load your invitation. Please try again in a moment.'); });
+    var setupForm = document.getElementById('setup-form');
+    if (setupForm) setupForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = setupForm.querySelector('button'); btn.disabled = true; serr.textContent = '';
+      spost({ form: 'officer_setup_confirm', t: t, code: setupForm.code.value }).then(function (res) {
+        if (!res.ok) { serr.textContent = res.error; return; }
+        scard.classList.add('hidden'); document.getElementById('setup-qr').innerHTML = '';
+        var dn = document.getElementById('setup-done'); dn.classList.remove('hidden'); dn.classList.add('is-visible');
+      }).catch(function () { serr.textContent = 'Couldn’t check the code. Please try again.'; }).then(function () { btn.disabled = false; });
+    });
   }
 
   // Register and Partners/Advertise forms go to the club's Google Sheet (no email). A form stays "not open yet"

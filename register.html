@@ -18,7 +18,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=b915d00cd2">
+  <link rel="stylesheet" href="/styles.css?v=f16dcc600e">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">Review copy for the FASSJ committee &mdash; not the official site</div>
@@ -152,6 +152,16 @@
             <div class="officer-head"><p>Signed in as <b id="officer-name"></b>. Tick <b>Approved</b> to approve a form: that signs the approval electronically in your name.</p><button class="btn btn-outline btn-sm" type="button" id="officer-out">Sign out</button></div>
             <div class="roster-wrap"><table class="roster-table officer-table"><thead><tr><th scope="col">Form</th><th scope="col">Name</th><th scope="col">Age group</th><th scope="col">Signed</th><th scope="col">Form PDF</th><th scope="col">Approved</th></tr></thead><tbody id="officer-body"></tbody></table></div>
             <p class="officer-msg" id="officer-msg" role="status"></p>
+            <form class="invite-form hidden" id="invite-form" autocomplete="off">
+              <h3>Invite an officer</h3>
+              <p class="note" style="margin:0 0 10px">They get an email from fassj.admin@gmail.com with a link (valid 48 hours) to set up Google Authenticator; then they can sign in here and approve forms.</p>
+              <div class="officer-fields">
+                <label>Full name<input type="text" name="name" required></label>
+                <label>Email<input type="email" name="email" required></label>
+                <button class="btn btn-outline" type="submit">Send invitation</button>
+              </div>
+              <p class="officer-msg" id="invite-msg" role="status"></p>
+            </form>
           </div>
         </div>
       </div>
@@ -182,10 +192,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 84 · Nov 21, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · Est. November 17, 2026 · <span class="build" data-build>Build 85 · Nov 21, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=1e4dde8692"></script>
+  <script src="/script.js?v=e1132ff298"></script>
 </body>
 </html>
