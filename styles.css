@@ -503,3 +503,7 @@ section[id], article[id], [id="zelle"] { scroll-margin-top: 96px; }
 .officer-table button.link { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
 .officer-panel .roster-wrap { max-width: none; }
 .officer-table .ok-tick { color: #1d6b3a; font-weight: 700; white-space: nowrap; }
+
+/* The Feast Mantua logo: white box so the logo's own white background blends in; logo fills the box (Alex, 2026-11-21) */
+.partner-logo--white { background: #fff; border: 1px solid var(--line); padding: 6px 10px; }
+.partner-logo--white img { max-height: 120px; width: 100%; height: auto; object-fit: contain; }
