@@ -153,6 +153,11 @@
         res.forms.forEach(function (f) {
           var tr = document.createElement('tr'), b = document.createElement('button'), box = document.createElement('input'), lab = document.createElement('label'), by = document.createElement('span');
           cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); var sc = cell(tr, f.signedAt.replace(/ at .*/, '')); if (f.revision > 1) { var up = document.createElement('span'); up.className = 'by'; up.textContent = 'Updated ' + f.updatedAt + ' (rev ' + f.revision + ')'; sc.appendChild(up); }
+          if (f.signed === false) {   // spec §43: not signed yet -> nothing to view or approve
+            cell(tr, 'Not signed yet');
+            var wait = document.createElement('span'); wait.className = 'by'; wait.textContent = 'Waiting for the member to complete and sign it (Change my registration)';
+            cell(tr, wait); obody.appendChild(tr); return;
+          }
           b.type = 'button'; b.className = 'link'; b.textContent = 'View'; b.addEventListener('click', function () { openPdf(f.id, b); }); cell(tr, b);
           box.type = 'checkbox'; box.setAttribute('aria-label', 'Approve form ' + f.id); by.className = 'by';
           var mailNote = document.createElement('span'), mailBtn = document.createElement('button');
