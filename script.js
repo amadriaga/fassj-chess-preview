@@ -473,7 +473,17 @@
       if (!state.choice) { note(vmsg, 'Please tick a design in the gallery first.'); return; }
       castBtn.disabled = true;
       post({ form: 'vote', email: vEmail.value.trim(), code: codeIn.value.trim(), entry: state.choice, source: location.hostname }).then(function (res) {
-        if (res.ok) { note(vmsg, 'Thank you! Your vote for \u201c' + state.choiceTitle + '\u201d is in. Results are announced when voting closes.', true); vf.querySelectorAll('input,button').forEach(function (x) { x.disabled = true; }); }
+        if (res.ok) {
+          // Voted (spec §25): keep the thank-you, then reset everything for the next voter (one vote per email is checked by the script).
+          var votedFor = state.choiceTitle;
+          state.choice = null; state.choiceTitle = '';
+          grid.querySelectorAll('input[name=entry]').forEach(function (r) { r.checked = false; r.disabled = false; });
+          vEmail.value = ''; codeIn.value = ''; document.getElementById('v-code-field').classList.add('hidden');
+          document.getElementById('vote-choice').textContent = 'No design chosen yet.';
+          vf.querySelectorAll('input,button').forEach(function (x) { x.disabled = false; });
+          syncCast();
+          note(vmsg, 'Thank you! Your vote for \u201c' + votedFor + '\u201d is in. Results are announced when voting closes. Another member can vote now.', true);
+        }
         else { note(vmsg, res.error || 'Something went wrong. Please try again.'); syncCast(); }
       }).catch(function () { note(vmsg, 'We couldn\u2019t record your vote. Please try again.'); syncCast(); });
     });
