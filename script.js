@@ -150,6 +150,7 @@
         loadEntries();
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
+        res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
         res.forms.forEach(function (f) {
           var tr = document.createElement('tr'), b = document.createElement('button'), box = document.createElement('input'), lab = document.createElement('label'), by = document.createElement('span');
           cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); var sc = cell(tr, f.signedAt.replace(/ at .*/, '')); if (f.revision > 1) { var up = document.createElement('span'); up.className = 'by'; up.textContent = 'Updated ' + f.updatedAt + ' (rev ' + f.revision + ')'; sc.appendChild(up); }
