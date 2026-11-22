@@ -248,15 +248,11 @@
           var last = document.createElement('span'); last.className = 'by'; if (f.note) last.textContent = 'Last: ' + f.note;
           var act = function (label, cls) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + cls; x.textContent = label; box.appendChild(x); return x; };
           lab.appendChild(box); lab.appendChild(by); lab.appendChild(last);
-          if (f.status === 'Approved') { done(f.approvedBy, f.emailed); cell(tr, lab); tb.appendChild(tr); return; }
-          if (f.status === 'Denied' || f.status === 'Closed') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 ' + f.status; lab.replaceChild(dn, box); cell(tr, lab); tb.appendChild(tr); return; }
-          var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny'), bC = act('Close as duplicate', 'btn-outline');
-          var busy = function (on) { bA.disabled = bR.disabled = bD.disabled = bC.disabled = on; };
-          bC.addEventListener('click', function () {   // spec §50: no email; needs the form that replaces it
+          var openClose = function (setBusy, closed) {   // spec §50/§58: close as a duplicate; no email; needs the replacing form
             if (tr.nextSibling && tr.nextSibling.className === 'reply-row') tr.parentNode.removeChild(tr.nextSibling);
             var row = document.createElement('tr'), td = document.createElement('td'), lb = document.createElement('label'), ta = document.createElement('textarea'), go = document.createElement('button'), no = document.createElement('button'), bar = document.createElement('div');
             row.className = 'reply-row'; td.colSpan = 3; td.className = 'reply-cell';
-            lb.textContent = 'Close ' + f.id + ' (' + f.name + ') as a duplicate. No email is sent. Give the form that replaces it:';
+            lb.textContent = 'Close ' + f.id + ' (' + f.name + ') as a duplicate. No email is sent. Give the form that replaces it' + (f.status === 'Approved' ? ' (it must be approved already)' : '') + ':';
             ta.rows = 2; ta.className = 'reply-text'; ta.value = 'Replaced by RF' + f.id.slice(2, 7) + ''; lb.appendChild(ta);
             go.type = 'button'; go.className = 'btn btn-sm btn-primary'; go.textContent = 'Close form';
             no.type = 'button'; no.className = 'btn btn-sm btn-outline'; no.textContent = 'Cancel';
@@ -265,15 +261,33 @@
             ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
             no.addEventListener('click', function () { row.parentNode.removeChild(row); });
             go.addEventListener('click', function () {
-              busy(true); go.disabled = no.disabled = true; say(omsg, 'Closing ' + f.id + '…', true);
+              setBusy(true); go.disabled = no.disabled = true; say(omsg, 'Closing ' + f.id + '…', true);
               post({ form: 'officer_close', token: tok(), id: f.id, message: ta.value.trim() }).then(function (res) {
                 if (res.signedOut) return signOut(res.error);
-                if (!res.ok) { busy(false); go.disabled = no.disabled = false; return say(omsg, res.error); }
-                row.parentNode.removeChild(row); last.textContent = 'Last: ' + res.note;
-                var dn3 = document.createElement('span'); dn3.className = 'denied-tick'; dn3.textContent = '\u2715 Closed'; box.parentNode.replaceChild(dn3, box);
+                if (!res.ok) { setBusy(false); go.disabled = no.disabled = false; return say(omsg, res.error); }
+                row.parentNode.removeChild(row); last.textContent = 'Last: ' + res.note; closed();
+                chip.className = 'vote-result r-open'; chip.textContent = 'Closed';
                 say(omsg, f.id + ' closed (no email sent).', true);
-              }).catch(function () { busy(false); go.disabled = no.disabled = false; say(omsg, 'Couldn’t close. Please try again.'); });
+              }).catch(function () { setBusy(false); go.disabled = no.disabled = false; say(omsg, 'Couldn’t close. Please try again.'); });
             });
+          };
+          if (f.status === 'Approved') {
+            done(f.approvedBy, f.emailed);
+            var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'link'; cl.textContent = 'Close (replaced by a newer form)';
+            cl.addEventListener('click', function () {
+              openClose(function (on) { cl.disabled = on; }, function () {
+                var dn4 = document.createElement('span'); dn4.className = 'denied-tick'; dn4.textContent = '\u2715 Closed';
+                Array.prototype.slice.call(lab.childNodes).forEach(function (n) { if (n !== last) lab.removeChild(n); });
+                lab.insertBefore(dn4, last);
+              });
+            });
+            lab.appendChild(cl); cell(tr, lab); tb.appendChild(tr); return;
+          }
+          if (f.status === 'Denied' || f.status === 'Closed') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 ' + f.status; lab.replaceChild(dn, box); cell(tr, lab); tb.appendChild(tr); return; }
+          var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny'), bC = act('Close as duplicate', 'btn-outline');
+          var busy = function (on) { bA.disabled = bR.disabled = bD.disabled = bC.disabled = on; };
+          bC.addEventListener('click', function () {   // spec §50
+            openClose(busy, function () { var dn3 = document.createElement('span'); dn3.className = 'denied-tick'; dn3.textContent = '\u2715 Closed'; box.parentNode.replaceChild(dn3, box); });
           });
           if (f.nameOk === false) { var nw = document.createElement('span'); nw.className = 'by warn'; nw.textContent = 'Name doesn\u2019t look like a real name: use Reply to ask for it, or Deny.'; lab.insertBefore(nw, by); }
           bA.addEventListener('click', function () {
