@@ -481,7 +481,7 @@
             });
             card.appendChild(vl);
           }
-          var wh = document.createElement('p'); wh.className = 'vote-head'; wh.textContent = (d.items || []).length ? 'The whole document' : 'Your decision on this document'; card.appendChild(wh);
+          var wh = document.createElement('p'); wh.className = 'vote-head'; wh.textContent = (d.items || []).length ? 'The whole document' : (canVote ? 'Your decision on this document' : 'Decision on this document'); card.appendChild(wh);
           var dtl = document.createElement('p'); dtl.className = 'vote-tally'; var dTally = d.docTally || { 'Approved': 0, 'Not approved': 0, 'Revise': 0 }, dMine = d.docMine || '';
           tallyLine(dtl, dTally); card.appendChild(dtl);
           var list = document.createElement('ul'); list.className = 'doc-comments';

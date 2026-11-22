@@ -686,3 +686,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .vote-who { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
 .vote-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .vote-btn[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.doc-card-o > .by { display: block; margin: 0 0 6px; font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
