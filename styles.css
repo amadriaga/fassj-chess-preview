@@ -668,3 +668,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .role-chooser { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0; font-size: .85rem; }
 .role-chooser label { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .role-slot { margin-top: 6px; }
+.officer-table th { white-space: nowrap; }
