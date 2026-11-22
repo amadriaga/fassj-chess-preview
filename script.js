@@ -232,7 +232,16 @@
             ta.rows = 5; ta.value = suggest(deny); ta.className = 'reply-text'; lb.appendChild(ta);
             go.type = 'button'; go.className = 'btn btn-sm ' + (deny ? 'btn-outline btn-deny' : 'btn-primary'); go.textContent = deny ? 'Deny and send' : 'Send reply';
             no.type = 'button'; no.className = 'btn btn-sm btn-outline'; no.textContent = 'Cancel';
-            bar.className = 'officer-actions'; bar.appendChild(go); bar.appendChild(no);
+            var tst = document.createElement('button'); tst.type = 'button'; tst.className = 'btn btn-sm btn-outline'; tst.textContent = 'Send me a test';
+            bar.className = 'officer-actions'; bar.appendChild(go); bar.appendChild(tst); bar.appendChild(no);
+            tst.addEventListener('click', function () {   // spec §45: same email with [TEST], to the signed-in officer only
+              var tmsg = ta.value.trim(); if (!tmsg) return say(omsg, 'Please type your message.');
+              tst.disabled = true; say(omsg, 'Sending a test to you…', true);
+              post({ form: deny ? 'officer_deny' : 'officer_reply', token: tok(), id: f.id, message: tmsg, site: location.origin, test: 'yes' }).then(function (res) {
+                if (res.signedOut) return signOut(res.error);
+                tst.disabled = false; say(omsg, res.ok ? res.note : res.error, res.ok);
+              }).catch(function () { tst.disabled = false; say(omsg, 'Couldn’t send the test. Please try again.'); });
+            });
             td.appendChild(lb); td.appendChild(bar); row.appendChild(td); tr.parentNode.insertBefore(row, tr.nextSibling);
             ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
             no.addEventListener('click', function () { row.parentNode.removeChild(row); });
