@@ -529,9 +529,10 @@
         (res.requests || []).forEach(function (q) {
           var card = document.createElement('div'), txt = document.createElement('p'), acts = document.createElement('span');
           card.className = 'doc-card-o'; acts.className = 'officer-actions';
-          txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when + (q.already ? ' · already an officer (decline this request)' : '');
-          var qch = q.already ? null : roleChooser('documents', false);
-          (q.already ? [['Decline', 'decline', 'btn-outline']] : [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']]).forEach(function (b) {
+          txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when;
+          if (q.already) { var al = document.createElement('p'); al.className = 'note'; al.textContent = q.email + ' is already an active officer of the club.'; card.appendChild(txt); card.appendChild(al); rlist.appendChild(card); return; }
+          var qch = roleChooser('documents', false);
+          [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']].forEach(function (b) {
             var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + b[2]; x.textContent = b[0];
             x.addEventListener('click', function () {
               if (!window.confirm(b[0] + ' for ' + q.name + ' (' + q.email + ')?')) return;
@@ -545,7 +546,7 @@
             });
             acts.appendChild(x);
           });
-          card.appendChild(txt); if (qch) card.appendChild(qch); card.appendChild(acts); rlist.appendChild(card);
+          card.appendChild(txt); card.appendChild(qch); card.appendChild(acts); rlist.appendChild(card);
         });
       }).catch(function () {});
     };
