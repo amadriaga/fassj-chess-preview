@@ -700,3 +700,6 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .admin-name { margin: 0; font-weight: 600; color: var(--ink); }
 .admin-email { display: block; width: 100%; max-width: 360px; margin: 8px 0 4px; }
 .admin-row .role-chooser { margin: 4px 0; }
+.admin-add-btn { margin-top: 14px; }
+.admin-add { display: grid; gap: 8px; max-width: 360px; margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--ivory); }
+.admin-add input[hidden] { display: none; }

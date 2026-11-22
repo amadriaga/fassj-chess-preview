@@ -563,7 +563,7 @@
         alist.innerHTML = '';
         var group = '';
         res.roster.forEach(function (p) {
-          if (p.group !== group) { group = p.group; var gh = document.createElement('p'); gh.className = 'vote-head'; gh.textContent = group === 'Board' ? 'Board of Directors' : 'Officers'; alist.appendChild(gh); }
+          if (p.group !== group) { group = p.group; var gh = document.createElement('p'); gh.className = 'vote-head'; gh.textContent = group === 'Board' ? 'Board of Directors' : group === 'Officer' ? 'Officers' : 'Other'; alist.appendChild(gh); }
           var row = document.createElement('div'), top = document.createElement('div'), nm = document.createElement('p'), st = document.createElement('span');
           row.className = 'admin-row'; top.className = 'admin-top'; nm.className = 'admin-name';
           nm.textContent = p.name + ' · ' + p.position;
@@ -603,6 +603,30 @@
           }
           alist.appendChild(row);
         });
+        // spec §55.4b: + Add a person
+        var addBtn = document.createElement('button'), addF = document.createElement('div');
+        addBtn.type = 'button'; addBtn.className = 'btn btn-sm btn-outline admin-add-btn'; addBtn.textContent = '+ Add a person';
+        addF.className = 'admin-add hidden';
+        var mk = function (tag, ph, lab) { var x = document.createElement(tag); if (ph) x.placeholder = ph; x.setAttribute('aria-label', lab); return x; };
+        var gsel = mk('select', '', 'Group'); [['Board', 'Board of Directors'], ['Officer', 'Officer'], ['Other', 'Other']].forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; gsel.appendChild(op); });
+        var nIn = mk('input', 'Full name', 'Full name'), pIn = mk('input', 'Position (e.g. Treasurer)', 'Position'), eIn = mk('input', 'Email (optional)', 'Email'); eIn.type = 'email';
+        var pos = function () { pIn.hidden = gsel.value === 'Board'; }; gsel.addEventListener('change', pos); pos();
+        var saveA = document.createElement('button'), cancelA = document.createElement('button');
+        saveA.type = 'button'; saveA.className = 'btn btn-sm btn-primary'; saveA.textContent = 'Add to the list';
+        cancelA.type = 'button'; cancelA.className = 'btn btn-sm btn-outline'; cancelA.textContent = 'Cancel';
+        var aa = document.createElement('div'); aa.className = 'officer-actions'; aa.appendChild(saveA); aa.appendChild(cancelA);
+        [gsel, nIn, pIn, eIn, aa].forEach(function (x) { addF.appendChild(x); });
+        addBtn.addEventListener('click', function () { addF.classList.remove('hidden'); addBtn.classList.add('hidden'); nIn.focus(); adminBusy = true; });
+        cancelA.addEventListener('click', function () { addF.classList.add('hidden'); addBtn.classList.remove('hidden'); adminBusy = false; });
+        saveA.addEventListener('click', function () {
+          saveA.disabled = true;
+          post({ form: 'admin_roster_add', token: tok(), group: gsel.value, name: nIn.value, position: pIn.hidden ? '' : pIn.value, email: eIn.value }).then(function (r) {
+            if (r.signedOut) return signOut(r.error);
+            if (!r.ok) return say(amsg, r.error);
+            say(amsg, nIn.value.trim() + ' added to the list.', true); adminBusy = false; loadAdmin();
+          }).catch(function () { say(amsg, 'Couldn’t add. Please try again.'); }).then(function () { saveA.disabled = false; });
+        });
+        alist.appendChild(addBtn); alist.appendChild(addF);
       }).catch(function () { say(amsg, 'Couldn’t load the roster. Please try again.'); });
     };
     var olistBody = document.getElementById('officer-list');
