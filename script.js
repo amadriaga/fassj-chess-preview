@@ -184,7 +184,7 @@
             });
             b.parentNode.appendChild(warn); b.parentNode.appendChild(rb);
           }
-          box.type = 'checkbox'; box.setAttribute('aria-label', 'Approve form ' + f.id); by.className = 'by';
+          box = document.createElement('span'); box.className = 'officer-actions'; by.className = 'by';   // spec §45: Approve · Reply · Deny
           var mailNote = document.createElement('span'), mailBtn = document.createElement('button');
           mailNote.className = 'by'; mailBtn.type = 'button'; mailBtn.className = 'link'; mailBtn.textContent = 'Email copy';
           mailBtn.addEventListener('click', function () {   // spec §43: send (again) the approved PDF to the form's email
@@ -197,18 +197,40 @@
             }).catch(function () { mailBtn.disabled = false; say(omsg, 'Couldn’t send. Please try again.'); });
           });
           var done = function (who, note) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; mailNote.textContent = note || 'Not emailed yet'; lab.appendChild(mailNote); lab.appendChild(mailBtn); };
-          lab.appendChild(box); lab.appendChild(by);
-          if (f.status === 'Approved') done(f.approvedBy, f.emailed);
-          box.addEventListener('change', function () {
-            if (!box.checked) return;
-            if (!window.confirm('Approve form ' + f.id + ' for ' + f.name + '?\n\nThis signs the approval electronically in your name.')) { box.checked = false; return; }
-            box.disabled = true; say(omsg, 'Approving ' + f.id + '…', true);
+          var last = document.createElement('span'); last.className = 'by'; if (f.note) last.textContent = 'Last: ' + f.note;
+          var act = function (label, cls) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + cls; x.textContent = label; box.appendChild(x); return x; };
+          lab.appendChild(box); lab.appendChild(by); lab.appendChild(last);
+          if (f.status === 'Approved') { done(f.approvedBy, f.emailed); cell(tr, lab); obody.appendChild(tr); return; }
+          if (f.status === 'Denied') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 Denied'; lab.replaceChild(dn, box); cell(tr, lab); obody.appendChild(tr); return; }
+          var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny');
+          var busy = function (on) { bA.disabled = bR.disabled = bD.disabled = on; };
+          if (f.nameOk === false) { var nw = document.createElement('span'); nw.className = 'by warn'; nw.textContent = 'Name doesn\u2019t look like a real name: use Reply to ask for it, or Deny.'; lab.insertBefore(nw, by); }
+          bA.addEventListener('click', function () {
+            if (!window.confirm('Approve form ' + f.id + ' for ' + f.name + '?\n\nThis signs the approval electronically in your name.')) return;
+            busy(true); say(omsg, 'Approving ' + f.id + '…', true);
             post({ form: 'officer_approve', token: tok(), id: f.id }).then(function (res) {
               if (res.signedOut) return signOut(res.error);
-              if (!res.ok) { box.checked = false; box.disabled = false; return say(omsg, res.error); }
-              done(res.approvedBy, res.emailNote); say(omsg, f.id + ' approved. The approved PDF is saved. ' + (res.emailNote || '') + '.', true);
-            }).catch(function () { box.checked = false; box.disabled = false; say(omsg, 'Couldn’t save. Please try again.'); });
+              if (!res.ok) { busy(false); return say(omsg, res.error); }
+              done(res.approvedBy, res.emailNote); last.textContent = ''; say(omsg, f.id + ' approved. The approved PDF is saved. ' + (res.emailNote || '') + '.', true);
+            }).catch(function () { busy(false); say(omsg, 'Couldn’t save. Please try again.'); });
           });
+          var send = function (kind) {
+            var deny = kind === 'deny';
+            var suggest = f.nameOk === false ? 'Please send us the player\u2019s real first and last name (not a chess.com or other username), so we can approve the membership form.' : '';
+            var msg = window.prompt((deny ? 'Reason for denying form ' : 'Message to the member about form ') + f.id + ' (emailed to the address on the form):', suggest);
+            if (msg === null || !msg.trim()) return;
+            if (deny && !window.confirm('Deny form ' + f.id + ' for ' + f.name + '?\n\nThe member is emailed your reason and the form leaves the public list.')) return;
+            busy(true); say(omsg, (deny ? 'Denying ' : 'Sending reply for ') + f.id + '…', true);
+            post({ form: deny ? 'officer_deny' : 'officer_reply', token: tok(), id: f.id, message: msg, site: location.origin }).then(function (res) {
+              if (res.signedOut) return signOut(res.error);
+              if (!res.ok) { busy(false); return say(omsg, res.error); }
+              last.textContent = 'Last: ' + res.note;
+              if (deny) { var dn2 = document.createElement('span'); dn2.className = 'denied-tick'; dn2.textContent = '\u2715 Denied'; box.parentNode.replaceChild(dn2, box); } else busy(false);
+              say(omsg, f.id + ': ' + (deny ? 'denied' : 'reply sent') + ' to ' + res.sentTo + '.', true);
+            }).catch(function () { busy(false); say(omsg, 'Couldn’t send. Please try again.'); });
+          };
+          bR.addEventListener('click', function () { send('reply'); });
+          bD.addEventListener('click', function () { send('deny'); });
           cell(tr, lab); obody.appendChild(tr);
         });
       }).catch(function () { say(omsg, 'Couldn’t load the forms. Please try again.'); });

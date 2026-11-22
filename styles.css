@@ -589,3 +589,8 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .roster-scroll td:nth-child(2) { white-space: nowrap; }
 .roster-scroll .roster-table th, .roster-scroll .roster-table td { padding: 7px 8px; font-size: .8rem; }
 .roster-scroll .roster-table th { letter-spacing: .04em; font-size: .7rem; }
+.officer-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.officer-actions .btn-sm { padding: 5px 10px; font-size: .78rem; }
+.btn-deny { color: #9b1c1c; border-color: #d8a5a5; }
+.denied-tick { color: #9b1c1c; font-weight: 600; }
+.officer-table .by.warn { color: #9b1c1c; }
