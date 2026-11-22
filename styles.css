@@ -695,3 +695,8 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .doc-acc > summary:hover .doc-title, .doc-acc > summary:focus-visible .doc-title { color: var(--gold); }
 .doc-sum { font-size: .82rem; color: var(--muted); }
 .doc-acc > .doc-body { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin: 0; }
+.admin-row { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.admin-top { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.admin-name { margin: 0; font-weight: 600; color: var(--ink); }
+.admin-email { display: block; width: 100%; max-width: 360px; margin: 8px 0 4px; }
+.admin-row .role-chooser { margin: 4px 0; }

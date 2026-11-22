@@ -187,11 +187,13 @@
         if (reqForm) reqForm.classList.add('hidden');
         var has = function (a) { return (res.roles || []).indexOf(a) !== -1; };   // spec §52: tabs by area
         ['registrations', 'contest', 'documents', 'officers'].forEach(function (id) { var tb = document.getElementById('tab-' + id); if (tb) tb.hidden = !has(id); });
+        var tAdmin = document.getElementById('tab-admin'); if (tAdmin) tAdmin.hidden = !res.owner;   // spec §55: owners only
         var cur = document.querySelector('#officer-panel .tab[aria-selected="true"]');
         if (!cur || cur.hidden) { var first = document.querySelector('#officer-panel .tab:not([hidden])'); if (first) first.click(); }
         if (has('contest')) loadEntries();
         if (has('documents')) loadDocs();
         if (has('officers')) { loadRequests(); loadOfficers(); }
+        if (res.owner) loadAdmin();
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -549,6 +551,59 @@
       AREA_NAMES.forEach(function (a) { var l = document.createElement('label'), c = document.createElement('input'); c.type = 'checkbox'; c.value = a[0]; c.checked = cur.indexOf(a[0]) !== -1; l.appendChild(c); l.appendChild(document.createTextNode(' ' + a[1])); box.appendChild(l); });
       box.values = function () { return { roles: Array.prototype.filter.call(box.querySelectorAll('input:not(.can-invite)'), function (c) { return c.checked; }).map(function (c) { return c.value; }).join(',') || 'documents', canInvite: '' }; };
       return box;
+    };
+    // spec §55: Admin tab: FASSJ officers and Board, with a fallback invitation
+    var alist = document.getElementById('admin-list'), amsg = document.getElementById('admin-msg'), adminBusy = false;
+    var loadAdmin = function () {
+      if (!alist || adminBusy) return;
+      if (alist.querySelector('input:focus') || Array.prototype.some.call(alist.querySelectorAll('input[type=email]'), function (x) { return x.value !== x.defaultValue; })) return;   // don't wipe typing on auto-refresh
+      post({ form: 'admin_roster', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) return say(amsg, res.error);
+        alist.innerHTML = '';
+        var group = '';
+        res.roster.forEach(function (p) {
+          if (p.group !== group) { group = p.group; var gh = document.createElement('p'); gh.className = 'vote-head'; gh.textContent = group === 'Board' ? 'Board of Directors' : 'Officers'; alist.appendChild(gh); }
+          var row = document.createElement('div'), top = document.createElement('div'), nm = document.createElement('p'), st = document.createElement('span');
+          row.className = 'admin-row'; top.className = 'admin-top'; nm.className = 'admin-name';
+          nm.textContent = p.name + ' · ' + p.position;
+          var SC = { 'Active': 'r-approved', 'Invitation sent': 'r-revise', 'Request waiting': 'r-revise' };
+          st.className = 'vote-result ' + (SC[p.status] || 'r-open'); st.textContent = p.status + (p.roles ? ' · ' + areaText(p.roles) : '');
+          top.appendChild(nm); top.appendChild(st); row.appendChild(top);
+          if (p.status !== 'Active') {
+            var em = document.createElement('input'); em.type = 'email'; em.className = 'admin-email'; em.placeholder = 'Email address'; em.value = p.email || ''; em.defaultValue = p.email || ''; em.setAttribute('aria-label', 'Email for ' + p.name);
+            var ch = roleChooser('documents', false), acts = document.createElement('div'); acts.className = 'officer-actions';
+            var sv = document.createElement('button'); sv.type = 'button'; sv.className = 'btn btn-sm btn-outline'; sv.textContent = 'Save email';
+            var inv = document.createElement('button'); inv.type = 'button'; inv.className = 'btn btn-sm btn-primary'; inv.textContent = p.status === 'Invitation sent' ? 'Resend invitation' : 'Send invitation';
+            sv.addEventListener('click', function () {
+              sv.disabled = true;
+              post({ form: 'admin_roster_set', token: tok(), name: p.name, email: em.value.trim() }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(amsg, r.error);
+                em.defaultValue = em.value; say(amsg, p.name + ': email saved.', true);
+              }).catch(function () { say(amsg, 'Couldn’t save. Please try again.'); }).then(function () { sv.disabled = false; });
+            });
+            inv.addEventListener('click', function () {
+              var e = em.value.trim(), v = ch.values();
+              if (!e) return say(amsg, 'Please type ' + p.name + '’s email first.');
+              if (!window.confirm(inv.textContent + ' to ' + p.name + ' (' + e + ')?\n\nAreas: ' + areaText(v.roles) + '\nThe email comes from fassj.admin@gmail.com; the link works for 48 hours.')) return;
+              inv.disabled = true; adminBusy = true;
+              post({ form: 'admin_invite', token: tok(), name: p.name, email: e, roles: v.roles, site: location.origin }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(amsg, r.error);
+                em.defaultValue = em.value; say(amsg, p.name + ': invitation sent to ' + e + '.', true);
+                adminBusy = false; loadAdmin(); if (typeof loadOfficers === 'function') loadOfficers();
+              }).catch(function () { say(amsg, 'Couldn’t send. Please try again.'); }).then(function () { inv.disabled = false; adminBusy = false; });
+            });
+            acts.appendChild(sv); acts.appendChild(inv);
+            row.appendChild(em); row.appendChild(ch); row.appendChild(acts);
+            if (p.status === 'Request waiting') { var rn = document.createElement('p'); rn.className = 'vote-who'; rn.textContent = 'They asked through Request access: you can approve it on the Officers tab, or send the invitation here.'; row.appendChild(rn); }
+          } else {
+            var ae = document.createElement('p'); ae.className = 'vote-who'; ae.textContent = p.email; row.appendChild(ae);
+          }
+          alist.appendChild(row);
+        });
+      }).catch(function () { say(amsg, 'Couldn’t load the roster. Please try again.'); });
     };
     var olistBody = document.getElementById('officer-list');
     var loadOfficers = function () {   // spec §52: current officers
