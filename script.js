@@ -314,6 +314,24 @@
       }).catch(function () { say(omsg, 'Couldn’t load the forms. Please try again.'); });
     };
     document.getElementById('officer-out').addEventListener('click', function () { signOut('Signed out.'); });
+    // spec §52: auto-refresh every 60 s while signed in and visible; never while the officer is typing or replying
+    var busy = function () {
+      if (opan.querySelector('.reply-row')) return true;
+      var tas = opan.querySelectorAll('textarea');
+      for (var i = 0; i < tas.length; i++) if (tas[i].value.trim() || tas[i] === document.activeElement) return true;
+      return false;
+    };
+    var stamp = function () {
+      var h = document.querySelector('#officer-panel .officer-head p'), u = document.getElementById('officer-updated');
+      if (!h) return; if (!u) { u = document.createElement('span'); u.id = 'officer-updated'; u.className = 'by'; h.appendChild(u); }
+      u.textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · refreshes every minute';
+    };
+    var autoRefresh = function () {
+      if (document.hidden || !tok() || opan.classList.contains('hidden') || busy()) return;
+      var y = window.scrollY; load(); setTimeout(function () { window.scrollTo(0, y); stamp(); }, 1500);
+    };
+    setInterval(autoRefresh, 60000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) autoRefresh(); });
     olog.addEventListener('submit', function (e) {
       e.preventDefault();
       var btn = olog.querySelector('button'); btn.disabled = true; say(lmsg, '');
@@ -459,8 +477,8 @@
         (res.requests || []).forEach(function (q) {
           var card = document.createElement('div'), txt = document.createElement('p'), acts = document.createElement('span');
           card.className = 'doc-card-o'; acts.className = 'officer-actions';
-          txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when;
-          [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']].forEach(function (b) {
+          txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when + (q.already ? ' · already an officer (decline this request)' : '');
+          (q.already ? [['Decline', 'decline', 'btn-outline']] : [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']]).forEach(function (b) {
             var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + b[2]; x.textContent = b[0];
             x.addEventListener('click', function () {
               if (!window.confirm(b[0] + ' for ' + q.name + ' (' + q.email + ')?')) return;
