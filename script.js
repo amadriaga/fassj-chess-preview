@@ -184,7 +184,11 @@
         document.getElementById('officer-name').textContent = res.name;
         document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
         var onone = document.getElementById('officers-none'); if (onone) onone.classList.toggle('hidden', !!res.canInvite);
-        loadEntries(); loadDocs(); loadRequests(); loadOfficers(); if (reqForm) reqForm.classList.add('hidden');
+        if (reqForm) reqForm.classList.add('hidden');
+        var full = res.roles !== 'documents';   // spec §52: documents-only officers see Board documents only
+        ['registrations', 'contest', 'officers'].forEach(function (id) { var tb = document.getElementById('tab-' + id); if (tb) tb.hidden = !full; });
+        if (!full) { var td = document.getElementById('tab-documents'); if (td && td.getAttribute('aria-selected') !== 'true') td.click(); loadDocs(); return; }
+        loadEntries(); loadDocs(); loadRequests(); loadOfficers();
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -474,11 +478,23 @@
       post({ form: 'officer_list', token: tok() }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         olistBody.innerHTML = '';
-        if (!res.ok || !res.officers.length) { var tr0 = document.createElement('tr'); cell(tr0, res.ok ? 'No officers yet.' : res.error).colSpan = 5; olistBody.appendChild(tr0); return; }
+        if (!res.ok || !res.officers.length) { var tr0 = document.createElement('tr'); cell(tr0, res.ok ? 'No officers yet.' : res.error).colSpan = 6; olistBody.appendChild(tr0); return; }
         res.officers.forEach(function (o) {
           var tr = document.createElement('tr'); cell(tr, o.name); cell(tr, o.email);
           var stc = cell(tr, o.status); stc.className = o.status === 'Active' ? 'st-active' : 'st-pending';
-          cell(tr, o.canInvite ? 'Yes' : '\u2014'); cell(tr, o.invited || '\u2014'); olistBody.appendChild(tr);
+          cell(tr, o.roles === 'all' ? 'Everything' : 'Board documents'); cell(tr, o.canInvite ? 'Yes' : '\u2014');
+          var ic = cell(tr, o.invited || '\u2014');
+          if (res.canRemove && !o.owner && o.email !== res.me) {
+            var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'link'; rm.textContent = 'Remove';
+            rm.addEventListener('click', function () {
+              if (!window.confirm('Remove ' + o.name + ' (' + o.email + ') as an officer?\n\nTheir sign-in stops working; their past decisions and comments stay.')) return;
+              rm.disabled = true;
+              post({ form: 'officer_remove', token: tok(), email: o.email }).then(function (r2) { if (r2.signedOut) return signOut(r2.error); if (!r2.ok) { rm.disabled = false; return say(rmsg, r2.error); } loadOfficers(); })
+                .catch(function () { rm.disabled = false; });
+            });
+            ic.appendChild(document.createTextNode(' ')); ic.appendChild(rm);
+          }
+          olistBody.appendChild(tr);
         });
       }).catch(function () {});
     };
@@ -525,7 +541,7 @@
     inv.addEventListener('submit', function (e) {
       e.preventDefault();
       var btn = inv.querySelector('button'); btn.disabled = true; say(imsg, 'Sending…', true);
-      post({ form: 'officer_invite', token: tok(), name: inv.name.value, email: inv.email.value, site: location.origin }).then(function (res) {
+      post({ form: 'officer_invite', token: tok(), name: inv.name.value, email: inv.email.value, role: inv.role ? inv.role.value : 'documents', site: location.origin }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         if (!res.ok) return say(imsg, res.error);
         say(imsg, 'Invitation sent to ' + inv.email.value + '. The link works for 48 hours.', true); inv.reset();
