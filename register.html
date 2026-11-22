@@ -71,9 +71,11 @@
           <div class="form-grid">
             <div class="field field--full"><label for="r-name">Player&rsquo;s full name <span class="req">*</span></label><input type="text" id="r-name" name="name" autocomplete="name" required></div>
             <div class="field field--full"><label for="r-age">Age group <span class="req">*</span></label><select id="r-age" name="age_bracket" required><option value="" selected disabled>Choose the player&rsquo;s age group</option><option>Early Learners (ages 4&ndash;6)</option><option>Elementary / Youth (ages 7&ndash;11)</option><option>Middle &amp; High School (ages 12&ndash;17)</option><option>Adult (18+)</option></select></div>
-            <div class="field field--full hidden" id="guardian-section"><label for="r-guardian">Parent or guardian&rsquo;s full name <span class="req">*</span></label><input type="text" id="r-guardian" name="guardian_name" autocomplete="name" data-guardian><span class="note" style="margin-top:2px">For players under 18, please give the parent or guardian&rsquo;s email and phone below.</span></div>
-            <div class="field"><label for="r-email">Email <span class="req">*</span></label><input type="email" id="r-email" name="email" autocomplete="email" required></div>
-            <div class="field"><label for="r-phone">Phone <span class="req">*</span></label><input type="tel" id="r-phone" name="phone" autocomplete="tel" required></div>
+            <div class="field field--full hidden" id="guardian-section"><label for="r-guardian">Parent or guardian&rsquo;s full name <span class="req">*</span></label><input type="text" id="r-guardian" name="guardian_name" autocomplete="name" data-guardian><span class="note" style="margin-top:2px">For players under 18, the parent or guardian&rsquo;s email gets a copy of every message about this form.</span></div>
+            <div class="field guardian-extra hidden"><label for="r-guardian-email">Parent or guardian&rsquo;s email <span class="req">*</span></label><input type="email" id="r-guardian-email" name="guardian_email" autocomplete="email" data-guardian></div>
+            <div class="field guardian-extra hidden"><label for="r-guardian-phone">Parent or guardian&rsquo;s phone <span class="req">*</span></label><input type="tel" id="r-guardian-phone" name="guardian_phone" autocomplete="tel" data-guardian></div>
+            <div class="field"><label for="r-email">Player&rsquo;s email <span class="req adult-req">*</span></label><input type="email" id="r-email" name="email" autocomplete="email" required><span class="note minor-opt hidden" style="margin-top:2px">Optional for players under 18.</span></div>
+            <div class="field"><label for="r-phone">Player&rsquo;s phone <span class="req adult-req">*</span></label><input type="tel" id="r-phone" name="phone" autocomplete="tel" required><span class="note minor-opt hidden" style="margin-top:2px">Optional for players under 18.</span></div>
             <fieldset class="field field--full"><legend>Chess experience</legend><div class="checks"><label class="check"><input type="radio" name="experience" value="New to chess"> New to chess</label><label class="check"><input type="radio" name="experience" value="Casual player"> Casual player</label><label class="check"><input type="radio" name="experience" value="Club player"> Club player</label><label class="check"><input type="radio" name="experience" value="Rated player"> Rated player</label></div></fieldset>
             <div class="field"><label for="r-uscf">US Chess ID (optional)</label><input type="text" id="r-uscf" name="uscf_id" inputmode="numeric"></div>
             <div class="field field--full"><label for="r-medical">Allergies or medical conditions (optional)</label><textarea id="r-medical" name="medical" rows="2" placeholder="Only what officers should know to keep the player safe at club activities."></textarea></div>
@@ -172,10 +174,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 141 · Nov 22, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 142 · Nov 22, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=fa4642d401"></script>
+  <script src="/script.js?v=2b5090ae3f"></script>
 </body>
 </html>

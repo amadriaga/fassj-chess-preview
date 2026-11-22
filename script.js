@@ -31,6 +31,9 @@
       var minor = isMinor();
       if (guardian) guardian.classList.toggle('hidden', !minor);
       for (var i = 0; i < gInputs.length; i++) gInputs[i].required = minor;
+      reg.querySelectorAll('.guardian-extra, .minor-opt').forEach(function (x) { x.classList.toggle('hidden', !minor); });   // spec §48
+      reg.querySelectorAll('.adult-req').forEach(function (x) { x.classList.toggle('hidden', minor); });
+      ['r-email', 'r-phone'].forEach(function (id) { var x = document.getElementById(id); if (x) x.required = !minor; });
       if (sm && sg) { sm.classList.toggle('hidden', minor); sg.classList.toggle('hidden', !minor); smIn.required = !minor; sgIn.required = minor; }
       sign();
     };
@@ -46,7 +49,7 @@
     // Under-18s: the parent/guardian is the default emergency contact (spec §28.3b). A field the person edits is left alone.
     var em = [['r-em-name', function () { return document.getElementById('r-guardian').value; }],
               ['r-em-rel', function () { return 'Parent/guardian'; }],
-              ['r-em-phone', function () { return document.getElementById('r-phone').value; }]];
+              ['r-em-phone', function () { var g = document.getElementById('r-guardian-phone'); return g ? g.value : ''; }]];   // spec §48: parent's phone
     var emNote = document.getElementById('em-auto-note');
     var emFill = function () {
       var minor = isMinor(), any = false;
@@ -61,7 +64,7 @@
       var f = document.getElementById(e[0]);
       if (f) f.addEventListener('input', function () { f.dataset.edited = '1'; delete f.dataset.auto; });
     });
-    ['r-guardian', 'r-phone'].forEach(function (id) { var x = document.getElementById(id); if (x) x.addEventListener('input', emFill); });
+    ['r-guardian', 'r-guardian-phone'].forEach(function (id) { var x = document.getElementById(id); if (x) x.addEventListener('input', emFill); });
     reg.addEventListener('reset', function () { em.forEach(function (e) { var f = document.getElementById(e[0]); if (f) { delete f.dataset.edited; delete f.dataset.auto; } }); setTimeout(emFill, 0); });
     var age = document.getElementById('r-age');
     if (age) age.addEventListener('change', function () { sync(); emFill(); });
@@ -447,7 +450,7 @@
         title.textContent = 'Change your registration ' + res.formId;
         intro.textContent = 'Change what you need, then tick the agreements and type the name again to sign. This link works for about ' + res.minutesLeft + ' more minutes. After you save, a club officer approves the form again.';
         var d = res.data;
-        ['name', 'age_bracket', 'guardian_name', 'email', 'phone', 'experience', 'uscf_id', 'medical', 'emergency_name', 'emergency_relationship', 'emergency_phone', 'shirt_size', 'heard_about_us', 'note', 'photos', 'news_by', 'show_on_list'].forEach(function (k) { set(k, d[k] || ''); });
+        ['name', 'age_bracket', 'guardian_name', 'guardian_email', 'guardian_phone', 'email', 'phone', 'experience', 'uscf_id', 'medical', 'emergency_name', 'emergency_relationship', 'emergency_phone', 'shirt_size', 'heard_about_us', 'note', 'photos', 'news_by', 'show_on_list'].forEach(function (k) { set(k, d[k] || ''); });
         ['r-em-name', 'r-em-rel', 'r-em-phone'].forEach(function (id) { var x = document.getElementById(id); if (x) { x.dataset.edited = '1'; delete x.dataset.auto; } });
         var ex = document.getElementById('r-extra');
         if (ex) {
