@@ -687,3 +687,11 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .vote-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .vote-btn[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
 .doc-card-o > .by { display: block; margin: 0 0 6px; font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
+.doc-acc { border: 1px solid var(--line); border-radius: 8px; background: #fff; margin-bottom: 10px; }
+.doc-acc > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 40px 12px 14px; position: relative; }
+.doc-acc > summary::-webkit-details-marker { display: none; }
+.doc-acc > summary::after { content: '+'; position: absolute; right: 14px; top: 10px; font: 600 1.2rem/1 var(--sans); color: var(--gold); }
+.doc-acc[open] > summary::after { content: '\2212'; }
+.doc-acc > summary:hover .doc-title, .doc-acc > summary:focus-visible .doc-title { color: var(--gold); }
+.doc-sum { font-size: .82rem; color: var(--muted); }
+.doc-acc > .doc-body { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin: 0; }

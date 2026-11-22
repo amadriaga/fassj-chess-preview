@@ -402,7 +402,7 @@
       }).catch(function () { elist.textContent = 'Couldn’t load the entries.'; });
     };
     // spec §52 phase 1: Board documents (view, download, comments) and officer access requests
-    var dlist = document.getElementById('doc-list'), dmsg = document.getElementById('doc-msg');
+    var dlist = document.getElementById('doc-list'), dmsg = document.getElementById('doc-msg'), openDocs = {};   // spec §54: which document cards are open (kept across auto-refresh)
     var b64Blob = function (data, mime) { var bin = atob(data), bytes = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return new Blob([bytes], { type: mime }); };
     var docOpen = function (d, btn, download) {
       btn.disabled = true; say(dmsg, 'Opening ' + d.name + '…', true);
@@ -435,7 +435,7 @@
         };
         res.docs.forEach(function (d) {
           var card = document.createElement('div'), head = document.createElement('div'), nm = document.createElement('b'), when = document.createElement('span'), acts = document.createElement('span');
-          card.className = 'doc-card-o'; head.className = 'doc-head'; when.className = 'by'; acts.className = 'officer-actions';
+          card.className = 'doc-card-o doc-body'; head.className = 'doc-head'; when.className = 'by'; acts.className = 'officer-actions';
           nm.className = 'doc-title'; nm.textContent = d.title || d.name; when.textContent = d.tech || '';
           var v = document.createElement('button'); v.type = 'button'; v.className = 'btn btn-sm btn-primary'; v.textContent = d.kind === 'pdf' ? 'View' : 'Download';
           v.addEventListener('click', function () { docOpen(d, v, d.kind !== 'pdf'); }); acts.appendChild(v);
@@ -527,7 +527,17 @@
             });
             if (canVote) dacts.appendChild(x);
           });
-          card.appendChild(ta); card.appendChild(dacts); dlist.appendChild(card);
+          card.appendChild(ta); card.appendChild(dacts);
+          // spec §54: title only; click to open the document's card
+          var acc = document.createElement('details'), sum = document.createElement('summary'), st = document.createElement('span'), sr = document.createElement('span');
+          acc.className = 'doc-acc'; acc.open = !!openDocs[d.id]; st.className = 'doc-title'; st.textContent = d.title || d.name;
+          var nItems = (d.items || []).length; sr.className = 'doc-sum';
+          sr.textContent = nItems ? nItems + ' items to decide' : (d.docResult && d.docResult !== 'Open' ? d.docResult : 'Whole document');
+          sum.appendChild(st); sum.appendChild(sr); acc.appendChild(sum);
+          head.removeChild(nm); if (!head.childNodes.length) card.removeChild(head);
+          acc.appendChild(card);
+          acc.addEventListener('toggle', function () { if (acc.open) openDocs[d.id] = 1; else delete openDocs[d.id]; });
+          dlist.appendChild(acc);
         });
       }).catch(function () { say(dmsg, 'Couldn’t load the documents. Please try again.'); });
     };
