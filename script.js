@@ -192,7 +192,7 @@
         if (!cur || cur.hidden) { var first = document.querySelector('#officer-panel .tab:not([hidden])'); if (first) first.click(); }
         if (has('contest')) loadEntries();
         if (has('documents')) loadDocs();
-        if (has('officers')) { loadRequests(); loadOfficers(); }
+        if (has('officers')) { loadRequests(); loadOfficers(); loadFassj(); }
         if (res.owner) loadAdmin();
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
@@ -609,7 +609,7 @@
         addF.className = 'admin-add hidden';
         var mk = function (tag, ph, lab) { var x = document.createElement(tag); if (ph) x.placeholder = ph; x.setAttribute('aria-label', lab); return x; };
         var gsel = mk('select', '', 'Group'); [['Board', 'Board of Directors'], ['Officer', 'Officer'], ['Other', 'Other']].forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; gsel.appendChild(op); });
-        var nIn = mk('input', 'Full name', 'Full name'), pIn = mk('input', 'Position (e.g. Treasurer)', 'Position'), eIn = mk('input', 'Email (optional)', 'Email'); eIn.type = 'email';
+        var nIn = mk('input', 'Full name', 'Full name'), pIn = mk('input', 'Position (e.g. Treasurer)', 'Position'), eIn = mk('input', 'Email (optional)', 'Email'); nIn.type = 'text'; pIn.type = 'text'; eIn.type = 'email';
         var pos = function () { pIn.hidden = gsel.value === 'Board'; }; gsel.addEventListener('change', pos); pos();
         var saveA = document.createElement('button'), cancelA = document.createElement('button');
         saveA.type = 'button'; saveA.className = 'btn btn-sm btn-primary'; saveA.textContent = 'Add to the list';
@@ -628,6 +628,22 @@
         });
         alist.appendChild(addBtn); alist.appendChild(addF);
       }).catch(function () { say(amsg, 'Couldn’t load the roster. Please try again.'); });
+    };
+    var fbody = document.getElementById('fassj-list');   // spec §55.4c: FASSJ officers, read-only
+    var loadFassj = function () {
+      if (!fbody) return;
+      post({ form: 'officer_fassj_roster', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        fbody.innerHTML = '';
+        if (!res.ok) { var t0 = document.createElement('tr'); cell(t0, res.error).colSpan = 3; fbody.appendChild(t0); return; }
+        var g = '';
+        res.roster.forEach(function (p) {
+          if (p.group !== g) { g = p.group; var gr = document.createElement('tr'); gr.className = 'group-row'; cell(gr, g === 'Board' ? 'Board of Directors' : g === 'Officer' ? 'Officers' : 'Other').colSpan = 3; fbody.appendChild(gr); }
+          var tr = document.createElement('tr'); cell(tr, p.name); cell(tr, p.position); var sc = cell(tr, p.status || '—');
+          if (p.status === 'Active') sc.className = 'st-active'; else if (p.status) sc.className = 'st-pending';
+          fbody.appendChild(tr);
+        });
+      }).catch(function () {});
     };
     var olistBody = document.getElementById('officer-list');
     var loadOfficers = function () {   // spec §52: current officers

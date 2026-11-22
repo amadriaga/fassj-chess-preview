@@ -703,3 +703,7 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .admin-add-btn { margin-top: 14px; }
 .admin-add { display: grid; gap: 8px; max-width: 360px; margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--ivory); }
 .admin-add input[hidden] { display: none; }
+.officer-sec { margin-bottom: 14px; }
+.officer-sec-body { padding: 4px 14px 14px; border-top: 1px solid var(--line); }
+.officer-sec-body .entries-review { margin-top: 12px; }
+.officer-table .group-row td { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--ivory); }
