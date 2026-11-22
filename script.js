@@ -163,6 +163,7 @@
         if (!res.ok) return say(omsg, res.error);
         document.getElementById('officer-name').textContent = res.name;
         document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
+        var onone = document.getElementById('officers-none'); if (onone) onone.classList.toggle('hidden', !!res.canInvite);
         loadEntries(); loadDocs(); loadRequests(); if (reqForm) reqForm.classList.add('hidden');
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
@@ -386,8 +387,18 @@
           var list = document.createElement('ul'); list.className = 'doc-comments';
           var addC = function (c) { var li = document.createElement('li'), w = document.createElement('span'); w.className = 'by'; w.textContent = c.officer + ' · ' + c.when; li.appendChild(w); li.appendChild(document.createTextNode(c.text)); list.appendChild(li); };
           d.comments.forEach(addC); card.appendChild(list);
+          // spec §52: each officer's latest decision, then Approve / Revise / Not approved (note from the comment box)
+          var dl2 = document.createElement('ul'); dl2.className = 'doc-decisions';
+          var cls = { 'Approved': 'd-approved', 'Revise': 'd-revise', 'Not approved': 'd-not' };
+          var shown = {};
+          var addD = function (x) {
+            if (shown[x.officer]) dl2.removeChild(shown[x.officer]);
+            var li = document.createElement('li'); li.className = cls[x.decision] || ''; li.textContent = x.officer + ': ' + x.decision + (x.note ? ' (\u201c' + x.note + '\u201d)' : '') + ' · ' + x.when;
+            dl2.appendChild(li); shown[x.officer] = li;
+          };
+          (d.decisions || []).forEach(addD); card.appendChild(dl2);
           var ta = document.createElement('textarea'), send = document.createElement('button');
-          ta.rows = 2; ta.className = 'reply-text'; ta.placeholder = 'Add a comment for the next revision…'; ta.setAttribute('aria-label', 'Comment on ' + d.name);
+          ta.rows = 2; ta.className = 'reply-text'; ta.placeholder = 'Comment, or the note for your decision…'; ta.setAttribute('aria-label', 'Comment or note on ' + d.name);
           send.type = 'button'; send.className = 'btn btn-sm btn-outline'; send.textContent = 'Add comment';
           send.addEventListener('click', function () {
             if (!ta.value.trim()) return say(dmsg, 'Please type your comment.');
@@ -398,7 +409,24 @@
               addC(res.comment); ta.value = ''; say(dmsg, 'Comment added.', true);
             }).catch(function () { say(dmsg, 'Couldn’t save the comment. Please try again.'); }).then(function () { send.disabled = false; });
           });
-          card.appendChild(ta); card.appendChild(send); dlist.appendChild(card);
+          var dacts = document.createElement('div'); dacts.className = 'officer-actions doc-actions';
+          dacts.appendChild(send);
+          [['Approve', 'Approved', 'btn-primary'], ['Revise', 'Revise', 'btn-outline'], ['Not approved', 'Not approved', 'btn-outline btn-deny']].forEach(function (b) {
+            var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + b[2]; x.textContent = b[0];
+            x.addEventListener('click', function () {
+              var note = ta.value.trim();
+              if (b[1] !== 'Approved' && !note) return say(dmsg, 'Please write what to change or why in the box first, then press ' + b[0] + '.');
+              if (!window.confirm(b[0] + ': ' + d.name + (note ? '\n\nNote: ' + note : '') + '\n\nThis records your decision with your name and the time.')) return;
+              x.disabled = true;
+              post({ form: 'officer_doc_decide', token: tok(), id: d.id, decision: b[1], note: note }).then(function (res) {
+                if (res.signedOut) return signOut(res.error);
+                if (!res.ok) return say(dmsg, res.error);
+                addD(res.decision); ta.value = ''; say(dmsg, 'Your decision is recorded: ' + res.decision.decision + '.', true);
+              }).catch(function () { say(dmsg, 'Couldn’t save your decision. Please try again.'); }).then(function () { x.disabled = false; });
+            });
+            dacts.appendChild(x);
+          });
+          card.appendChild(ta); card.appendChild(dacts); dlist.appendChild(card);
         });
       }).catch(function () { say(dmsg, 'Couldn’t load the documents. Please try again.'); });
     };

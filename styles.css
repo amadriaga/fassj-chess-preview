@@ -607,3 +607,13 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .officer-request h3 { margin: 0 0 6px; }
 .request-fields { flex-wrap: wrap; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.officer-login + .officer-request { margin-top: 28px; }
+.officer-secure { margin-top: 28px; }
+.officer-panel .tabs { margin: 8px 0 18px; }
+main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure { margin-top: 28px; }
+.doc-decisions { list-style: none; margin: 4px 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.doc-decisions li { font-size: .8rem; padding: 3px 9px; border-radius: 99px; background: var(--ivory); border: 1px solid var(--line); }
+.doc-decisions li.d-approved { background: #eef6ef; border-color: #cfe3d2; color: #1f5f24; }
+.doc-decisions li.d-revise { background: #fff6e0; border-color: #ecd9a6; color: #7a5c14; }
+.doc-decisions li.d-not { background: #fbeeee; border-color: #e8c4c4; color: #9b1c1c; }
+.doc-actions { margin-top: 8px; }
