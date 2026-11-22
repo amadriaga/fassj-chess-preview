@@ -597,3 +597,13 @@ main[data-approve-api] .officer-login, main[data-approve-api] .officer-panel { m
 .reply-cell { background: var(--ivory); }
 .reply-cell label { display: block; font-size: .85rem; color: var(--muted); }
 .reply-text { display: block; width: 100%; margin: 6px 0 10px; font-size: .9rem; line-height: 1.45; }
+.doc-card-o { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; background: #fff; }
+.doc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 6px; }
+.doc-head b { overflow-wrap: anywhere; }
+.doc-comments { list-style: none; margin: 6px 0 8px; padding: 0; }
+.doc-comments li { padding: 6px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+.doc-comments .by { display: block; font-size: .75rem; color: var(--muted); }
+.officer-request { margin-top: 24px; }
+.officer-request h3 { margin: 0 0 6px; }
+.request-fields { flex-wrap: wrap; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }

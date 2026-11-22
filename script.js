@@ -142,7 +142,8 @@
     var tok = function (v) { try { if (v === undefined) return sessionStorage.getItem('fassjOfficer') || ''; if (v) sessionStorage.setItem('fassjOfficer', v); else sessionStorage.removeItem('fassjOfficer'); } catch (e) { return ''; } };
     var post = function (data) { return fetch(oapi, { method: 'POST', body: new URLSearchParams(data) }).then(function (r) { return r.json(); }); };
     var say = function (el, m, good) { el.textContent = m || ''; el.classList.toggle('ok', !!good); };
-    var signOut = function (m) { tok(''); opan.classList.add('hidden'); olog.classList.remove('hidden'); say(lmsg, m || ''); };
+    var reqForm = document.getElementById('request');
+    var signOut = function (m) { tok(''); opan.classList.add('hidden'); olog.classList.remove('hidden'); if (reqForm) reqForm.classList.remove('hidden'); say(lmsg, m || ''); };
     var cell = function (tr, x) { var td = document.createElement('td'); if (typeof x === 'string') td.textContent = x; else if (x) td.appendChild(x); tr.appendChild(td); return td; };
     var openPdf = function (id, btn) {
       btn.disabled = true; say(omsg, 'Opening ' + id + '…', true);
@@ -162,7 +163,7 @@
         if (!res.ok) return say(omsg, res.error);
         document.getElementById('officer-name').textContent = res.name;
         document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
-        loadEntries();
+        loadEntries(); loadDocs(); loadRequests(); if (reqForm) reqForm.classList.add('hidden');
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -354,6 +355,92 @@
         });
       }).catch(function () { elist.textContent = 'Couldn’t load the entries.'; });
     };
+    // spec §52 phase 1: Board documents (view, download, comments) and officer access requests
+    var dlist = document.getElementById('doc-list'), dmsg = document.getElementById('doc-msg');
+    var b64Blob = function (data, mime) { var bin = atob(data), bytes = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return new Blob([bytes], { type: mime }); };
+    var docOpen = function (d, btn, download) {
+      btn.disabled = true; say(dmsg, 'Opening ' + d.name + '…', true);
+      post({ form: 'officer_doc', token: tok(), id: d.id }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) return say(dmsg, res.error);
+        var a = document.createElement('a'); a.href = URL.createObjectURL(b64Blob(res.data, res.mime)); a.rel = 'noopener';
+        if (download || d.kind !== 'pdf') a.download = res.name; else a.target = '_blank';
+        document.body.appendChild(a); a.click(); a.remove(); say(dmsg, '');
+      }).catch(function () { say(dmsg, 'Couldn’t open the document. Please try again.'); }).then(function () { btn.disabled = false; });
+    };
+    var loadDocs = function () {
+      if (!dlist) return;
+      post({ form: 'officer_docs', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) { dlist.innerHTML = ''; return say(dmsg, res.error); }
+        dlist.innerHTML = '';
+        if (!res.docs.length) { var none = document.createElement('p'); none.className = 'note'; none.textContent = 'No documents yet.'; dlist.appendChild(none); return; }
+        res.docs.forEach(function (d) {
+          var card = document.createElement('div'), head = document.createElement('div'), nm = document.createElement('b'), when = document.createElement('span'), acts = document.createElement('span');
+          card.className = 'doc-card-o'; head.className = 'doc-head'; when.className = 'by'; acts.className = 'officer-actions';
+          nm.textContent = d.name; when.textContent = d.kind.toUpperCase() + ' · updated ' + d.updated;
+          var v = document.createElement('button'); v.type = 'button'; v.className = 'btn btn-sm btn-primary'; v.textContent = d.kind === 'pdf' ? 'View' : 'Download';
+          v.addEventListener('click', function () { docOpen(d, v, d.kind !== 'pdf'); }); acts.appendChild(v);
+          if (d.kind === 'pdf') { var dl = document.createElement('button'); dl.type = 'button'; dl.className = 'btn btn-sm btn-outline'; dl.textContent = 'Download'; dl.addEventListener('click', function () { docOpen(d, dl, true); }); acts.appendChild(dl); }
+          head.appendChild(nm); head.appendChild(when); head.appendChild(acts); card.appendChild(head);
+          var list = document.createElement('ul'); list.className = 'doc-comments';
+          var addC = function (c) { var li = document.createElement('li'), w = document.createElement('span'); w.className = 'by'; w.textContent = c.officer + ' · ' + c.when; li.appendChild(w); li.appendChild(document.createTextNode(c.text)); list.appendChild(li); };
+          d.comments.forEach(addC); card.appendChild(list);
+          var ta = document.createElement('textarea'), send = document.createElement('button');
+          ta.rows = 2; ta.className = 'reply-text'; ta.placeholder = 'Add a comment for the next revision…'; ta.setAttribute('aria-label', 'Comment on ' + d.name);
+          send.type = 'button'; send.className = 'btn btn-sm btn-outline'; send.textContent = 'Add comment';
+          send.addEventListener('click', function () {
+            if (!ta.value.trim()) return say(dmsg, 'Please type your comment.');
+            send.disabled = true;
+            post({ form: 'officer_doc_comment', token: tok(), id: d.id, comment: ta.value }).then(function (res) {
+              if (res.signedOut) return signOut(res.error);
+              if (!res.ok) return say(dmsg, res.error);
+              addC(res.comment); ta.value = ''; say(dmsg, 'Comment added.', true);
+            }).catch(function () { say(dmsg, 'Couldn’t save the comment. Please try again.'); }).then(function () { send.disabled = false; });
+          });
+          card.appendChild(ta); card.appendChild(send); dlist.appendChild(card);
+        });
+      }).catch(function () { say(dmsg, 'Couldn’t load the documents. Please try again.'); });
+    };
+    var rbox = document.getElementById('request-review'), rlist = document.getElementById('request-list'), rmsg = document.getElementById('request-msg');
+    var loadRequests = function () {
+      if (!rbox) return;
+      post({ form: 'officer_requests', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        rlist.innerHTML = ''; rbox.classList.toggle('hidden', !(res.ok && res.requests.length));
+        (res.requests || []).forEach(function (q) {
+          var card = document.createElement('div'), txt = document.createElement('p'), acts = document.createElement('span');
+          card.className = 'doc-card-o'; acts.className = 'officer-actions';
+          txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when;
+          [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']].forEach(function (b) {
+            var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + b[2]; x.textContent = b[0];
+            x.addEventListener('click', function () {
+              if (!window.confirm(b[0] + ' for ' + q.name + ' (' + q.email + ')?')) return;
+              x.disabled = true;
+              post({ form: 'officer_request_decide', token: tok(), id: q.id, decision: b[1], site: location.origin }).then(function (res) {
+                if (res.signedOut) return signOut(res.error);
+                if (!res.ok) { x.disabled = false; return say(rmsg, res.error); }
+                say(rmsg, q.name + ': ' + (res.status === 'Invited' ? 'invitation sent.' : 'declined.'), true); loadRequests();
+              }).catch(function () { x.disabled = false; say(rmsg, 'Couldn’t save. Please try again.'); });
+            });
+            acts.appendChild(x);
+          });
+          card.appendChild(txt); card.appendChild(acts); rlist.appendChild(card);
+        });
+      }).catch(function () {});
+    };
+    if (reqForm) {
+      var qmsg = document.getElementById('request-form-msg');
+      if (location.hash === '#request') { reqForm.scrollIntoView(); var fn = reqForm.querySelector('input[name=name]'); if (fn) fn.focus(); }
+      reqForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var btn = reqForm.querySelector('button'); btn.disabled = true; say(qmsg, 'Sending…', true);
+        post(Object.assign({ form: 'officer_request' }, Object.fromEntries(new FormData(reqForm)))).then(function (res) {
+          say(qmsg, res.ok ? 'Thank you. An officer will check your request and email you a link to set up your sign-in.' : res.error, res.ok);
+          if (res.ok) reqForm.reset();
+        }).catch(function () { say(qmsg, 'Couldn’t send. Please try again.'); }).then(function () { btn.disabled = false; });
+      });
+    }
     var inv = document.getElementById('invite-form'), imsg = document.getElementById('invite-msg');
     inv.addEventListener('submit', function (e) {
       e.preventDefault();
