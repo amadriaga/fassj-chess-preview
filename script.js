@@ -558,8 +558,9 @@
       reqForm.addEventListener('submit', function (e) {
         e.preventDefault();
         var btn = reqForm.querySelector('button'); btn.disabled = true; say(qmsg, 'Sending…', true);
-        post(Object.assign({ form: 'officer_request' }, Object.fromEntries(new FormData(reqForm)))).then(function (res) {
-          say(qmsg, res.ok ? 'Thank you. An officer will check your request and email you a link to set up your sign-in.' : res.error, res.ok);
+        var qdata = Object.fromEntries(new FormData(reqForm)), qmail = String(qdata.email || '').trim();
+        post(Object.assign({ form: 'officer_request' }, qdata)).then(function (res) {
+          say(qmsg, res.ok ? 'Thank you. An officer will check your request and email you a link to set up your sign-in. Please watch your ' + qmail + ' inbox, and check your spam or junk folder too: the email comes from FASSJ Chess Club (fassj.admin@gmail.com). The link works for 48 hours.' : res.error, res.ok);
           if (res.ok) reqForm.reset();
         }).catch(function () { say(qmsg, 'Couldn’t send. Please try again.'); }).then(function () { btn.disabled = false; });
       });
