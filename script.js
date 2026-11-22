@@ -495,7 +495,7 @@
         res.officers.forEach(function (o) {
           var tr = document.createElement('tr'); cell(tr, o.name); cell(tr, o.email);
           var stc = cell(tr, o.status); stc.className = o.status === 'Active' ? 'st-active' : 'st-pending';
-          var rc2 = cell(tr, areaText(o.roles)); cell(tr, o.canInvite ? 'Yes' : '\u2014');
+          var rc2 = cell(tr, areaText(o.roles)); cell(tr, o.canInvite ? 'Yes' : 'No');
           if (res.canRemove && !o.owner) {
             var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'link'; ed.textContent = 'Edit';
             ed.addEventListener('click', function () {
@@ -506,7 +506,7 @@
             });
             rc2.appendChild(document.createTextNode(' ')); rc2.appendChild(ed);
           }
-          var ic = cell(tr, o.invited || '\u2014');
+          var ic = cell(tr, o.invited || 'by System Administrator');
           if (res.canRemove && !o.owner && o.email !== res.me) {
             var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'link'; rm.textContent = 'Remove';
             rm.addEventListener('click', function () {
