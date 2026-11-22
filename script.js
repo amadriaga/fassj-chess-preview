@@ -115,19 +115,31 @@
         document.getElementById('roster-count').textContent = res.total === 1 ? '1 player has registered so far.' : res.total + ' players have registered so far.';
         body.innerHTML = list.length ? list.map(function (p) {
           var d = document.createElement('tr'), fid = document.createElement('td'), a = document.createElement('td'), g = document.createElement('td'), b = document.createElement('td'), ms = document.createElement('td');
-          fid.textContent = p.id || '\u2014'; ms.textContent = p.since || '\u2014';   // spec §44: Form ID first, Member since last
-          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = p.level || '\u2014'; d.appendChild(fid); d.appendChild(a); d.appendChild(g); d.appendChild(b); d.appendChild(ms); return d.outerHTML;
+          fid.textContent = p.id || '\u2014'; ms.textContent = String(p.since || '\u2014').replace(/ member$/i, '');   // spec §44: Form ID first, Member since last
+          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = String(p.level || '\u2014').replace(/ player$/i, ''); d.appendChild(fid); d.appendChild(a); d.appendChild(g); d.appendChild(b); d.appendChild(ms); return d.outerHTML;
         }).join('') : '<tr><td colspan="5">No one has chosen to be listed yet. Be the first!</td></tr>';
-        var tally = document.getElementById('age-tally');   // spec §44: sign-ups per age group (numbers only)
+        var tally = document.getElementById('age-tally');   // spec §53: one card: total, proportional bar, the four groups in a row
         if (tally && res.byAge) {
-          var short = { 'Early Learners (ages 4–6)': 'Early Learners (4–6)', 'Elementary / Youth (ages 7–11)': 'Elementary / Youth (7–11)', 'Middle & High School (ages 12–17)': 'Middle & High School (12–17)', 'Adult (18+)': 'Adult (18+)' };
+          var groups = [['Early Learners (ages 4–6)', 'Early Learners', '4–6'], ['Elementary / Youth (ages 7–11)', 'Elementary / Youth', '7–11'], ['Middle & High School (ages 12–17)', 'Middle & High School', '12–17'], ['Adult (18+)', 'Adults', '18+']];
+          Object.keys(res.byAge).forEach(function (k) { if (!groups.some(function (g) { return g[0] === k; }) && res.byAge[k]) groups.push([k, k, '']); });
+          var total = groups.reduce(function (t, g) { return t + (res.byAge[g[0]] || 0); }, 0);
           tally.innerHTML = '';
-          Object.keys(res.byAge).forEach(function (k) {
-            if (!short[k] && !res.byAge[k]) return;
-            var li = document.createElement('li'), n = document.createElement('b'), l = document.createElement('span');
-            n.textContent = res.byAge[k]; l.textContent = short[k] || k; li.appendChild(n); li.appendChild(l); tally.appendChild(li);
+          var top = document.createElement('div'), tn = document.createElement('b'), tl = document.createElement('span');
+          top.className = 'age-total'; tn.textContent = total; tl.textContent = total === 1 ? ' player registered so far' : ' players registered so far'; top.appendChild(tn); top.appendChild(tl);
+          var bar = document.createElement('div'), row = document.createElement('ul');
+          bar.className = 'age-bar'; bar.setAttribute('aria-hidden', 'true'); row.className = 'age-row';
+          groups.forEach(function (g, i) {
+            var n = res.byAge[g[0]] || 0;
+            if (n) { var seg = document.createElement('span'); seg.className = 'seg seg' + i; seg.style.flexGrow = n; bar.appendChild(seg); }
+            var li = document.createElement('li'), num = document.createElement('b'), lab = document.createElement('span'), age = document.createElement('small');
+            if (!n) li.className = 'zero';
+            num.textContent = n; lab.textContent = g[1]; age.textContent = g[2] ? 'ages ' + g[2] : '';
+            var dot = document.createElement('i'); dot.className = 'dot seg' + i; li.appendChild(dot);
+            li.appendChild(num); li.appendChild(lab); li.appendChild(age); row.appendChild(li);
           });
+          tally.appendChild(top); if (total) tally.appendChild(bar); tally.appendChild(row);
           tally.classList.remove('hidden');
+          var rc = document.getElementById('roster-count'); if (rc) rc.hidden = true;
         }
         roster.classList.remove('hidden');
       }).catch(function () {});
