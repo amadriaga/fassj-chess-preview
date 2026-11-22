@@ -196,7 +196,7 @@
         if (has('contest')) loadEntries();
         if (has('documents')) loadDocs();
         if (has('officers')) { loadRequests(); loadOfficers(); loadFassj(); }
-        if (res.owner) loadAdmin();
+        if (res.owner) { loadAdmin(); loadSignIns(); }
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = 'No signed forms yet.'; obody.appendChild(p0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -376,7 +376,9 @@
     olog.addEventListener('submit', function (e) {
       e.preventDefault();
       var btn = olog.querySelector('button'); btn.disabled = true; say(lmsg, '');
-      post({ form: 'officer_login', email: olog.email.value, code: olog.code.value }).then(function (res) {
+      var devId = '';   // spec §63: a random ID for this browser, so new devices can be noticed
+      try { devId = localStorage.getItem('fassjDevice') || ''; if (!devId) { devId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now(); localStorage.setItem('fassjDevice', devId); } } catch (e) {}
+      post({ form: 'officer_login', email: olog.email.value, code: olog.code.value, device: devId, ua: navigator.userAgent }).then(function (res) {
         if (!res.ok) return say(lmsg, res.error);
         tok(res.token); olog.reset(); load();
       }).catch(function () { say(lmsg, 'Couldn’t sign in. Please try again.'); }).then(function () { btn.disabled = false; });
@@ -685,6 +687,16 @@
         });
       }).catch(function () {});
     };
+    var sbody = document.getElementById('signin-list');   // spec §63: recent sign-ins (owners)
+    var loadSignIns = function () {
+      if (!sbody) return;
+      post({ form: 'admin_signins', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        sbody.innerHTML = '';
+        if (!res.ok || !res.signins.length) { var t0 = document.createElement('tr'); cell(t0, res.ok ? 'No sign-ins recorded yet.' : res.error).colSpan = 3; sbody.appendChild(t0); return; }
+        res.signins.forEach(function (s) { var tr = document.createElement('tr'); cell(tr, s.when); cell(tr, s.officer + ' (' + s.email + ')'); var dc = cell(tr, s.device + (s.isNew ? ' · new device' : '')); if (s.isNew) dc.className = 'st-pending'; sbody.appendChild(tr); });
+      }).catch(function () {});
+    };
     var olistBody = document.getElementById('officer-list');
     var loadOfficers = function () {   // spec §52: current officers
       if (!olistBody) return;
@@ -716,6 +728,14 @@
                 .catch(function () { rm.disabled = false; });
             });
             ic.appendChild(document.createTextNode(' ')); ic.appendChild(rm);
+            var nk = document.createElement('button'); nk.type = 'button'; nk.className = 'link'; nk.textContent = 'New authenticator';   // spec §63
+            nk.addEventListener('click', function () {
+              if (!window.confirm('Reset ' + o.name + '’s authenticator?\n\nTheir current code stops working at once, they are signed out everywhere, and a new 48-hour setup link is emailed to ' + o.email + '. Use this if their QR code or phone was shared or lost.')) return;
+              nk.disabled = true;
+              post({ form: 'admin_new_key', token: tok(), email: o.email, site: location.origin }).then(function (r4) { if (r4.signedOut) return signOut(r4.error); if (!r4.ok) { nk.disabled = false; return say(rmsg, r4.error); } say(rmsg, o.name + ': authenticator reset; a new setup link was emailed.', true); loadOfficers(); })
+                .catch(function () { nk.disabled = false; });
+            });
+            ic.appendChild(document.createTextNode(' ')); ic.appendChild(nk);
           }
           olistBody.appendChild(tr);
         });
