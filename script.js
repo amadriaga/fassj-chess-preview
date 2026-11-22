@@ -125,7 +125,10 @@
           var mk = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
           var tile = function (label, value, sub, cls) { var t = mk('div', 'tb-tile' + (cls ? ' ' + cls : '')); t.appendChild(mk('span', 'tb-label', label)); t.appendChild(mk('b', 'tb-value', value)); if (sub) t.appendChild(mk('small', 'tb-sub', sub)); return t; };
           tally.innerHTML = '';
-          tally.appendChild(mk('h4', 'tb-title', 'Founding Season Tally'));
+          var brand = mk('div', 'tb-brand'), lg = document.createElement('img');   // Alex: club logo, then "2027 Founders' Cup"
+          lg.src = '/assets/logo-512.webp'; lg.width = 64; lg.height = 64; lg.alt = 'FASSJ Chess Club crest'; lg.className = 'tb-logo';
+          brand.appendChild(lg); brand.appendChild(mk('h4', 'tb-title', '2027 Founders\u2019 Cup')); brand.appendChild(mk('p', 'tb-kicker', 'Founding Season Tally'));
+          tally.appendChild(brand);
           var grid = mk('div', 'tb-grid');
           grid.appendChild(tile('Players registered', String(total), '', 'tb-main'));
           groups.forEach(function (g) { var n = res.byAge[g[0]] || 0; grid.appendChild(tile(g[1], String(n), 'ages ' + g[2], n ? '' : 'tb-zero')); });
