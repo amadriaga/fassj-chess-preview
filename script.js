@@ -661,6 +661,14 @@
         alist.appendChild(addBtn); alist.appendChild(addF);
       }).catch(function () { say(amsg, 'Couldn’t load the roster. Please try again.'); });
     };
+    // spec §55.4d: tick boxes choose which Officers-tab sections show (FASSJ off, club on by default); remembered per browser
+    Array.prototype.forEach.call(document.querySelectorAll('.sec-picker input[data-sec]'), function (cb) {
+      var sec = document.getElementById(cb.dataset.sec), key = 'fassjSec:' + cb.dataset.sec;
+      try { var v = localStorage.getItem(key); if (v !== null) cb.checked = v === '1'; } catch (e) {}
+      var apply = function () { if (!sec) return; sec.hidden = !cb.checked; if (cb.checked) sec.open = true; };
+      apply();
+      cb.addEventListener('change', function () { apply(); try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch (e) {} });
+    });
     var fbody = document.getElementById('fassj-list');   // spec §55.4c: FASSJ officers, read-only
     var loadFassj = function () {
       if (!fbody) return;
