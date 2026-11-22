@@ -665,3 +665,6 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .officer-roster { margin-bottom: 18px; }
 .officer-table td.st-active { color: #1f5f24; font-weight: 600; }
 .officer-table td.st-pending { color: #7a5c14; }
+.role-chooser { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0; font-size: .85rem; }
+.role-chooser label { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.role-slot { margin-top: 6px; }

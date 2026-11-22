@@ -185,10 +185,13 @@
         document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
         var onone = document.getElementById('officers-none'); if (onone) onone.classList.toggle('hidden', !!res.canInvite);
         if (reqForm) reqForm.classList.add('hidden');
-        var full = res.roles !== 'documents';   // spec §52: documents-only officers see Board documents only
-        ['registrations', 'contest', 'officers'].forEach(function (id) { var tb = document.getElementById('tab-' + id); if (tb) tb.hidden = !full; });
-        if (!full) { var td = document.getElementById('tab-documents'); if (td && td.getAttribute('aria-selected') !== 'true') td.click(); loadDocs(); return; }
-        loadEntries(); loadDocs(); loadRequests(); loadOfficers();
+        var has = function (a) { return (res.roles || []).indexOf(a) !== -1; };   // spec §52: tabs by area
+        ['registrations', 'contest', 'documents', 'officers'].forEach(function (id) { var tb = document.getElementById('tab-' + id); if (tb) tb.hidden = !has(id); });
+        var cur = document.querySelector('#officer-panel .tab[aria-selected="true"]');
+        if (!cur || cur.hidden) { var first = document.querySelector('#officer-panel .tab:not([hidden])'); if (first) first.click(); }
+        if (has('contest')) loadEntries();
+        if (has('documents')) loadDocs();
+        if (has('officers')) { loadRequests(); loadOfficers(); }
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -472,6 +475,16 @@
         });
       }).catch(function () { say(dmsg, 'Couldn’t load the documents. Please try again.'); });
     };
+    var AREA_NAMES = [['registrations', 'Registrations'], ['contest', 'T-shirt contest'], ['documents', 'Board documents'], ['officers', 'Officers']];
+    var areaText = function (r) { return r === 'all' ? 'Everything' : String(r || 'documents').split(/\s*,\s*/).map(function (a) { var n = AREA_NAMES.filter(function (x) { return x[0] === a; })[0]; return n ? n[1] : a; }).join(', '); };
+    var roleChooser = function (current, canInv) {   // tick boxes for areas + Can invite
+      var box = document.createElement('div'); box.className = 'role-chooser';
+      var cur = current === 'all' ? AREA_NAMES.map(function (x) { return x[0]; }) : String(current || 'documents').split(/\s*,\s*/);
+      AREA_NAMES.forEach(function (a) { var l = document.createElement('label'), c = document.createElement('input'); c.type = 'checkbox'; c.value = a[0]; c.checked = cur.indexOf(a[0]) !== -1; l.appendChild(c); l.appendChild(document.createTextNode(' ' + a[1])); box.appendChild(l); });
+      var li = document.createElement('label'), ci = document.createElement('input'); ci.type = 'checkbox'; ci.className = 'can-invite'; ci.checked = !!canInv; li.appendChild(ci); li.appendChild(document.createTextNode(' Can invite')); box.appendChild(li);
+      box.values = function () { return { roles: Array.prototype.filter.call(box.querySelectorAll('input:not(.can-invite)'), function (c) { return c.checked; }).map(function (c) { return c.value; }).join(',') || 'documents', canInvite: ci.checked ? 'true' : '' }; };
+      return box;
+    };
     var olistBody = document.getElementById('officer-list');
     var loadOfficers = function () {   // spec §52: current officers
       if (!olistBody) return;
@@ -482,7 +495,17 @@
         res.officers.forEach(function (o) {
           var tr = document.createElement('tr'); cell(tr, o.name); cell(tr, o.email);
           var stc = cell(tr, o.status); stc.className = o.status === 'Active' ? 'st-active' : 'st-pending';
-          cell(tr, o.roles === 'all' ? 'Everything' : 'Board documents'); cell(tr, o.canInvite ? 'Yes' : '\u2014');
+          var rc2 = cell(tr, areaText(o.roles)); cell(tr, o.canInvite ? 'Yes' : '\u2014');
+          if (res.canRemove && !o.owner) {
+            var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'link'; ed.textContent = 'Edit';
+            ed.addEventListener('click', function () {
+              if (rc2.querySelector('.role-chooser')) return;
+              var ch = roleChooser(o.roles, o.canInvite), sv = document.createElement('button'); sv.type = 'button'; sv.className = 'btn btn-sm btn-primary'; sv.textContent = 'Save';
+              sv.addEventListener('click', function () { var v = ch.values(); sv.disabled = true; post({ form: 'officer_set_role', token: tok(), email: o.email, roles: v.roles, canInvite: v.canInvite }).then(function (r3) { if (r3.signedOut) return signOut(r3.error); if (!r3.ok) { sv.disabled = false; return say(rmsg, r3.error); } say(rmsg, o.name + ': role saved.', true); loadOfficers(); }).catch(function () { sv.disabled = false; }); });
+              rc2.appendChild(ch); rc2.appendChild(sv);
+            });
+            rc2.appendChild(document.createTextNode(' ')); rc2.appendChild(ed);
+          }
           var ic = cell(tr, o.invited || '\u2014');
           if (res.canRemove && !o.owner && o.email !== res.me) {
             var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'link'; rm.textContent = 'Remove';
@@ -508,12 +531,14 @@
           var card = document.createElement('div'), txt = document.createElement('p'), acts = document.createElement('span');
           card.className = 'doc-card-o'; acts.className = 'officer-actions';
           txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when + (q.already ? ' · already an officer (decline this request)' : '');
+          var qch = q.already ? null : roleChooser('documents', false);
           (q.already ? [['Decline', 'decline', 'btn-outline']] : [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']]).forEach(function (b) {
             var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + b[2]; x.textContent = b[0];
             x.addEventListener('click', function () {
               if (!window.confirm(b[0] + ' for ' + q.name + ' (' + q.email + ')?')) return;
               x.disabled = true;
-              post({ form: 'officer_request_decide', token: tok(), id: q.id, decision: b[1], site: location.origin }).then(function (res) {
+              var qv = qch ? qch.values() : {};
+              post({ form: 'officer_request_decide', token: tok(), id: q.id, decision: b[1], site: location.origin, roles: qv.roles || 'documents', canInvite: qv.canInvite || '' }).then(function (res) {
                 if (res.signedOut) return signOut(res.error);
                 if (!res.ok) { x.disabled = false; return say(rmsg, res.error); }
                 say(rmsg, q.name + ': ' + (res.status === 'Invited' ? 'invitation sent.' : 'declined.'), true); loadRequests();
@@ -521,7 +546,7 @@
             });
             acts.appendChild(x);
           });
-          card.appendChild(txt); card.appendChild(acts); rlist.appendChild(card);
+          card.appendChild(txt); if (qch) card.appendChild(qch); card.appendChild(acts); rlist.appendChild(card);
         });
       }).catch(function () {});
     };
@@ -538,10 +563,12 @@
       });
     }
     var inv = document.getElementById('invite-form'), imsg = document.getElementById('invite-msg');
+    var invChooser = null;
+    if (inv) { var slot = inv.querySelector('.role-slot'); if (slot) { invChooser = roleChooser('documents', false); slot.appendChild(invChooser); } }
     inv.addEventListener('submit', function (e) {
       e.preventDefault();
       var btn = inv.querySelector('button'); btn.disabled = true; say(imsg, 'Sending…', true);
-      post({ form: 'officer_invite', token: tok(), name: inv.name.value, email: inv.email.value, role: inv.role ? inv.role.value : 'documents', site: location.origin }).then(function (res) {
+      post(Object.assign({ form: 'officer_invite', token: tok(), name: inv.name.value, email: inv.email.value, site: location.origin }, invChooser ? invChooser.values() : { roles: 'documents' })).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         if (!res.ok) return say(imsg, res.error);
         say(imsg, 'Invitation sent to ' + inv.email.value + '. The link works for 48 hours.', true); inv.reset();
