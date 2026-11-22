@@ -707,3 +707,9 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .officer-sec-body { padding: 4px 14px 14px; border-top: 1px solid var(--line); }
 .officer-sec-body .entries-review { margin-top: 12px; }
 .officer-table .group-row td { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--ivory); }
+.reg-list { margin-top: 6px; }
+.reg-acc { margin-bottom: 8px; }
+.reg-acc > summary { padding: 10px 40px 10px 14px; }
+.reg-id { font: 600 .82rem/1.4 var(--sans); color: var(--muted); white-space: nowrap; }
+.reg-acc .reg-name { font-size: 1.02rem; }
+.reg-acc .reg-body { border-top: 1px solid var(--line); padding: 0 14px 10px; }

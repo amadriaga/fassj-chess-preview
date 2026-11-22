@@ -158,7 +158,7 @@
   var obox = document.getElementById('officer-box'), omain = document.querySelector('main[data-approve-api]');
   if (obox && omain) {
     var oapi = omain.getAttribute('data-approve-api'), olog = document.getElementById('officer-login'), opan = document.getElementById('officer-panel');
-    var omsg = document.getElementById('officer-msg'), lmsg = document.getElementById('officer-login-msg'), obody = document.getElementById('officer-body');
+    var omsg = document.getElementById('officer-msg'), lmsg = document.getElementById('officer-login-msg'), obody = document.getElementById('officer-body'), openRegs = {};   // spec §57: open rows kept across auto-refresh
     var tok = function (v) { try { if (v === undefined) return sessionStorage.getItem('fassjOfficer') || ''; if (v) sessionStorage.setItem('fassjOfficer', v); else sessionStorage.removeItem('fassjOfficer'); } catch (e) { return ''; } };
     var post = function (data) { return fetch(oapi, { method: 'POST', body: new URLSearchParams(data) }).then(function (r) { return r.json(); }); };
     var say = function (el, m, good) { el.textContent = m || ''; el.classList.toggle('ok', !!good); };
@@ -195,15 +195,29 @@
         if (has('officers')) { loadRequests(); loadOfficers(); loadFassj(); }
         if (res.owner) loadAdmin();
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
-        if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
+        if (!res.forms.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = 'No signed forms yet.'; obody.appendChild(p0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
         res.forms.forEach(function (f) {
           var tr = document.createElement('tr'), b = document.createElement('button'), box = document.createElement('input'), lab = document.createElement('label'), by = document.createElement('span');
-          cell(tr, f.id); cell(tr, f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : '')); cell(tr, f.age); var sc = cell(tr, f.signedAt.replace(/ at .*/, '')); if (f.revision > 1) { var up = document.createElement('span'); up.className = 'by'; up.textContent = 'Updated ' + f.updatedAt + ' (rev ' + f.revision + ')'; sc.appendChild(up); }
+          // spec §57: one collapsible row per form; the details table opens on click
+          var acc = document.createElement('details'), sum = document.createElement('summary'), sid = document.createElement('span'), snm = document.createElement('span'), sag = document.createElement('span'), chip = document.createElement('span');
+          acc.className = 'doc-acc reg-acc'; acc.open = !!openRegs[f.id];
+          sid.className = 'reg-id'; sid.textContent = f.id; snm.className = 'doc-title reg-name'; snm.textContent = f.name + (f.guardian ? ' (parent: ' + f.guardian + ')' : ''); sag.className = 'doc-sum'; sag.textContent = f.age;
+          var stx = f.signed === false ? 'Not signed yet' : f.status === 'Pending approval' || !f.status ? 'Waiting for approval' : f.status;
+          var scl = { 'Approved': 'r-approved', 'Denied': 'r-not', 'Closed': 'r-open', 'Waiting for approval': 'r-revise', 'Not signed yet': 'r-open' };
+          chip.className = 'vote-result ' + (scl[stx] || 'r-open'); chip.textContent = stx + (f.nameOk === false && stx === 'Waiting for approval' ? ' · name to check' : '') + (f.pdfOk === false ? ' · PDF to rebuild' : '');
+          sum.appendChild(sid); sum.appendChild(snm); sum.appendChild(sag); sum.appendChild(chip); acc.appendChild(sum);
+          var tw = document.createElement('div'), tbl = document.createElement('table'), th = document.createElement('thead'), tb = document.createElement('tbody');
+          tw.className = 'roster-wrap reg-body'; tbl.className = 'roster-table officer-table';
+          th.innerHTML = '<tr><th scope="col">Signed</th><th scope="col">Form PDF</th><th scope="col">Approved</th></tr>';
+          tbl.appendChild(th); tbl.appendChild(tb); tw.appendChild(tbl); acc.appendChild(tw);
+          acc.addEventListener('toggle', function () { if (acc.open) openRegs[f.id] = 1; else delete openRegs[f.id]; });
+          obody.appendChild(acc);
+          var sc = cell(tr, f.signedAt.replace(/ at .*/, '')); if (f.revision > 1) { var up = document.createElement('span'); up.className = 'by'; up.textContent = 'Updated ' + f.updatedAt + ' (rev ' + f.revision + ')'; sc.appendChild(up); }
           if (f.signed === false) {   // spec §43: not signed yet -> nothing to view or approve
             cell(tr, 'Not signed yet');
             var wait = document.createElement('span'); wait.className = 'by'; wait.textContent = 'Waiting for the member to complete and sign it (Change my registration)';
-            cell(tr, wait); obody.appendChild(tr); return;
+            cell(tr, wait); tb.appendChild(tr); return;
           }
           b.type = 'button'; b.className = 'link'; b.textContent = 'View'; b.addEventListener('click', function () { openPdf(f.id, b); }); cell(tr, b);
           if (f.pdfOk === false) {   // spec §43: the row's PDF belongs to another form -> rebuild it from the row
@@ -234,14 +248,14 @@
           var last = document.createElement('span'); last.className = 'by'; if (f.note) last.textContent = 'Last: ' + f.note;
           var act = function (label, cls) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + cls; x.textContent = label; box.appendChild(x); return x; };
           lab.appendChild(box); lab.appendChild(by); lab.appendChild(last);
-          if (f.status === 'Approved') { done(f.approvedBy, f.emailed); cell(tr, lab); obody.appendChild(tr); return; }
-          if (f.status === 'Denied' || f.status === 'Closed') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 ' + f.status; lab.replaceChild(dn, box); cell(tr, lab); obody.appendChild(tr); return; }
+          if (f.status === 'Approved') { done(f.approvedBy, f.emailed); cell(tr, lab); tb.appendChild(tr); return; }
+          if (f.status === 'Denied' || f.status === 'Closed') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 ' + f.status; lab.replaceChild(dn, box); cell(tr, lab); tb.appendChild(tr); return; }
           var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny'), bC = act('Close as duplicate', 'btn-outline');
           var busy = function (on) { bA.disabled = bR.disabled = bD.disabled = bC.disabled = on; };
           bC.addEventListener('click', function () {   // spec §50: no email; needs the form that replaces it
             if (tr.nextSibling && tr.nextSibling.className === 'reply-row') tr.parentNode.removeChild(tr.nextSibling);
             var row = document.createElement('tr'), td = document.createElement('td'), lb = document.createElement('label'), ta = document.createElement('textarea'), go = document.createElement('button'), no = document.createElement('button'), bar = document.createElement('div');
-            row.className = 'reply-row'; td.colSpan = 6; td.className = 'reply-cell';
+            row.className = 'reply-row'; td.colSpan = 3; td.className = 'reply-cell';
             lb.textContent = 'Close ' + f.id + ' (' + f.name + ') as a duplicate. No email is sent. Give the form that replaces it:';
             ta.rows = 2; ta.className = 'reply-text'; ta.value = 'Replaced by RF' + f.id.slice(2, 7) + ''; lb.appendChild(ta);
             go.type = 'button'; go.className = 'btn btn-sm btn-primary'; go.textContent = 'Close form';
@@ -284,7 +298,7 @@
             var deny = kind === 'deny';
             if (tr.nextSibling && tr.nextSibling.className === 'reply-row') tr.parentNode.removeChild(tr.nextSibling);
             var row = document.createElement('tr'), td = document.createElement('td'), lb = document.createElement('label'), ta = document.createElement('textarea'), go = document.createElement('button'), no = document.createElement('button'), bar = document.createElement('div');
-            row.className = 'reply-row'; td.colSpan = 6; td.className = 'reply-cell';
+            row.className = 'reply-row'; td.colSpan = 3; td.className = 'reply-cell';
             lb.textContent = (deny ? 'Reason for denying ' : 'Reply about ') + f.id + ' (' + f.name + '). Emailed to the address on the form; edit as you like:';
             ta.rows = 5; ta.value = suggest(deny); ta.className = 'reply-text'; lb.appendChild(ta);
             go.type = 'button'; go.className = 'btn btn-sm ' + (deny ? 'btn-outline btn-deny' : 'btn-primary'); go.textContent = deny ? 'Deny and send' : 'Send reply';
@@ -318,7 +332,7 @@
           };
           bR.addEventListener('click', function () { send('reply'); });
           bD.addEventListener('click', function () { send('deny'); });
-          cell(tr, lab); obody.appendChild(tr);
+          cell(tr, lab); tb.appendChild(tr);
         });
       }).catch(function () { say(omsg, 'Couldn’t load the forms. Please try again.'); });
     };
