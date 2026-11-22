@@ -118,26 +118,34 @@
           fid.textContent = p.id || '\u2014'; ms.textContent = String(p.since || '\u2014').replace(/ member$/i, '');   // spec §44: Form ID first, Member since last
           a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = String(p.level || '\u2014').replace(/ player$/i, ''); d.appendChild(fid); d.appendChild(a); d.appendChild(g); d.appendChild(b); d.appendChild(ms); return d.outerHTML;
         }).join('') : '<tr><td colspan="5">No one has chosen to be listed yet. Be the first!</td></tr>';
-        var tally = document.getElementById('age-tally');   // spec §53: one card: total, proportional bar, the four groups in a row
+        var tally = document.getElementById('age-tally');   // spec §53: scoreboard-style tally (numbers only, no names)
         if (tally && res.byAge) {
           var groups = [['Early Learners (ages 4–6)', 'Early Learners', '4–6'], ['Elementary / Youth (ages 7–11)', 'Elementary / Youth', '7–11'], ['Middle & High School (ages 12–17)', 'Middle & High School', '12–17'], ['Adult (18+)', 'Adults', '18+']];
-          Object.keys(res.byAge).forEach(function (k) { if (!groups.some(function (g) { return g[0] === k; }) && res.byAge[k]) groups.push([k, k, '']); });
           var total = groups.reduce(function (t, g) { return t + (res.byAge[g[0]] || 0); }, 0);
+          var mk = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+          var tile = function (label, value, sub, cls) { var t = mk('div', 'tb-tile' + (cls ? ' ' + cls : '')); t.appendChild(mk('span', 'tb-label', label)); t.appendChild(mk('b', 'tb-value', value)); if (sub) t.appendChild(mk('small', 'tb-sub', sub)); return t; };
           tally.innerHTML = '';
-          var top = document.createElement('div'), tn = document.createElement('b'), tl = document.createElement('span');
-          top.className = 'age-total'; tn.textContent = total; tl.textContent = total === 1 ? ' player registered so far' : ' players registered so far'; top.appendChild(tn); top.appendChild(tl);
-          var bar = document.createElement('div'), row = document.createElement('ul');
-          bar.className = 'age-bar'; bar.setAttribute('aria-hidden', 'true'); row.className = 'age-row';
-          groups.forEach(function (g, i) {
-            var n = res.byAge[g[0]] || 0;
-            if (n) { var seg = document.createElement('span'); seg.className = 'seg seg' + i; seg.style.flexGrow = n; bar.appendChild(seg); }
-            var li = document.createElement('li'), num = document.createElement('b'), lab = document.createElement('span'), age = document.createElement('small');
-            if (!n) li.className = 'zero';
-            num.textContent = n; lab.textContent = g[1]; age.textContent = g[2] ? 'ages ' + g[2] : '';
-            var dot = document.createElement('i'); dot.className = 'dot seg' + i; li.appendChild(dot);
-            li.appendChild(num); li.appendChild(lab); li.appendChild(age); row.appendChild(li);
-          });
-          tally.appendChild(top); if (total) tally.appendChild(bar); tally.appendChild(row);
+          tally.appendChild(mk('h4', 'tb-title', 'Founding Season Tally'));
+          var grid = mk('div', 'tb-grid');
+          grid.appendChild(tile('Players registered', String(total), '', 'tb-main'));
+          groups.forEach(function (g) { var n = res.byAge[g[0]] || 0; grid.appendChild(tile(g[1], String(n), 'ages ' + g[2], n ? '' : 'tb-zero')); });
+          var days = Math.ceil((Date.UTC(2027, 0, 11, 5) - Date.now()) / 86400000);
+          grid.appendChild(days >= 0 ? tile('Days to opening night', String(days), 'Mon, Jan 11, 2027', 'tb-count') : tile('Club nights', 'Mon', '6:00–8:30 PM', 'tb-count'));
+          tally.appendChild(grid);
+          var weeks = res.byWeek || [];
+          if (weeks.length) {
+            var chart = mk('div', 'tb-chart'), max = Math.max.apply(null, weeks.map(function (w) { return w.count; })) || 1;
+            chart.appendChild(mk('span', 'tb-label', 'Sign-ups per week'));
+            var bars = mk('div', 'tb-bars'); bars.setAttribute('role', 'list');
+            weeks.forEach(function (w) {
+              var col = mk('div', 'tb-col'), bar = mk('span', 'tb-bar'), tip = 'Week of ' + w.label + ': ' + w.count + (w.count === 1 ? ' sign-up' : ' sign-ups');
+              col.setAttribute('role', 'listitem'); col.tabIndex = 0; col.setAttribute('aria-label', tip); col.setAttribute('data-tip', tip);
+              bar.style.height = Math.max(4, Math.round(100 * w.count / max)) + '%';
+              col.appendChild(mk('span', 'tb-n', String(w.count))); col.appendChild(bar); col.appendChild(mk('span', 'tb-week', w.label)); bars.appendChild(col);
+            });
+            chart.appendChild(bars); tally.appendChild(chart);
+          }
+          tally.appendChild(mk('p', 'tb-foot', 'Live from registrations · numbers only, no names'));
           tally.classList.remove('hidden');
           var rc = document.getElementById('roster-count'); if (rc) rc.hidden = true;
         }
@@ -395,7 +403,7 @@
           var v = document.createElement('button'); v.type = 'button'; v.className = 'btn btn-sm btn-primary'; v.textContent = d.kind === 'pdf' ? 'View' : 'Download';
           v.addEventListener('click', function () { docOpen(d, v, d.kind !== 'pdf'); }); acts.appendChild(v);
           if (d.kind === 'pdf') { var dl = document.createElement('button'); dl.type = 'button'; dl.className = 'btn btn-sm btn-outline'; dl.textContent = 'Download'; dl.addEventListener('click', function () { docOpen(d, dl, true); }); acts.appendChild(dl); }
-          head.appendChild(nm); head.appendChild(when); head.appendChild(acts); card.appendChild(head);
+          acts.classList.add('doc-open'); head.appendChild(nm); head.appendChild(when); card.appendChild(head); card.appendChild(acts);   // spec §52: View/Download on their own row
           var list = document.createElement('ul'); list.className = 'doc-comments';
           var addC = function (c) { var li = document.createElement('li'), w = document.createElement('span'); w.className = 'by'; w.textContent = c.officer + ' · ' + c.when; li.appendChild(w); li.appendChild(document.createTextNode(c.text)); list.appendChild(li); };
           d.comments.forEach(addC); card.appendChild(list);
