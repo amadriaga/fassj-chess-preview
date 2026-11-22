@@ -477,12 +477,11 @@
     };
     var AREA_NAMES = [['registrations', 'Registrations'], ['contest', 'T-shirt contest'], ['documents', 'Board documents'], ['officers', 'Officers']];
     var areaText = function (r) { return r === 'all' ? 'Everything' : String(r || 'documents').split(/\s*,\s*/).map(function (a) { var n = AREA_NAMES.filter(function (x) { return x[0] === a; })[0]; return n ? n[1] : a; }).join(', '); };
-    var roleChooser = function (current, canInv) {   // tick boxes for areas + Can invite
+    var roleChooser = function (current, canInv) {   // tick boxes for areas (only the club account invites, spec §52 v39)
       var box = document.createElement('div'); box.className = 'role-chooser';
       var cur = current === 'all' ? AREA_NAMES.map(function (x) { return x[0]; }) : String(current || 'documents').split(/\s*,\s*/);
       AREA_NAMES.forEach(function (a) { var l = document.createElement('label'), c = document.createElement('input'); c.type = 'checkbox'; c.value = a[0]; c.checked = cur.indexOf(a[0]) !== -1; l.appendChild(c); l.appendChild(document.createTextNode(' ' + a[1])); box.appendChild(l); });
-      var li = document.createElement('label'), ci = document.createElement('input'); ci.type = 'checkbox'; ci.className = 'can-invite'; ci.checked = !!canInv; li.appendChild(ci); li.appendChild(document.createTextNode(' Can invite')); box.appendChild(li);
-      box.values = function () { return { roles: Array.prototype.filter.call(box.querySelectorAll('input:not(.can-invite)'), function (c) { return c.checked; }).map(function (c) { return c.value; }).join(',') || 'documents', canInvite: ci.checked ? 'true' : '' }; };
+      box.values = function () { return { roles: Array.prototype.filter.call(box.querySelectorAll('input:not(.can-invite)'), function (c) { return c.checked; }).map(function (c) { return c.value; }).join(',') || 'documents', canInvite: '' }; };
       return box;
     };
     var olistBody = document.getElementById('officer-list');
