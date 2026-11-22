@@ -273,7 +273,7 @@
           };
           if (f.status === 'Approved') {
             done(f.approvedBy, f.emailed);
-            var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'link'; cl.textContent = 'Close (replaced by a newer form)';
+            var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'link link-gap'; cl.textContent = 'Close (replaced by a newer form)';
             cl.addEventListener('click', function () {
               openClose(function (on) { cl.disabled = on; }, function () {
                 var dn4 = document.createElement('span'); dn4.className = 'denied-tick'; dn4.textContent = '\u2715 Closed';
