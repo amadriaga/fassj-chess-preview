@@ -204,9 +204,32 @@
           var act = function (label, cls) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + cls; x.textContent = label; box.appendChild(x); return x; };
           lab.appendChild(box); lab.appendChild(by); lab.appendChild(last);
           if (f.status === 'Approved') { done(f.approvedBy, f.emailed); cell(tr, lab); obody.appendChild(tr); return; }
-          if (f.status === 'Denied') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 Denied'; lab.replaceChild(dn, box); cell(tr, lab); obody.appendChild(tr); return; }
-          var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny');
-          var busy = function (on) { bA.disabled = bR.disabled = bD.disabled = on; };
+          if (f.status === 'Denied' || f.status === 'Closed') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 ' + f.status; lab.replaceChild(dn, box); cell(tr, lab); obody.appendChild(tr); return; }
+          var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny'), bC = act('Close as duplicate', 'btn-outline');
+          var busy = function (on) { bA.disabled = bR.disabled = bD.disabled = bC.disabled = on; };
+          bC.addEventListener('click', function () {   // spec §50: no email; needs the form that replaces it
+            if (tr.nextSibling && tr.nextSibling.className === 'reply-row') tr.parentNode.removeChild(tr.nextSibling);
+            var row = document.createElement('tr'), td = document.createElement('td'), lb = document.createElement('label'), ta = document.createElement('textarea'), go = document.createElement('button'), no = document.createElement('button'), bar = document.createElement('div');
+            row.className = 'reply-row'; td.colSpan = 6; td.className = 'reply-cell';
+            lb.textContent = 'Close ' + f.id + ' (' + f.name + ') as a duplicate. No email is sent. Give the form that replaces it:';
+            ta.rows = 2; ta.className = 'reply-text'; ta.value = 'Replaced by RF' + f.id.slice(2, 7) + ''; lb.appendChild(ta);
+            go.type = 'button'; go.className = 'btn btn-sm btn-primary'; go.textContent = 'Close form';
+            no.type = 'button'; no.className = 'btn btn-sm btn-outline'; no.textContent = 'Cancel';
+            bar.className = 'officer-actions'; bar.appendChild(go); bar.appendChild(no);
+            td.appendChild(lb); td.appendChild(bar); row.appendChild(td); tr.parentNode.insertBefore(row, tr.nextSibling);
+            ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+            no.addEventListener('click', function () { row.parentNode.removeChild(row); });
+            go.addEventListener('click', function () {
+              busy(true); go.disabled = no.disabled = true; say(omsg, 'Closing ' + f.id + '…', true);
+              post({ form: 'officer_close', token: tok(), id: f.id, message: ta.value.trim() }).then(function (res) {
+                if (res.signedOut) return signOut(res.error);
+                if (!res.ok) { busy(false); go.disabled = no.disabled = false; return say(omsg, res.error); }
+                row.parentNode.removeChild(row); last.textContent = 'Last: ' + res.note;
+                var dn3 = document.createElement('span'); dn3.className = 'denied-tick'; dn3.textContent = '\u2715 Closed'; box.parentNode.replaceChild(dn3, box);
+                say(omsg, f.id + ' closed (no email sent).', true);
+              }).catch(function () { busy(false); go.disabled = no.disabled = false; say(omsg, 'Couldn’t close. Please try again.'); });
+            });
+          });
           if (f.nameOk === false) { var nw = document.createElement('span'); nw.className = 'by warn'; nw.textContent = 'Name doesn\u2019t look like a real name: use Reply to ask for it, or Deny.'; lab.insertBefore(nw, by); }
           bA.addEventListener('click', function () {
             if (!window.confirm('Approve form ' + f.id + ' for ' + f.name + '?\n\nThis signs the approval electronically in your name.')) return;
