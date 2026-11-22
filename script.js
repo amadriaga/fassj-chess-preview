@@ -214,20 +214,41 @@
               done(res.approvedBy, res.emailNote); last.textContent = ''; say(omsg, f.id + ' approved. The approved PDF is saved. ' + (res.emailNote || '') + '.', true);
             }).catch(function () { busy(false); say(omsg, 'Couldn’t save. Please try again.'); });
           });
+          var first = String(f.name || '').split(/[\s_]+/)[0];
+          var suggest = function (deny) {   // spec §45: pre-filled, editable
+            if (f.nameOk === false) return deny
+              ? 'We can\u2019t accept this membership form because the player\u2019s name (\u201c' + f.name + '\u201d) isn\u2019t a real first and last name. You\u2019re very welcome to sign up again using the player\u2019s real name.'
+              : 'Thank you for signing up! The player\u2019s name on the form (\u201c' + f.name + '\u201d) looks like a username. For club records, membership forms need the player\u2019s real first and last name. Could you please update it on the Change my registration page (link below)? We\u2019ll approve the form as soon as it\u2019s updated.';
+            return deny
+              ? 'We\u2019re sorry, but we can\u2019t approve this membership form because '
+              : 'Thank you for signing up for the FASSJ Chess Club! Before we approve the form, could you please ';
+          };
           var send = function (kind) {
             var deny = kind === 'deny';
-            var suggest = f.nameOk === false ? 'Please send us the player\u2019s real first and last name (not a chess.com or other username), so we can approve the membership form.' : '';
-            var msg = window.prompt((deny ? 'Reason for denying form ' : 'Message to the member about form ') + f.id + ' (emailed to the address on the form):', suggest);
-            if (msg === null || !msg.trim()) return;
-            if (deny && !window.confirm('Deny form ' + f.id + ' for ' + f.name + '?\n\nThe member is emailed your reason and the form leaves the public list.')) return;
-            busy(true); say(omsg, (deny ? 'Denying ' : 'Sending reply for ') + f.id + '…', true);
-            post({ form: deny ? 'officer_deny' : 'officer_reply', token: tok(), id: f.id, message: msg, site: location.origin }).then(function (res) {
-              if (res.signedOut) return signOut(res.error);
-              if (!res.ok) { busy(false); return say(omsg, res.error); }
-              last.textContent = 'Last: ' + res.note;
-              if (deny) { var dn2 = document.createElement('span'); dn2.className = 'denied-tick'; dn2.textContent = '\u2715 Denied'; box.parentNode.replaceChild(dn2, box); } else busy(false);
-              say(omsg, f.id + ': ' + (deny ? 'denied' : 'reply sent') + ' to ' + res.sentTo + '.', true);
-            }).catch(function () { busy(false); say(omsg, 'Couldn’t send. Please try again.'); });
+            if (tr.nextSibling && tr.nextSibling.className === 'reply-row') tr.parentNode.removeChild(tr.nextSibling);
+            var row = document.createElement('tr'), td = document.createElement('td'), lb = document.createElement('label'), ta = document.createElement('textarea'), go = document.createElement('button'), no = document.createElement('button'), bar = document.createElement('div');
+            row.className = 'reply-row'; td.colSpan = 6; td.className = 'reply-cell';
+            lb.textContent = (deny ? 'Reason for denying ' : 'Reply about ') + f.id + ' (' + f.name + '). Emailed to the address on the form; edit as you like:';
+            ta.rows = 5; ta.value = suggest(deny); ta.className = 'reply-text'; lb.appendChild(ta);
+            go.type = 'button'; go.className = 'btn btn-sm ' + (deny ? 'btn-outline btn-deny' : 'btn-primary'); go.textContent = deny ? 'Deny and send' : 'Send reply';
+            no.type = 'button'; no.className = 'btn btn-sm btn-outline'; no.textContent = 'Cancel';
+            bar.className = 'officer-actions'; bar.appendChild(go); bar.appendChild(no);
+            td.appendChild(lb); td.appendChild(bar); row.appendChild(td); tr.parentNode.insertBefore(row, tr.nextSibling);
+            ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+            no.addEventListener('click', function () { row.parentNode.removeChild(row); });
+            go.addEventListener('click', function () {
+              var msg = ta.value.trim();
+              if (!msg) return say(omsg, deny ? 'Please give the reason.' : 'Please type your message.');
+              if (deny && !window.confirm('Deny form ' + f.id + ' for ' + f.name + '?\n\nThe member is emailed your reason and the form leaves the public list.')) return;
+              busy(true); go.disabled = no.disabled = true; say(omsg, (deny ? 'Denying ' : 'Sending reply for ') + f.id + '…', true);
+              post({ form: deny ? 'officer_deny' : 'officer_reply', token: tok(), id: f.id, message: msg, site: location.origin }).then(function (res) {
+                if (res.signedOut) return signOut(res.error);
+                if (!res.ok) { busy(false); go.disabled = no.disabled = false; return say(omsg, res.error); }
+                row.parentNode.removeChild(row); last.textContent = 'Last: ' + res.note;
+                if (deny) { var dn2 = document.createElement('span'); dn2.className = 'denied-tick'; dn2.textContent = '\u2715 Denied'; box.parentNode.replaceChild(dn2, box); } else busy(false);
+                say(omsg, f.id + ': ' + (deny ? 'denied' : 'reply sent') + ' to ' + res.sentTo + '.', true);
+              }).catch(function () { busy(false); go.disabled = no.disabled = false; say(omsg, 'Couldn’t send. Please try again.'); });
+            });
           };
           bR.addEventListener('click', function () { send('reply'); });
           bD.addEventListener('click', function () { send('deny'); });
