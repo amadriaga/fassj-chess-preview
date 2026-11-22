@@ -490,11 +490,11 @@
       post({ form: 'officer_list', token: tok() }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         olistBody.innerHTML = '';
-        if (!res.ok || !res.officers.length) { var tr0 = document.createElement('tr'); cell(tr0, res.ok ? 'No officers yet.' : res.error).colSpan = 6; olistBody.appendChild(tr0); return; }
+        if (!res.ok || !res.officers.length) { var tr0 = document.createElement('tr'); cell(tr0, res.ok ? 'No officers yet.' : res.error).colSpan = 5; olistBody.appendChild(tr0); return; }
         res.officers.forEach(function (o) {
           var tr = document.createElement('tr'); cell(tr, o.name); cell(tr, o.email);
           var stc = cell(tr, o.status); stc.className = o.status === 'Active' ? 'st-active' : 'st-pending';
-          var rc2 = cell(tr, areaText(o.roles)); cell(tr, o.canInvite ? 'Yes' : 'No');
+          var rc2 = cell(tr, areaText(o.roles));
           if (res.canRemove && !o.owner) {
             var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'link'; ed.textContent = 'Edit';
             ed.addEventListener('click', function () {
