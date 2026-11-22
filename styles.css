@@ -662,3 +662,6 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tb-foot { margin: 8px 0 0; font-size: .64rem; letter-spacing: .06em; text-transform: uppercase; color: #6f7d91; text-align: center; }
 @media (max-width: 420px) { .tb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .doc-open { margin: 2px 0 8px; }
+.officer-roster { margin-bottom: 18px; }
+.officer-table td.st-active { color: #1f5f24; font-weight: 600; }
+.officer-table td.st-pending { color: #7a5c14; }

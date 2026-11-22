@@ -184,7 +184,7 @@
         document.getElementById('officer-name').textContent = res.name;
         document.getElementById('invite-form').classList.toggle('hidden', !res.canInvite);
         var onone = document.getElementById('officers-none'); if (onone) onone.classList.toggle('hidden', !!res.canInvite);
-        loadEntries(); loadDocs(); loadRequests(); if (reqForm) reqForm.classList.add('hidden');
+        loadEntries(); loadDocs(); loadRequests(); loadOfficers(); if (reqForm) reqForm.classList.add('hidden');
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var tr0 = document.createElement('tr'); cell(tr0, 'No signed forms yet.').colSpan = 6; obody.appendChild(tr0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -467,6 +467,20 @@
           card.appendChild(ta); card.appendChild(dacts); dlist.appendChild(card);
         });
       }).catch(function () { say(dmsg, 'Couldn’t load the documents. Please try again.'); });
+    };
+    var olistBody = document.getElementById('officer-list');
+    var loadOfficers = function () {   // spec §52: current officers
+      if (!olistBody) return;
+      post({ form: 'officer_list', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        olistBody.innerHTML = '';
+        if (!res.ok || !res.officers.length) { var tr0 = document.createElement('tr'); cell(tr0, res.ok ? 'No officers yet.' : res.error).colSpan = 5; olistBody.appendChild(tr0); return; }
+        res.officers.forEach(function (o) {
+          var tr = document.createElement('tr'); cell(tr, o.name); cell(tr, o.email);
+          var stc = cell(tr, o.status); stc.className = o.status === 'Active' ? 'st-active' : 'st-pending';
+          cell(tr, o.canInvite ? 'Yes' : '\u2014'); cell(tr, o.invited || '\u2014'); olistBody.appendChild(tr);
+        });
+      }).catch(function () {});
     };
     var rbox = document.getElementById('request-review'), rlist = document.getElementById('request-list'), rmsg = document.getElementById('request-msg');
     var loadRequests = function () {
