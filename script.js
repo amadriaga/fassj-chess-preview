@@ -234,7 +234,8 @@
           }
           box = document.createElement('span'); box.className = 'officer-actions'; by.className = 'by';   // spec §45: Approve · Reply · Deny
           var mailNote = document.createElement('span'), mailBtn = document.createElement('button');
-          mailNote.className = 'by'; mailBtn.type = 'button'; mailBtn.className = 'link'; mailBtn.textContent = 'Email copy';
+          mailNote.className = 'by'; mailBtn.type = 'button'; mailBtn.className = 'btn btn-sm btn-outline'; mailBtn.textContent = 'Email copy';
+          var apBar = document.createElement('div'); apBar.className = 'officer-actions approved-actions';
           mailBtn.addEventListener('click', function () {   // spec §43: send (again) the approved PDF to the form's email
             if (!window.confirm('Email the approved form ' + f.id + ' to the email on the form?')) return;
             mailBtn.disabled = true; say(omsg, 'Emailing ' + f.id + '…', true);
@@ -244,7 +245,7 @@
               say(omsg, res.ok ? f.id + ': ' + res.emailNote + '.' : res.error, res.ok);
             }).catch(function () { mailBtn.disabled = false; say(omsg, 'Couldn’t send. Please try again.'); });
           });
-          var done = function (who, note) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; mailNote.textContent = note || 'Not emailed yet'; lab.appendChild(mailNote); lab.appendChild(mailBtn); };
+          var done = function (who, note) { var t = document.createElement('span'); t.className = 'ok-tick'; t.textContent = '\u2713 Approved'; if (box.parentNode) box.parentNode.replaceChild(t, box); else box = t; by.textContent = 'by ' + who; mailNote.textContent = note || 'Not emailed yet'; lab.appendChild(mailNote); apBar.appendChild(mailBtn); lab.appendChild(apBar); };
           var last = document.createElement('span'); last.className = 'by'; if (f.note) last.textContent = 'Last: ' + f.note;
           var act = function (label, cls) { var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + cls; x.textContent = label; box.appendChild(x); return x; };
           lab.appendChild(box); lab.appendChild(by); lab.appendChild(last);
@@ -273,7 +274,7 @@
           };
           if (f.status === 'Approved') {
             done(f.approvedBy, f.emailed);
-            var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'link link-gap'; cl.textContent = 'Close (replaced by a newer form)';
+            var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'btn btn-sm btn-outline'; cl.textContent = 'Close (replaced by a newer form)';
             cl.addEventListener('click', function () {
               openClose(function (on) { cl.disabled = on; }, function () {
                 var dn4 = document.createElement('span'); dn4.className = 'denied-tick'; dn4.textContent = '\u2715 Closed';
@@ -281,7 +282,7 @@
                 lab.insertBefore(dn4, last);
               });
             });
-            lab.appendChild(cl); cell(tr, lab); tb.appendChild(tr); return;
+            apBar.appendChild(cl); cell(tr, lab); tb.appendChild(tr); return;
           }
           if (f.status === 'Denied' || f.status === 'Closed') { var dn = document.createElement('span'); dn.className = 'denied-tick'; dn.textContent = '\u2715 ' + f.status; lab.replaceChild(dn, box); cell(tr, lab); tb.appendChild(tr); return; }
           var bA = act('Approve', 'btn-primary'), bR = act('Reply', 'btn-outline'), bD = act('Deny', 'btn-outline btn-deny'), bC = act('Close as duplicate', 'btn-outline');

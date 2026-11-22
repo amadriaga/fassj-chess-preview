@@ -714,3 +714,5 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .reg-acc .reg-name { font-size: 1.02rem; }
 .reg-acc .reg-body { border-top: 1px solid var(--line); padding: 0 14px 10px; }
 .link-gap { display: block; margin-top: 4px; }
+.approved-actions { margin-top: 8px; }
+.approved-actions .btn { margin: 0; }
