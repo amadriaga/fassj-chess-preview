@@ -421,14 +421,69 @@
         if (!res.ok) { dlist.innerHTML = ''; return say(dmsg, res.error); }
         dlist.innerHTML = '';
         if (!res.docs.length) { var none = document.createElement('p'); none.className = 'note'; none.textContent = 'No documents yet.'; dlist.appendChild(none); return; }
+        var board = res.board || 0, maj = res.majority || 1, canVote = res.canVote !== false;
+        var KINDS = ['Approved', 'Not approved', 'Revise'], RCLS = { 'Approved': 'r-approved', 'Not approved': 'r-not', 'Revise': 'r-revise', 'Open': 'r-open' };
+        var resultOf = function (t) { for (var i = 0; i < KINDS.length; i++) if (board && t[KINDS[i]] >= maj) return KINDS[i]; return 'Open'; };
+        var tallyLine = function (el, t) {   // spec §54: live tally and result
+          var voted = t['Approved'] + t['Not approved'] + t['Revise'], r = resultOf(t);
+          el.innerHTML = '';
+          var badge = document.createElement('span'); badge.className = 'vote-result ' + RCLS[r];
+          badge.textContent = r === 'Open' ? 'Open · ' + voted + ' of ' + board + ' voted' : r + ' · majority of ' + board;
+          var nums = document.createElement('span'); nums.className = 'vote-nums';
+          nums.textContent = t['Approved'] + ' Approve · ' + t['Not approved'] + ' Not approved · ' + t['Revise'] + ' Revise';
+          el.appendChild(badge); el.appendChild(nums);
+        };
         res.docs.forEach(function (d) {
           var card = document.createElement('div'), head = document.createElement('div'), nm = document.createElement('b'), when = document.createElement('span'), acts = document.createElement('span');
           card.className = 'doc-card-o'; head.className = 'doc-head'; when.className = 'by'; acts.className = 'officer-actions';
-          nm.textContent = d.name; when.textContent = d.kind.toUpperCase() + ' · updated ' + d.updated;
+          nm.className = 'doc-title'; nm.textContent = d.title || d.name; when.textContent = d.tech || '';
           var v = document.createElement('button'); v.type = 'button'; v.className = 'btn btn-sm btn-primary'; v.textContent = d.kind === 'pdf' ? 'View' : 'Download';
           v.addEventListener('click', function () { docOpen(d, v, d.kind !== 'pdf'); }); acts.appendChild(v);
           if (d.kind === 'pdf') { var dl = document.createElement('button'); dl.type = 'button'; dl.className = 'btn btn-sm btn-outline'; dl.textContent = 'Download'; dl.addEventListener('click', function () { docOpen(d, dl, true); }); acts.appendChild(dl); }
-          acts.classList.add('doc-open'); head.appendChild(nm); head.appendChild(when); card.appendChild(head); card.appendChild(acts);   // spec §52: View/Download on their own row
+          acts.classList.add('doc-open'); head.appendChild(nm); card.appendChild(head);
+          if (d.about) { var ab = document.createElement('p'); ab.className = 'doc-about'; ab.textContent = d.about; card.appendChild(ab); }
+          if (d.tech) card.appendChild(when);   // file name, type and date: owners only (spec §54)
+          card.appendChild(acts);   // spec §52: View/Download on their own row
+          if ((d.items || []).length) {   // spec §54: vote on each item
+            var ih = document.createElement('p'); ih.className = 'vote-head'; ih.textContent = 'Items to decide'; card.appendChild(ih);
+            var vl = document.createElement('div'); vl.className = 'vote-list';
+            d.items.forEach(function (it) {
+              var row = document.createElement('div'), lab = document.createElement('p'), tl = document.createElement('p'), who = document.createElement('p'), bs = document.createElement('div');
+              row.className = 'vote-row'; lab.className = 'vote-label'; tl.className = 'vote-tally'; who.className = 'vote-who'; bs.className = 'vote-btns';
+              lab.textContent = it.label;
+              var voters = (it.voters || []).slice(), tally = it.tally, mine = it.mine;
+              var showWho = function () { who.textContent = voters.length ? voters.map(function (v) { return v.officer + ': ' + v.vote; }).join(' · ') : 'No votes yet.'; };
+              tallyLine(tl, tally); showWho();
+              row.appendChild(lab); row.appendChild(tl); row.appendChild(who);
+              if (canVote) {
+                var btns = [];
+                [['Approve', 'Approved'], ['Not approved', 'Not approved'], ['Revise', 'Revise']].forEach(function (b) {
+                  var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm btn-outline vote-btn'; x.textContent = b[0]; x.dataset.vote = b[1];
+                  x.setAttribute('aria-pressed', mine === b[1] ? 'true' : 'false');
+                  x.addEventListener('click', function () {
+                    if (mine === b[1]) return;
+                    btns.forEach(function (y) { y.disabled = true; });
+                    post({ form: 'officer_doc_vote', token: tok(), id: d.id, item: it.id, vote: b[1] }).then(function (r2) {
+                      if (r2.signedOut) return signOut(r2.error);
+                      if (!r2.ok) return say(dmsg, r2.error);
+                      if (mine) tally[mine]--; tally[b[1]]++; mine = b[1];
+                      var meName = (document.getElementById('officer-name') || {}).textContent || 'You';
+                      voters = voters.filter(function (v) { return v.officer !== meName; }); voters.push({ officer: meName, vote: b[1] });
+                      btns.forEach(function (y) { y.setAttribute('aria-pressed', y.dataset.vote === mine ? 'true' : 'false'); });
+                      tallyLine(tl, tally); showWho(); say(dmsg, it.label + ': your vote is recorded (' + b[0] + ').', true);
+                    }).catch(function () { say(dmsg, 'Couldn’t save your vote. Please try again.'); }).then(function () { btns.forEach(function (y) { y.disabled = false; }); });
+                  });
+                  btns.push(x); bs.appendChild(x);
+                });
+                row.appendChild(bs);
+              }
+              vl.appendChild(row);
+            });
+            card.appendChild(vl);
+          }
+          var wh = document.createElement('p'); wh.className = 'vote-head'; wh.textContent = (d.items || []).length ? 'The whole document' : 'Your decision on this document'; card.appendChild(wh);
+          var dtl = document.createElement('p'); dtl.className = 'vote-tally'; var dTally = d.docTally || { 'Approved': 0, 'Not approved': 0, 'Revise': 0 }, dMine = d.docMine || '';
+          tallyLine(dtl, dTally); card.appendChild(dtl);
           var list = document.createElement('ul'); list.className = 'doc-comments';
           var addC = function (c) { var li = document.createElement('li'), w = document.createElement('span'); w.className = 'by'; w.textContent = c.officer + ' · ' + c.when; li.appendChild(w); li.appendChild(document.createTextNode(c.text)); list.appendChild(li); };
           d.comments.forEach(addC); card.appendChild(list);
@@ -443,7 +498,7 @@
           };
           (d.decisions || []).forEach(addD); card.appendChild(dl2);
           var ta = document.createElement('textarea'), send = document.createElement('button');
-          ta.rows = 2; ta.className = 'reply-text'; ta.placeholder = 'Comment, or the note for your decision…'; ta.setAttribute('aria-label', 'Comment or note on ' + d.name);
+          ta.rows = 2; ta.className = 'reply-text'; ta.placeholder = 'Comment, or the note for your decision…'; ta.setAttribute('aria-label', 'Comment or note on ' + (d.title || d.name));
           send.type = 'button'; send.className = 'btn btn-sm btn-outline'; send.textContent = 'Add comment';
           send.addEventListener('click', function () {
             if (!ta.value.trim()) return say(dmsg, 'Please type your comment.');
@@ -461,15 +516,16 @@
             x.addEventListener('click', function () {
               var note = ta.value.trim();
               if (b[1] !== 'Approved' && !note) return say(dmsg, 'Please write what to change or why in the box first, then press ' + b[0] + '.');
-              if (!window.confirm(b[0] + ': ' + d.name + (note ? '\n\nNote: ' + note : '') + '\n\nThis records your decision with your name and the time.')) return;
+              if (!window.confirm(b[0] + ': ' + (d.title || d.name) + (note ? '\n\nNote: ' + note : '') + '\n\nThis records your decision with your name and the time.')) return;
               x.disabled = true;
               post({ form: 'officer_doc_decide', token: tok(), id: d.id, decision: b[1], note: note }).then(function (res) {
                 if (res.signedOut) return signOut(res.error);
                 if (!res.ok) return say(dmsg, res.error);
                 addD(res.decision); ta.value = ''; say(dmsg, 'Your decision is recorded: ' + res.decision.decision + '.', true);
+                if (dMine) dTally[dMine]--; dTally[res.decision.decision]++; dMine = res.decision.decision; tallyLine(dtl, dTally);
               }).catch(function () { say(dmsg, 'Couldn’t save your decision. Please try again.'); }).then(function () { x.disabled = false; });
             });
-            dacts.appendChild(x);
+            if (canVote) dacts.appendChild(x);
           });
           card.appendChild(ta); card.appendChild(dacts); dlist.appendChild(card);
         });
