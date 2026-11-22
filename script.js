@@ -527,10 +527,13 @@
         if (res.signedOut) return signOut(res.error);
         rlist.innerHTML = ''; rbox.classList.toggle('hidden', !(res.ok && res.requests.length));
         (res.requests || []).forEach(function (q) {
-          var card = document.createElement('div'), txt = document.createElement('p'), acts = document.createElement('span');
-          card.className = 'doc-card-o'; acts.className = 'officer-actions';
-          txt.textContent = q.name + ' · ' + q.email + ' · ' + q.position + (q.note ? ' · "' + q.note + '"' : '') + ' · asked ' + q.when;
-          if (q.already) { var al = document.createElement('p'); al.className = 'note'; al.textContent = q.email + ' is already an active officer of the club.'; card.appendChild(txt); card.appendChild(al); rlist.appendChild(card); return; }
+          var card = document.createElement('div'), txt = document.createElement('div'), acts = document.createElement('span');
+          card.className = 'doc-card-o req-card'; acts.className = 'officer-actions';
+          var nm = document.createElement('p'), mt = document.createElement('p'); nm.className = 'req-name'; mt.className = 'req-meta';
+          nm.textContent = q.name + (q.position ? ' · ' + q.position : '');
+          mt.textContent = q.email + (q.note ? ' · “' + q.note + '”' : '') + ' · asked ' + q.when;
+          txt.appendChild(nm); txt.appendChild(mt);
+          if (q.already) { var al = document.createElement('p'); al.className = 'req-already'; al.textContent = q.email + ' is already an active officer of the club.'; card.appendChild(txt); card.appendChild(al); rlist.appendChild(card); return; }
           var qch = roleChooser('documents', false);
           [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']].forEach(function (b) {
             var x = document.createElement('button'); x.type = 'button'; x.className = 'btn btn-sm ' + b[2]; x.textContent = b[0];
