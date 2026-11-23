@@ -765,10 +765,3 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .req-group-line { margin-top: -6px; color: var(--ink); }
 .off-none { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 40px 10px 14px; }
 .off-pos { font-weight: 600; }
-/* Tally card: softer pastel charcoal (Alex, 2026-11-23); muted text lightened to stay readable */
-.age-card { background: linear-gradient(180deg, #5b6676 0%, #4c5666 100%); border-color: #6b7686; box-shadow: 0 6px 20px rgba(15,27,45,.15); }
-.tb-tile { background: rgba(255,255,255,.07); }
-.tb-zero .tb-value { color: #b3bdca; }
-.tb-sub, .tb-week { color: #d0d7e1; }
-.tb-foot { color: #c3ccd8; }
-.age-card .tb-kicker, .tb-label { color: #e3e8ef; }
