@@ -765,3 +765,8 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .req-group-line { margin-top: -6px; color: var(--ink); }
 .off-none { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 40px 10px 14px; }
 .off-pos { font-weight: 600; }
+/* Tally tiles: same layout in every tile (Alex: symmetry) — 2-line title, centred number, bottom line fixed */
+.tb-tile { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.tb-label { min-height: 2.6em; display: flex; align-items: flex-start; justify-content: center; }
+.tb-value { margin: 4px 0 2px; }
+.tb-sub { margin-top: auto; min-height: 1.3em; }

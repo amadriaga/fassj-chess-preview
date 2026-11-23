@@ -123,7 +123,7 @@
           var groups = [['Early Learners (ages 4–6)', 'Early Learners', '4–6'], ['Elementary / Youth (ages 7–11)', 'Elementary / Youth', '7–11'], ['Middle & High School (ages 12–17)', 'Middle & High School', '12–17'], ['Adult (18+)', 'Adults', '18+']];
           var total = groups.reduce(function (t, g) { return t + (res.byAge[g[0]] || 0); }, 0);
           var mk = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-          var tile = function (label, value, sub, cls) { var t = mk('div', 'tb-tile' + (cls ? ' ' + cls : '')); t.appendChild(mk('span', 'tb-label', label)); t.appendChild(mk('b', 'tb-value', value)); if (sub) t.appendChild(mk('small', 'tb-sub', sub)); return t; };
+          var tile = function (label, value, sub, cls) { var t = mk('div', 'tb-tile' + (cls ? ' ' + cls : '')); t.appendChild(mk('span', 'tb-label', label)); t.appendChild(mk('b', 'tb-value', value)); t.appendChild(mk('small', 'tb-sub', sub || '\u00a0')); return t; };   // every tile keeps the bottom line, for symmetry
           tally.innerHTML = '';
           var brand = mk('div', 'tb-brand'), lg = document.createElement('img');   // Alex: club logo, then "2027 Founders' Cup"
           lg.src = '/assets/logo-512.webp'; lg.width = 64; lg.height = 64; lg.alt = 'FASSJ Chess Club crest'; lg.className = 'tb-logo';
