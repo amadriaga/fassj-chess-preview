@@ -1138,8 +1138,9 @@
     msg.textContent = tags.length + ' approved members \u00b7 ' + (items.length - tags.length) + ' blank tags \u00b7 ' + (items.length / 8) + ' sheet(s)';
   };
   extra.addEventListener('change', render);
-  document.getElementById('nt-print').addEventListener('click', function () { window.print(); });
-  if (!tok) { msg.textContent = 'Please sign in on the officers page first, then press Print name tags there.'; return; }
+  var pb = document.getElementById('nt-print');
+  pb.addEventListener('click', function () { if (!tags.length && !box.children.length) { msg.textContent = 'Nothing to print yet: sign in on the officers page, then press Print name tags there.'; return; } window.print(); });
+  if (!tok) { msg.textContent = 'You\u2019re not signed in on this tab. Go back to the officers page, sign in, then press Print name tags.'; pb.disabled = true; return; }
   fetch(api, { method: 'POST', body: new URLSearchParams({ form: 'officer_name_tags', token: tok }) }).then(function (r) { return r.json(); }).then(function (res) {
     if (!res.ok) { msg.textContent = res.error || 'Couldn\u2019t load the members.'; return; }
     tags = res.tags || []; render();
