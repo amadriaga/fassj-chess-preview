@@ -1,4 +1,4 @@
-// FASSJ Chess Club: site behaviour
+// SJFACC: site behaviour
 (function () {
   // Mobile menu
   var toggle = document.querySelector('.menu-toggle');
@@ -126,7 +126,7 @@
           var tile = function (label, value, sub, cls) { var t = mk('div', 'tb-tile' + (cls ? ' ' + cls : '')); t.appendChild(mk('span', 'tb-label', label)); t.appendChild(mk('b', 'tb-value', value)); t.appendChild(mk('small', 'tb-sub', sub || '\u00a0')); return t; };   // every tile keeps the bottom line, for symmetry
           tally.innerHTML = '';
           var brand = mk('div', 'tb-brand'), lg = document.createElement('img');   // Alex: club logo, then "2027 Founders' Cup"
-          lg.src = '/assets/logo-512.webp'; lg.width = 64; lg.height = 64; lg.alt = 'FASSJ Chess Club crest'; lg.className = 'tb-logo';
+          lg.src = '/assets/logo-512.webp?v=3'; lg.width = 64; lg.height = 64; lg.alt = 'SJFACC crest'; lg.className = 'tb-logo';
           brand.appendChild(lg); brand.appendChild(mk('h4', 'tb-title', '2027 Founders\u2019 Cup')); brand.appendChild(mk('p', 'tb-date', 'January 11, 2027')); brand.appendChild(mk('p', 'tb-kicker', 'Founding Season Tally'));
           tally.appendChild(brand);
           // four corner pins: bevelled 3D gold stars (Alex)
@@ -333,7 +333,7 @@
               : 'Thank you for signing up! The player\u2019s name on the form (\u201c' + f.name + '\u201d) looks like a username. For club records, membership forms need the player\u2019s real first and last name. Could you please update it on the Change my registration page (link below)? We\u2019ll approve the form as soon as it\u2019s updated.';
             return deny
               ? 'We\u2019re sorry, but we can\u2019t approve this membership form because '
-              : 'Thank you for signing up for the FASSJ Chess Club! Before we approve the form, could you please ';
+              : 'Thank you for signing up for SJFACC! Before we approve the form, could you please ';
           };
           var send = function (kind) {
             var deny = kind === 'deny';
@@ -840,7 +840,7 @@
           var nm = document.createElement('p'), mt = document.createElement('p'); nm.className = 'req-name'; mt.className = 'req-meta';
           mt.textContent = q.name + ' · ' + q.email + (q.position ? ' · ' + q.position : '') + (q.note ? ' · “' + q.note + '”' : '') + ' · asked ' + q.when;
           var gl = document.createElement('p'); gl.className = 'req-meta req-group-line';   // spec §67
-          gl.textContent = 'Goes to: ' + (q.group === 'fassj' ? 'FASSJ officers' : 'FASSJ Chess Club officers') + (q.rosterMatch && q.chose !== 'fassj' ? ' (name matches the FASSJ list, so placed with FASSJ officers)' : '');
+          gl.textContent = 'Goes to: ' + (q.group === 'fassj' ? 'FASSJ officers' : 'SJFACC officers') + (q.rosterMatch && q.chose !== 'fassj' ? ' (name matches the FASSJ list, so placed with FASSJ officers)' : '');
           txt.appendChild(mt); txt.appendChild(gl);
           if (q.already) { var al = document.createElement('p'); al.className = 'req-already'; al.textContent = q.email + ' is already an active officer of the club.'; card.appendChild(txt); card.appendChild(al); rlist.appendChild(card); return; }
           var qch = roleChooser('documents', false);
@@ -870,7 +870,7 @@
         var btn = reqForm.querySelector('button'); btn.disabled = true; say(qmsg, 'Sending…', true);
         var qdata = Object.fromEntries(new FormData(reqForm)), qmail = String(qdata.email || '').trim();
         post(Object.assign({ form: 'officer_request' }, qdata)).then(function (res) {
-          say(qmsg, res.ok ? 'Thank you. An officer will check your request and email you a link to set up your sign-in. Please watch your ' + qmail + ' inbox, and check your spam or junk folder too: the email comes from FASSJ Chess Club (fassj.admin@gmail.com). The link works for 48 hours.' : res.error, res.ok);
+          say(qmsg, res.ok ? 'Thank you. An officer will check your request and email you a link to set up your sign-in. Please watch your ' + qmail + ' inbox, and check your spam or junk folder too: the email comes from SJFACC (fassj.admin@gmail.com). The link works for 48 hours.' : res.error, res.ok);
           if (res.ok) reqForm.reset();
         }).catch(function () { say(qmsg, 'Couldn’t send. Please try again.'); }).then(function () { btn.disabled = false; });
       });
@@ -1187,7 +1187,7 @@
   var api = main.getAttribute('data-approve-api'), box = document.getElementById('nt-sheets'), msg = document.getElementById('nt-msg'), extra = document.getElementById('nt-extra'), tags = [];
   var tok = ''; try { tok = sessionStorage.getItem('fassjOfficer') || ''; } catch (e) {}
   var el = function (tag, cls, text) { var x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; };
-  var top = function (t, group) { var d = el('div', 'nt-top'), im = document.createElement('img'); im.src = '/assets/logo-512.webp'; im.alt = ''; d.appendChild(im); d.appendChild(el('span', '', 'FASSJ Chess Club')); if (group) d.appendChild(el('em', '', group)); t.appendChild(d); };
+  var top = function (t, group) { var d = el('div', 'nt-top'), im = document.createElement('img'); im.src = '/assets/logo-512.webp?v=3'; im.alt = ''; d.appendChild(im); d.appendChild(el('span', '', 'SJFACC')); if (group) d.appendChild(el('em', '', group)); t.appendChild(d); };
   var render = function () {
     box.innerHTML = '';
     var items = tags.slice(); while (items.length % 8) items.push(null);
