@@ -165,8 +165,9 @@
             weeks.forEach(function (w) {
               var col = mk('div', 'tb-col'), bar = mk('span', 'tb-bar'), tip = 'Week of ' + w.label + ': ' + w.count + (w.count === 1 ? ' sign-up' : ' sign-ups');
               col.setAttribute('role', 'listitem'); col.tabIndex = 0; col.setAttribute('aria-label', tip); col.setAttribute('data-tip', tip);
-              bar.style.height = Math.max(4, Math.round(100 * w.count / max)) + '%';
-              col.appendChild(mk('span', 'tb-n', String(w.count))); col.appendChild(bar); col.appendChild(mk('span', 'tb-week', w.label)); bars.appendChild(col);
+              bar.style.height = w.count ? Math.max(4, Math.round(100 * w.count / max)) + '%' : '0';   // spec §70: empty weeks show only their date
+              if (!w.count) col.classList.add('tb-empty');
+              col.appendChild(mk('span', 'tb-n', w.count ? String(w.count) : '\u00a0')); col.appendChild(bar); col.appendChild(mk('span', 'tb-week', w.label)); bars.appendChild(col);
             });
             chart.appendChild(bars); tally.appendChild(chart);
           }
