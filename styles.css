@@ -779,3 +779,7 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tb-pin svg { width: 100%; height: 100%; display: block; }
 .tb-pin-tl { top: 7px; left: 7px; } .tb-pin-tr { top: 7px; right: 7px; }
 .tb-pin-bl { bottom: 7px; left: 7px; } .tb-pin-br { bottom: 7px; right: 7px; }
+/* Circles around the tally numbers (not the countdown) (Alex) */
+.tb-tile:not(.tb-countdown) .tb-value { width: 2.1em; height: 2.1em; line-height: 2.1em; margin: 4px auto 2px; border-radius: 50%; border: 1.5px solid rgba(212,176,106,.7); box-shadow: inset 0 0 10px rgba(212,176,106,.12), 0 0 8px rgba(212,176,106,.15); font-size: 1.5rem; text-align: center; }
+.tb-main .tb-value { border-color: rgba(255,255,255,.75); }
+.tb-zero .tb-value { border-color: rgba(111,125,145,.7); box-shadow: none; }
