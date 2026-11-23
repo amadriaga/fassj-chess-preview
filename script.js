@@ -708,15 +708,27 @@
       }).catch(function () {});
     };
     var olistBody = document.getElementById('officer-list');
+    var openOff = {};   // officers kept open across refreshes
     var loadOfficers = function () {   // spec §52: current officers
       if (!olistBody) return;
       post({ form: 'officer_list', token: tok() }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         olistBody.innerHTML = '';
-        if (!res.ok || !res.officers.length) { var tr0 = document.createElement('tr'); cell(tr0, res.ok ? 'No officers yet.' : res.error).colSpan = 5; olistBody.appendChild(tr0); return; }
+        if (!res.ok || !res.officers.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = res.ok ? 'No officers yet.' : res.error; olistBody.appendChild(p0); return; }
         res.officers.forEach(function (o) {
-          var tr = document.createElement('tr'); cell(tr, o.name); cell(tr, o.email);
-          var stc = cell(tr, o.status); stc.className = o.status === 'Active' ? 'st-active' : 'st-pending';
+          // collapsible row: name, sign-in status and areas; opens to email, role and invitation details
+          var acc = document.createElement('details'), sum = document.createElement('summary'), sn = document.createElement('span'), sch = document.createElement('span'), sa = document.createElement('span');
+          acc.className = 'doc-acc reg-acc off-acc'; acc.open = !!openOff[o.email];
+          sn.className = 'doc-title reg-name'; sn.textContent = o.name;
+          sch.className = 'vote-result ' + (o.status === 'Active' ? 'r-approved' : 'r-revise'); sch.textContent = o.status;
+          sa.className = 'doc-sum'; sa.textContent = areaText(o.roles);
+          sum.appendChild(sn); sum.appendChild(sch); sum.appendChild(sa); acc.appendChild(sum);
+          var tw = document.createElement('div'), tbl = document.createElement('table'), th = document.createElement('thead'), tb = document.createElement('tbody');
+          tw.className = 'roster-wrap reg-body'; tbl.className = 'roster-table officer-table';
+          th.innerHTML = '<tr><th scope="col">Email</th><th scope="col">Role</th><th scope="col">Invited</th></tr>';
+          tbl.appendChild(th); tbl.appendChild(tb); tw.appendChild(tbl); acc.appendChild(tw);
+          acc.addEventListener('toggle', function () { if (acc.open) openOff[o.email] = 1; else delete openOff[o.email]; });
+          var tr = document.createElement('tr'); cell(tr, o.email);
           var rc2 = cell(tr, areaText(o.roles));
           if (res.canRemove && !o.owner) {
             var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'link'; ed.textContent = 'Edit';
@@ -747,7 +759,7 @@
             });
             ic.appendChild(document.createTextNode(' ')); ic.appendChild(nk);
           }
-          olistBody.appendChild(tr);
+          tb.appendChild(tr); olistBody.appendChild(acc);
         });
       }).catch(function () {});
     };
