@@ -199,7 +199,7 @@
         var bin = atob(res.pdf), bytes = new Uint8Array(bin.length);
         for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
         var url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })), a = document.createElement('a');
-        a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.download = 'FASSJ-Chess-Club-form-' + id + '.pdf'; document.body.appendChild(a); a.click(); a.remove();
+        a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.download = 'SJFACC-form-' + id + '.pdf'; document.body.appendChild(a); a.click(); a.remove();
         say(omsg, '');
       }).catch(function () { say(omsg, 'Couldn’t open the PDF. Please try again.'); }).then(function () { btn.disabled = false; });
     };
