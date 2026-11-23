@@ -727,7 +727,7 @@
           sum.appendChild(sn); sum.appendChild(sch); sum.appendChild(sa); acc.appendChild(sum);
           var tw = document.createElement('div'), tbl = document.createElement('table'), th = document.createElement('thead'), tb = document.createElement('tbody');
           tw.className = 'roster-wrap reg-body'; tbl.className = 'roster-table officer-table';
-          th.innerHTML = '<tr><th scope="col">Email</th><th scope="col">Role</th><th scope="col">Invited</th></tr>';
+          th.innerHTML = '<tr><th scope="col">Email</th><th scope="col">Access</th><th scope="col">Invited</th></tr>';
           tbl.appendChild(th); tbl.appendChild(tb); tw.appendChild(tbl); acc.appendChild(tw);
           acc.addEventListener('toggle', function () { if (acc.open) openOff[o.email] = 1; else delete openOff[o.email]; });
           var tr = document.createElement('tr'); cell(tr, o.email);
@@ -737,7 +737,7 @@
             ed.addEventListener('click', function () {
               if (rc2.querySelector('.role-chooser')) return;
               var ch = roleChooser(o.roles, o.canInvite), sv = document.createElement('button'); sv.type = 'button'; sv.className = 'btn btn-sm btn-primary'; sv.textContent = 'Save';
-              sv.addEventListener('click', function () { var v = ch.values(); sv.disabled = true; post({ form: 'officer_set_role', token: tok(), email: o.email, roles: v.roles, canInvite: v.canInvite }).then(function (r3) { if (r3.signedOut) return signOut(r3.error); if (!r3.ok) { sv.disabled = false; return say(rmsg, r3.error); } say(rmsg, o.name + ': role saved.', true); loadOfficers(); }).catch(function () { sv.disabled = false; }); });
+              sv.addEventListener('click', function () { var v = ch.values(); sv.disabled = true; post({ form: 'officer_set_role', token: tok(), email: o.email, roles: v.roles, canInvite: v.canInvite }).then(function (r3) { if (r3.signedOut) return signOut(r3.error); if (!r3.ok) { sv.disabled = false; return say(rmsg, r3.error); } say(rmsg, o.name + ': access saved.', true); loadOfficers(); }).catch(function () { sv.disabled = false; }); });
               rc2.appendChild(ch); rc2.appendChild(sv);
             });
             rc2.appendChild(document.createTextNode(' ')); rc2.appendChild(ed);
