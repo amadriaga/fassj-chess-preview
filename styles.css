@@ -783,3 +783,5 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tb-bars { gap: 4px; }
 .tb-week { font-size: .55rem; }
 .tally-head { margin-top: 32px; }
+/* Phone (2 columns): players registered + countdown on the first row, then the four age groups (Alex) */
+@media (max-width: 420px) { .tb-grid .tb-main { order: 1; } .tb-grid .tb-countdown { order: 2; } .tb-grid .tb-tile:not(.tb-main):not(.tb-countdown) { order: 3; } }
