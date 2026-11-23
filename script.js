@@ -390,6 +390,7 @@
       if (e.status === 'rejected') return '✗ Rejected' + (e.reviewedBy ? ' by ' + e.reviewedBy : '') + (e.reviewedAt ? ', ' + e.reviewedAt : '');
       return 'Waiting for review';
     };
+    var openEntries = {};   // contest entries kept open across refreshes
     var loadEntries = function () {
       if (!elist) return;
       post({ form: 'officer_entries', token: tok() }).then(function (res) {
@@ -433,7 +434,15 @@
             });
             acts.appendChild(bt);
           });
-          info.appendChild(acts); card.appendChild(pic); card.appendChild(info); elist.appendChild(card);
+          info.appendChild(acts); card.appendChild(pic); card.appendChild(info);
+          // collapsible row: entry number and title, with its status; opens to the design and buttons
+          var acc = document.createElement('details'), sum = document.createElement('summary'), st1 = document.createElement('span'), ch1 = document.createElement('span');
+          acc.className = 'doc-acc entry-acc'; acc.open = !!openEntries[e.id];
+          st1.className = 'doc-title'; st1.textContent = e.id + ' · ' + e.title;
+          var SC = { approved: 'r-approved', rejected: 'r-not' }; ch1.className = 'vote-result ' + (SC[e.status] || 'r-revise'); ch1.textContent = e.status === 'approved' ? 'Approved' : e.status === 'rejected' ? 'Rejected' : 'Waiting for review';
+          sum.appendChild(st1); sum.appendChild(ch1); acc.appendChild(sum); acc.appendChild(card);
+          acc.addEventListener('toggle', function () { if (acc.open) openEntries[e.id] = 1; else delete openEntries[e.id]; });
+          elist.appendChild(acc);
         });
       }).catch(function () { elist.textContent = 'Couldn’t load the entries.'; });
     };

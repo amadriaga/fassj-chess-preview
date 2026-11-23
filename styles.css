@@ -726,3 +726,14 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .officer-sec[hidden] { display: none; }
 .setup-warn { background: #fff6e0; border: 1px solid #ecd9a6; border-radius: 8px; padding: 10px 12px; font-size: .92rem; }
 .doc-no { width: 28px; height: 28px; flex: 0 0 28px; border-radius: 50%; background: var(--ivory); border: 1px solid var(--line); display: inline-grid; place-items: center; font-family: var(--serif); font-size: .9rem; color: var(--gold); align-self: center; }   /* same as .aside-list .dot (register: What happens next) */
+.dl-list { display: block; }
+.dl-acc { margin-bottom: 10px; }
+.dl-acc > summary { gap: 6px 12px; }
+.dl-pdf { width: 40px; height: 28px; border-radius: 5px; background: var(--ivory); border: 1px solid var(--line); color: var(--ph-red); font: 700 .68rem/26px var(--sans); text-align: center; letter-spacing: .06em; align-self: center; }
+.dl-acc .badge { position: static; align-self: center; }
+.dl-body { border-top: 1px solid var(--line); padding: 12px 16px 16px; }
+.dl-body .doc-meta { margin-top: 6px !important; }
+.dl-body .btn { margin-top: 10px; }
+.dl-body .doc-btns { margin-top: 10px; }
+.entry-acc { margin-bottom: 10px; }
+.entry-acc > .entry-card { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin: 0; }
