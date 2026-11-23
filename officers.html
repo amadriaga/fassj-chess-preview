@@ -18,7 +18,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=965c9316e9">
+  <link rel="stylesheet" href="/styles.css?v=f4972a03f2">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">FASSJ Chess Club website &mdash; fully operational &middot; FASSJ Committee Review Pending &middot; <a href="/register.html" style="color:#0f1b2d;text-decoration:underline">Registration is now open &rarr;</a></div>
@@ -76,6 +76,10 @@
           <form class="officer-login officer-request" id="request" autocomplete="on" data-request-form>
             <h3>New officer? Request access</h3>
             <p class="note" style="margin:0 0 10px">For FASSJ Board members and club officers. An existing officer checks your request and emails you a link to set up your sign-in code.</p>
+            <fieldset class="req-group"><legend>I am a</legend>
+              <label><input type="radio" name="group" value="club" checked> FASSJ Chess Club officer</label>
+              <label><input type="radio" name="group" value="fassj"> FASSJ officer or Board member</label>
+            </fieldset>
             <div class="officer-fields request-fields">
               <label>Full name<input type="text" name="name" required autocomplete="name"></label>
               <label>Email<input type="email" name="email" required autocomplete="email"></label>
@@ -145,6 +149,9 @@
             <details class="doc-acc officer-sec" id="sec-fassj" open hidden>
               <summary><span class="doc-title">FASSJ officers and Board of Directors</span><span class="doc-sum">Filipino American Society of South Jersey, 2026&ndash;2028</span></summary>
               <div class="officer-sec-body">
+                <h3 class="sec-sub">With chess-site access</h3>
+                <div class="reg-list" id="fassj-officer-list"><p class="note">Loading&hellip;</p></div>
+                <h3 class="sec-sub">FASSJ officers and Board, 2026&ndash;2028</h3>
                 <div class="roster-wrap"><table class="roster-table officer-table"><thead><tr><th scope="col">Name</th><th scope="col">Position</th><th scope="col">Chess site access</th></tr></thead><tbody id="fassj-list"><tr><td colspan="3">Loading&hellip;</td></tr></tbody></table></div>
               </div>
             </details>
@@ -212,10 +219,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> FASSJ Chess Club</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 187 · Nov 23, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 188 · Nov 23, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=b92c1f19b2"></script>
+  <script src="/script.js?v=e02232228c"></script>
 </body>
 </html>

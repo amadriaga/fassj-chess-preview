@@ -439,6 +439,7 @@
           var acc = document.createElement('details'), sum = document.createElement('summary'), st1 = document.createElement('span'), ch1 = document.createElement('span');
           acc.className = 'doc-acc entry-acc'; acc.open = !!openEntries[e.id];
           st1.className = 'doc-title'; st1.textContent = e.id + ' · ' + e.title;
+          var enNo = document.createElement('span'); enNo.className = 'doc-no'; enNo.textContent = String(res.entries.indexOf(e) + 1); sum.appendChild(enNo);   // spec §68
           var SC = { approved: 'r-approved', rejected: 'r-not' }; ch1.className = 'vote-result ' + (SC[e.status] || 'r-revise'); ch1.textContent = e.status === 'approved' ? 'Approved' : e.status === 'rejected' ? 'Rejected' : 'Waiting for review';
           sum.appendChild(st1); sum.appendChild(ch1); acc.appendChild(sum); acc.appendChild(card);
           acc.addEventListener('toggle', function () { if (acc.open) openEntries[e.id] = 1; else delete openEntries[e.id]; });
@@ -714,7 +715,10 @@
       post({ form: 'officer_list', token: tok() }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         olistBody.innerHTML = '';
+        var flist = document.getElementById('fassj-officer-list'); if (flist) flist.innerHTML = '';   // spec §67: FASSJ-group officers listed in the FASSJ section
         if (!res.ok || !res.officers.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = res.ok ? 'No officers yet.' : res.error; olistBody.appendChild(p0); return; }
+        var nF = res.officers.filter(function (o) { return o.group === 'fassj'; }).length;
+        if (flist && !nF) { var pf = document.createElement('p'); pf.className = 'note'; pf.textContent = 'No FASSJ officers have chess-site access yet.'; flist.appendChild(pf); }
         res.officers.forEach(function (o) {
           // collapsible row: name, sign-in status and areas; opens to email, role and invitation details
           var acc = document.createElement('details'), sum = document.createElement('summary'), sn = document.createElement('span'), sch = document.createElement('span'), sa = document.createElement('span');
@@ -758,8 +762,17 @@
                 .catch(function () { nk.disabled = false; });
             });
             ic.appendChild(document.createTextNode(' ')); ic.appendChild(nk);
+            var mv = document.createElement('button'); mv.type = 'button'; mv.className = 'link';   // spec §67: move between the two lists
+            var to = o.group === 'fassj' ? 'club' : 'fassj'; mv.textContent = to === 'fassj' ? 'Move to FASSJ officers' : 'Move to Chess Club officers';
+            mv.addEventListener('click', function () {
+              if (!window.confirm(mv.textContent + ': ' + o.name + '?')) return;
+              mv.disabled = true;
+              post({ form: 'officer_set_group', token: tok(), email: o.email, group: to }).then(function (r5) { if (r5.signedOut) return signOut(r5.error); if (!r5.ok) { mv.disabled = false; return say(rmsg, r5.error); } say(rmsg, o.name + ' moved.', true); loadOfficers(); })
+                .catch(function () { mv.disabled = false; });
+            });
+            ic.appendChild(document.createTextNode(' ')); ic.appendChild(mv);
           }
-          tb.appendChild(tr); olistBody.appendChild(acc);
+          tb.appendChild(tr); ((o.group === 'fassj' && flist) ? flist : olistBody).appendChild(acc);
         });
       }).catch(function () {});
     };
@@ -774,7 +787,9 @@
           card.className = 'doc-card-o req-card'; acts.className = 'officer-actions';
           var nm = document.createElement('p'), mt = document.createElement('p'); nm.className = 'req-name'; mt.className = 'req-meta';
           mt.textContent = q.name + ' · ' + q.email + (q.position ? ' · ' + q.position : '') + (q.note ? ' · “' + q.note + '”' : '') + ' · asked ' + q.when;
-          txt.appendChild(mt);
+          var gl = document.createElement('p'); gl.className = 'req-meta req-group-line';   // spec §67
+          gl.textContent = 'Goes to: ' + (q.group === 'fassj' ? 'FASSJ officers' : 'FASSJ Chess Club officers') + (q.rosterMatch && q.chose !== 'fassj' ? ' (name matches the FASSJ list, so placed with FASSJ officers)' : '');
+          txt.appendChild(mt); txt.appendChild(gl);
           if (q.already) { var al = document.createElement('p'); al.className = 'req-already'; al.textContent = q.email + ' is already an active officer of the club.'; card.appendChild(txt); card.appendChild(al); rlist.appendChild(card); return; }
           var qch = roleChooser('documents', false);
           [['Send invitation', 'invite', 'btn-primary'], ['Decline', 'decline', 'btn-outline']].forEach(function (b) {
@@ -783,7 +798,7 @@
               if (!window.confirm(b[0] + ' for ' + q.name + ' (' + q.email + ')?')) return;
               x.disabled = true;
               var qv = qch ? qch.values() : {};
-              post({ form: 'officer_request_decide', token: tok(), id: q.id, decision: b[1], site: location.origin, roles: qv.roles || 'documents', canInvite: qv.canInvite || '' }).then(function (res) {
+              post({ form: 'officer_request_decide', token: tok(), id: q.id, decision: b[1], site: location.origin, roles: qv.roles || 'documents', canInvite: qv.canInvite || '', group: q.group || '' }).then(function (res) {
                 if (res.signedOut) return signOut(res.error);
                 if (!res.ok) { x.disabled = false; return say(rmsg, res.error); }
                 say(rmsg, q.name + ': ' + (res.status === 'Invited' ? 'invitation sent.' : 'declined.'), true); loadRequests();

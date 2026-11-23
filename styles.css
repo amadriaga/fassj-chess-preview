@@ -758,3 +758,8 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .nt-line { margin-top: 0.42in; border-bottom: 1.2pt solid #0f1b2d; }
 .nt-launch { margin: 6px 0 10px; }
 @media print { .nt-bar { display: none; } .nt-page { background: #fff; } .nt-sheet { margin: 0; box-shadow: none; } }
+.req-group { border: 0; padding: 0; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .92rem; }
+.req-group legend { font-weight: 600; margin-bottom: 4px; padding: 0; }
+.req-group label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.sec-sub { font-size: 1rem; margin: 14px 0 8px; }
+.req-group-line { margin-top: -6px; color: var(--ink); }
