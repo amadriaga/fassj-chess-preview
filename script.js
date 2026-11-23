@@ -1113,3 +1113,36 @@
     });
   }
 })();
+
+// spec §65: Print name tags (officers with Registrations): approved members, Avery 5395 layout, extra blank sheets
+(function () {
+  var main = document.querySelector('main[data-name-tags]'); if (!main) return;
+  var api = main.getAttribute('data-approve-api'), box = document.getElementById('nt-sheets'), msg = document.getElementById('nt-msg'), extra = document.getElementById('nt-extra'), tags = [];
+  var tok = ''; try { tok = sessionStorage.getItem('fassjOfficer') || ''; } catch (e) {}
+  var el = function (tag, cls, text) { var x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; };
+  var top = function (t, group) { var d = el('div', 'nt-top'), im = document.createElement('img'); im.src = '/assets/logo-512.webp'; im.alt = ''; d.appendChild(im); d.appendChild(el('span', '', 'FASSJ Chess Club')); if (group) d.appendChild(el('em', '', group)); t.appendChild(d); };
+  var render = function () {
+    box.innerHTML = '';
+    var items = tags.slice(); while (items.length % 8) items.push(null);
+    for (var k = 0; k < Number(extra.value || 0) * 8; k++) items.push(null);
+    for (var i = 0; i < items.length; i += 8) {
+      var sh = el('section', 'nt-sheet');
+      items.slice(i, i + 8).forEach(function (p) {
+        var t = el('div', 'nt-tag' + (p ? '' : ' nt-blank'));
+        if (p) { top(t, p.group); t.appendChild(el('div', 'nt-first', p.name.split(' ')[0])); t.appendChild(el('div', 'nt-full', p.name)); t.appendChild(el('div', 'nt-foot', 'Founding member \u00b7 Founders\u2019 Cup 2027')); }
+        else { top(t, ''); t.appendChild(el('div', 'nt-hello', 'Hello, my name is')); t.appendChild(el('div', 'nt-line')); t.appendChild(el('div', 'nt-foot', 'Inaugural Club Night \u00b7 Founders\u2019 Cup 2027')); }
+        sh.appendChild(t);
+      });
+      box.appendChild(sh);
+    }
+    msg.textContent = tags.length + ' approved members \u00b7 ' + (items.length - tags.length) + ' blank tags \u00b7 ' + (items.length / 8) + ' sheet(s)';
+  };
+  extra.addEventListener('change', render);
+  document.getElementById('nt-print').addEventListener('click', function () { window.print(); });
+  if (!tok) { msg.textContent = 'Please sign in on the officers page first, then press Print name tags there.'; return; }
+  fetch(api, { method: 'POST', body: new URLSearchParams({ form: 'officer_name_tags', token: tok }) }).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res.ok) { msg.textContent = res.error || 'Couldn\u2019t load the members.'; return; }
+    tags = res.tags || []; render();
+  }).catch(function () { msg.textContent = 'Couldn\u2019t load the members. Please try again.'; });
+})();
+
