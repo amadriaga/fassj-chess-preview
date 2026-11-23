@@ -841,3 +841,15 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .roster-side .roster-scroll tbody td:first-child { font-size: .66rem; letter-spacing: 0; }
 .roster-side .roster-scroll td:nth-child(3) { white-space: nowrap; }
 .roster-side .roster-scroll tbody td { vertical-align: middle; } .roster-side .roster-scroll tbody td:first-child { padding-top: 10px; }
+.roster-side .roster-scroll { overflow-x: hidden; }
+.roster-side .roster-scroll .roster-table { table-layout: auto; width: 100%; }
+.roster-side .roster-scroll .roster-table th, .roster-side .roster-scroll .roster-table td { padding: 7px 6px; font-size: .78rem; }
+.roster-side .roster-scroll .roster-table th { font-size: .64rem; letter-spacing: .03em; }
+.roster-side .roster-scroll tbody td:first-child { font-size: .6rem; padding-left: 8px; }
+.roster-side .roster-scroll td:nth-child(5) { white-space: normal; }
+@media (max-width: 420px) {
+  .roster-side .roster-scroll { padding: 4px; }
+  .roster-side .roster-scroll .roster-table th, .roster-side .roster-scroll .roster-table td { padding: 6px 4px; font-size: .72rem; }
+  .roster-side .roster-scroll .roster-table th { font-size: .58rem; }
+  .roster-side .roster-scroll tbody td:first-child { font-size: .52rem; padding-left: 6px; }
+}
