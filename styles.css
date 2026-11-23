@@ -795,3 +795,5 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .pass-dates b { color: var(--gold-2); font-size: .9rem; } .pass-dates span { color: #c9d2df; font-size: .88rem; }
 .promo-pass .promo-text p.note { margin-top: 12px; font-size: .85rem; color: #9aa6b8; }
 @media (max-width: 480px) { .pass-dates { grid-template-columns: 1fr; } }
+.promo-pass .promo-text p.pass-deadline { margin-top: 16px; padding: 10px 14px; border-left: 3px solid var(--gold-2); background: rgba(212,176,106,.1); border-radius: 0 8px 8px 0; color: #e8edf4; }
+.pass-deadline b { color: #fff; }
