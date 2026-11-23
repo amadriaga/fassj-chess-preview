@@ -785,3 +785,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tally-head { margin-top: 32px; }
 /* Phone (2 columns): players registered + countdown on the first row, then the four age groups (Alex) */
 @media (max-width: 420px) { .tb-grid .tb-main { order: 1; } .tb-grid .tb-countdown { order: 2; } .tb-grid .tb-tile:not(.tb-main):not(.tb-countdown) { order: 3; } }
+.age-card .tb-date { margin: 4px 0 0; font-family: var(--serif); font-size: .95rem; letter-spacing: .06em; color: #d4b06a; }

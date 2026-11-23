@@ -127,7 +127,7 @@
           tally.innerHTML = '';
           var brand = mk('div', 'tb-brand'), lg = document.createElement('img');   // Alex: club logo, then "2027 Founders' Cup"
           lg.src = '/assets/logo-512.webp'; lg.width = 64; lg.height = 64; lg.alt = 'FASSJ Chess Club crest'; lg.className = 'tb-logo';
-          brand.appendChild(lg); brand.appendChild(mk('h4', 'tb-title', '2027 Founders\u2019 Cup')); brand.appendChild(mk('p', 'tb-kicker', 'Founding Season Tally'));
+          brand.appendChild(lg); brand.appendChild(mk('h4', 'tb-title', '2027 Founders\u2019 Cup')); brand.appendChild(mk('p', 'tb-date', 'January 11, 2027')); brand.appendChild(mk('p', 'tb-kicker', 'Founding Season Tally'));
           tally.appendChild(brand);
           // four corner pins: bevelled 3D gold stars (Alex)
           var starSvg = (function () {
