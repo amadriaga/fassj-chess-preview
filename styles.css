@@ -763,3 +763,5 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .req-group label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 .sec-sub { font-size: 1rem; margin: 14px 0 8px; }
 .req-group-line { margin-top: -6px; color: var(--ink); }
+.off-none { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 40px 10px 14px; }
+.off-pos { font-weight: 600; }

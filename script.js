@@ -195,7 +195,7 @@
         if (!cur || cur.hidden) { var first = document.querySelector('#officer-panel .tab:not([hidden])'); if (first) first.click(); }
         if (has('contest')) loadEntries();
         if (has('documents')) loadDocs();
-        if (has('officers')) { loadRequests(); loadOfficers(); loadFassj(); }
+        if (has('officers')) { loadRequests(); loadOfficers(); }
         if (res.owner) { loadAdmin(); loadSignIns(); }
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = 'No signed forms yet.'; obody.appendChild(p0); return; }
@@ -715,10 +715,8 @@
       post({ form: 'officer_list', token: tok() }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
         olistBody.innerHTML = '';
-        var flist = document.getElementById('fassj-officer-list'); if (flist) flist.innerHTML = '';   // spec §67: FASSJ-group officers listed in the FASSJ section
-        if (!res.ok || !res.officers.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = res.ok ? 'No officers yet.' : res.error; olistBody.appendChild(p0); return; }
-        var nF = res.officers.filter(function (o) { return o.group === 'fassj'; }).length;
-        if (flist && !nF) { var pf = document.createElement('p'); pf.className = 'note'; pf.textContent = 'No FASSJ officers have chess-site access yet.'; flist.appendChild(pf); }
+        var fassjOffs = [];   // spec §67: FASSJ-group officers are merged into the FASSJ list (one row per person)
+        if (!res.ok || !res.officers.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = res.ok ? 'No officers yet.' : res.error; olistBody.appendChild(p0); renderFassj([]); return; }
         res.officers.forEach(function (o) {
           // collapsible row: name, sign-in status and areas; opens to email, role and invitation details
           var acc = document.createElement('details'), sum = document.createElement('summary'), sn = document.createElement('span'), sch = document.createElement('span'), sa = document.createElement('span');
@@ -772,8 +770,39 @@
             });
             ic.appendChild(document.createTextNode(' ')); ic.appendChild(mv);
           }
-          tb.appendChild(tr); ((o.group === 'fassj' && flist) ? flist : olistBody).appendChild(acc);
+          tb.appendChild(tr);
+          if (o.group === 'fassj') fassjOffs.push({ o: o, acc: acc }); else olistBody.appendChild(acc);
         });
+        renderFassj(fassjOffs);
+      }).catch(function () {});
+    };
+    // spec §67: one FASSJ list: every FASSJ officer/Board member (from the roster) with their chess-site status;
+    // a person with access opens to their email, role and buttons; FASSJ-group officers not on the roster go under "Other".
+    var fcomb = document.getElementById('fassj-combined');
+    var normName = function (s) { return String(s || '').toLowerCase().replace(/,.*$/, '').replace(/[^a-z ]/g, '').replace(/\s+/g, ' ').trim(); };
+    var renderFassj = function (offs) {
+      if (!fcomb) return;
+      post({ form: 'officer_fassj_roster', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        fcomb.innerHTML = '';
+        if (!res.ok) { var e0 = document.createElement('p'); e0.className = 'note'; e0.textContent = res.error; fcomb.appendChild(e0); return; }
+        var used = {}, g = '';
+        var head = function (t) { var h = document.createElement('p'); h.className = 'vote-head'; h.textContent = t; fcomb.appendChild(h); };
+        res.roster.forEach(function (p) {
+          if (p.group !== g) { g = p.group; head(g === 'Board' ? 'Board of Directors' : g === 'Officer' ? 'Officers' : 'Other'); }
+          var hit = null; offs.forEach(function (x, i) { if (!hit && !used[i] && normName(x.o.name) === normName(p.name)) { hit = x; used[i] = 1; } });
+          if (hit) {
+            var sm = hit.acc.querySelector('summary'), ps = document.createElement('span'); ps.className = 'doc-sum off-pos'; ps.textContent = p.position;
+            sm.insertBefore(ps, sm.children[1]); fcomb.appendChild(hit.acc);
+          } else {
+            var row = document.createElement('div'), nm = document.createElement('span'), po = document.createElement('span'), na = document.createElement('span');
+            row.className = 'doc-acc reg-acc off-none'; nm.className = 'doc-title reg-name'; nm.textContent = p.name; po.className = 'doc-sum off-pos'; po.textContent = p.position;
+            na.className = 'vote-result r-open'; na.textContent = p.status || 'No chess-site access';
+            row.appendChild(nm); row.appendChild(po); row.appendChild(na); fcomb.appendChild(row);
+          }
+        });
+        var rest = offs.filter(function (x, i) { return !used[i]; });
+        if (rest.length) { head('Other FASSJ officers with access'); rest.forEach(function (x) { fcomb.appendChild(x.acc); }); }
       }).catch(function () {});
     };
     var rbox = document.getElementById('request-review'), rlist = document.getElementById('request-list'), rmsg = document.getElementById('request-msg');
