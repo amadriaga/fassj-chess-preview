@@ -773,3 +773,9 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tb-clock { display: block; text-align: center; font-variant-numeric: tabular-nums; font-size: .78rem; letter-spacing: .04em; color: #8fd19e; margin: -2px 0 4px; }
 .tb-countdown .tb-value { font-size: 1.35rem; }
 .tb-sub { text-align: center; }
+/* Corner pins: 3D gold stars (Alex) */
+.age-card { position: relative; }
+.tb-pin { position: absolute; width: 20px; height: 20px; pointer-events: none; filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,.55)); }
+.tb-pin svg { width: 100%; height: 100%; display: block; }
+.tb-pin-tl { top: 7px; left: 7px; } .tb-pin-tr { top: 7px; right: 7px; }
+.tb-pin-bl { bottom: 7px; left: 7px; } .tb-pin-br { bottom: 7px; right: 7px; }

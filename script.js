@@ -129,6 +129,15 @@
           lg.src = '/assets/logo-512.webp'; lg.width = 64; lg.height = 64; lg.alt = 'FASSJ Chess Club crest'; lg.className = 'tb-logo';
           brand.appendChild(lg); brand.appendChild(mk('h4', 'tb-title', '2027 Founders\u2019 Cup')); brand.appendChild(mk('p', 'tb-kicker', 'Founding Season Tally'));
           tally.appendChild(brand);
+          // four corner pins: bevelled 3D gold stars (Alex)
+          var starSvg = (function () {
+            var pts = [], f = '', cx = 12, cy = 12;
+            for (var k = 0; k < 10; k++) { var r = k % 2 ? 4.6 : 11, a = -Math.PI / 2 + k * Math.PI / 5; pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); }
+            for (var k2 = 0; k2 < 10; k2++) { var p = pts[k2], q = pts[(k2 + 1) % 10]; f += '<path d="M12 12L' + p[0].toFixed(2) + ' ' + p[1].toFixed(2) + 'L' + q[0].toFixed(2) + ' ' + q[1].toFixed(2) + 'Z" fill="' + (k2 % 2 ? 'url(#pd)' : 'url(#pl)') + '"/>'; }
+            return '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="pl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4cf"/><stop offset="1" stop-color="#d4b06a"/></linearGradient>'
+              + '<linearGradient id="pd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b8913a"/><stop offset="1" stop-color="#6b5520"/></linearGradient></defs>' + f + '</svg>';
+          })();
+          ['tl', 'tr', 'bl', 'br'].forEach(function (pos) { var pin = mk('span', 'tb-pin tb-pin-' + pos); pin.innerHTML = starSvg; tally.appendChild(pin); });
           var grid = mk('div', 'tb-grid');
           grid.appendChild(tile('Players registered', String(total), '', 'tb-main'));
           groups.forEach(function (g) { var n = res.byAge[g[0]] || 0; grid.appendChild(tile(g[1], String(n), 'ages ' + g[2], n ? '' : 'tb-zero')); });
