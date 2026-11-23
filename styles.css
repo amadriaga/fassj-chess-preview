@@ -737,3 +737,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .dl-body .doc-btns { margin-top: 10px; }
 .entry-acc { margin-bottom: 10px; }
 .entry-acc > .entry-card { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin: 0; }
+.dl-body .doc-meta { display: none; }
