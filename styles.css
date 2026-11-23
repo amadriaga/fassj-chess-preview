@@ -800,8 +800,7 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 /* Tally board in 3D: raised board with a thick edge and drop shadow, raised tiles, rounded bars (Alex, 2026-11-23) */
 .age-card { border-color: #3a5175; box-shadow:
   inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.35),
-  0 1px 0 #0b1524, 0 2px 0 #0a1321, 0 3px 0 #09111d, 0 4px 0 #08101b, 0 5px 0 #070e18,
-  0 10px 14px rgba(15,27,45,.35), 0 22px 40px rgba(15,27,45,.35); }
+  0 6px 12px rgba(15,27,45,.30), 0 18px 36px rgba(15,27,45,.30); }
 .tb-tile { background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.02) 55%, rgba(0,0,0,.12) 100%);
   border-color: rgba(212,176,106,.55); box-shadow:
   inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.4),
@@ -815,3 +814,11 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
   box-shadow: 2px 0 0 rgba(0,0,0,.35), 0 -1px 0 rgba(255,255,255,.35) inset; }
 .age-card .tb-logo { box-shadow: 0 0 0 2px var(--gold), 0 4px 0 #8a6a22, 0 8px 14px rgba(0,0,0,.5); }
 .age-card .tb-title { text-shadow: 0 2px 0 rgba(0,0,0,.6), 0 4px 10px rgba(0,0,0,.4); }
+/* Dot-matrix scoreboard font on the tally board (Alex, 2026-11-23). Doto, SIL Open Font License, self-hosted. */
+@font-face { font-family: 'Doto'; src: url('/fonts/doto-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+.age-card .tb-title, .tb-value, .tb-clock, .tb-n, .age-card .tb-date { font-family: 'Doto', var(--serif); font-weight: 900; }
+.age-card .tb-title { font-size: 1.35rem; letter-spacing: .06em; }
+.tb-value { font-size: 2.3rem; line-height: 1; letter-spacing: .02em; }
+.tb-countdown .tb-value { font-size: 1.6rem; }
+.tb-clock { font-size: .95rem; letter-spacing: .02em; }
+.age-card .tb-date { font-size: 1.1rem; letter-spacing: .04em; }
