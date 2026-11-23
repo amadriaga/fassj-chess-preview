@@ -146,7 +146,7 @@
             return true;
           };
           if (tick()) { if (window.fassjCountdown) clearInterval(window.fassjCountdown); window.fassjCountdown = setInterval(function () { if (!tick()) clearInterval(window.fassjCountdown); }, 1000); }
-          grid.appendChild(cd);
+          grid.insertBefore(cd, grid.children[3] || null);   // 2nd row, 1st column: the four age groups sit together on the right (Alex)
           tally.appendChild(grid);
           var weeks = res.byWeek || [];
           if (weeks.length) {
