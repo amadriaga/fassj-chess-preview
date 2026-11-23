@@ -786,3 +786,12 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 /* Phone (2 columns): players registered + countdown on the first row, then the four age groups (Alex) */
 @media (max-width: 420px) { .tb-grid .tb-main { order: 1; } .tb-grid .tb-countdown { order: 2; } .tb-grid .tb-tile:not(.tb-main):not(.tb-countdown) { order: 3; } }
 .age-card .tb-date { margin: 4px 0 0; font-family: var(--serif); font-size: .95rem; letter-spacing: .06em; color: #d4b06a; }
+
+/* 2027 Season Pass promo, beside the T-shirt promo (spec §71, 2026-11-23) */
+.promo-pass { border-top: 0; background: linear-gradient(135deg, #1c2c46 0%, var(--ink) 100%); }
+.promo-pic--pass { background: #0f1b2d; max-width: 300px; justify-self: center; }
+.pass-dates { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-width: 56ch; }
+.pass-dates li { border: 1px solid rgba(212,176,106,.45); border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; min-width: 0; }
+.pass-dates b { color: var(--gold-2); font-size: .9rem; } .pass-dates span { color: #c9d2df; font-size: .88rem; }
+.promo-pass .promo-text p.note { margin-top: 12px; font-size: .85rem; color: #9aa6b8; }
+@media (max-width: 480px) { .pass-dates { grid-template-columns: 1fr; } }
