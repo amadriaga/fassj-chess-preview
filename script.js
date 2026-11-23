@@ -567,6 +567,7 @@
           // spec §54: title only; click to open the document's card
           var acc = document.createElement('details'), sum = document.createElement('summary'), st = document.createElement('span'), sr = document.createElement('span');
           acc.className = 'doc-acc'; acc.open = !!openDocs[d.id]; st.className = 'doc-title'; st.textContent = d.title || d.name;
+          if (d.order && d.order < 999) { var no = document.createElement('span'); no.className = 'doc-no'; no.textContent = (d.order < 10 ? '0' : '') + d.order; sum.appendChild(no); }   // Alex: number each board document
           var nItems = (d.items || []).length; sr.className = 'doc-sum';
           sr.textContent = nItems ? nItems + ' items to decide' : (d.docResult && d.docResult !== 'Open' ? d.docResult : 'Whole document');
           sum.appendChild(st); sum.appendChild(sr); acc.appendChild(sum);

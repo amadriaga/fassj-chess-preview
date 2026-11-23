@@ -725,3 +725,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .sec-picker label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 .officer-sec[hidden] { display: none; }
 .setup-warn { background: #fff6e0; border: 1px solid #ecd9a6; border-radius: 8px; padding: 10px 12px; font-size: .92rem; }
+.doc-no { display: inline-grid; place-items: center; min-width: 2.1em; height: 2.1em; padding: 0 .3em; border-radius: 6px; background: var(--ink); color: #fff; font: 700 .85rem/1 var(--sans); }
