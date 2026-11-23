@@ -132,8 +132,21 @@
           var grid = mk('div', 'tb-grid');
           grid.appendChild(tile('Players registered', String(total), '', 'tb-main'));
           groups.forEach(function (g) { var n = res.byAge[g[0]] || 0; grid.appendChild(tile(g[1], String(n), 'ages ' + g[2], n ? '' : 'tb-zero')); });
-          var days = Math.ceil((Date.UTC(2027, 0, 11, 5) - Date.now()) / 86400000);
-          grid.appendChild(days >= 0 ? tile('Days to opening night', String(days), 'Mon, Jan 11, 2027', 'tb-count') : tile('Club nights', 'Mon', '6:00–8:30 PM', 'tb-count'));
+          // live countdown to opening night: Mon, Jan 11, 2027, 6:00 PM Eastern (= 23:00 UTC)
+          var OPEN = Date.UTC(2027, 0, 11, 23, 0, 0), ENDS = Date.UTC(2027, 0, 12, 2, 0, 0);
+          var cd = tile('Countdown to opening night', '', 'Mon, Jan 11, 2027 \u00b7 6:00 PM', 'tb-count tb-countdown');
+          var cdv = cd.querySelector('.tb-value'), clk = mk('span', 'tb-clock', ''); cd.insertBefore(clk, cd.querySelector('.tb-sub'));
+          var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+          var tick = function () {
+            var ms = OPEN - Date.now();
+            if (ms <= 0) { cdv.textContent = Date.now() < ENDS ? 'Tonight!' : 'Opened'; clk.textContent = Date.now() < ENDS ? 'Club night is on now' : 'Welcome, founding members'; return false; }
+            var s = Math.floor(ms / 1000), d = Math.floor(s / 86400);
+            cdv.textContent = d + (d === 1 ? ' day' : ' days');
+            clk.textContent = pad(Math.floor(s % 86400 / 3600)) + 'h ' + pad(Math.floor(s % 3600 / 60)) + 'm ' + pad(s % 60) + 's';
+            return true;
+          };
+          if (tick()) { if (window.fassjCountdown) clearInterval(window.fassjCountdown); window.fassjCountdown = setInterval(function () { if (!tick()) clearInterval(window.fassjCountdown); }, 1000); }
+          grid.appendChild(cd);
           tally.appendChild(grid);
           var weeks = res.byWeek || [];
           if (weeks.length) {
