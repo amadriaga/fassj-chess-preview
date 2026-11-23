@@ -766,7 +766,7 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .off-none { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 40px 10px 14px; }
 .off-pos { font-weight: 600; }
 /* Tally tiles: same layout in every tile (Alex: symmetry) — 2-line title, centred number, bottom line fixed */
-.tb-tile { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.tb-label { min-height: 2.6em; display: flex; align-items: flex-start; justify-content: center; }
-.tb-value { margin: 4px 0 2px; }
+.tb-tile { display: flex; flex-direction: column; align-items: stretch; text-align: left; }
+.tb-label { min-height: 2.6em; display: block; }
+.tb-value { margin: 4px 0 2px; text-align: center; }
 .tb-sub { margin-top: auto; min-height: 1.3em; }
