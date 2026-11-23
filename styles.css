@@ -840,3 +840,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .roster-side .roster-scroll tbody tr:hover td { background: rgba(212,176,106,.12); }
 .roster-side .roster-scroll tbody td:first-child { font-size: .66rem; letter-spacing: 0; }
 .roster-side .roster-scroll td:nth-child(3) { white-space: nowrap; }
+.roster-side .roster-scroll tbody td { vertical-align: middle; } .roster-side .roster-scroll tbody td:first-child { padding-top: 10px; }
