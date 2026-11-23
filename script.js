@@ -134,7 +134,7 @@
           groups.forEach(function (g) { var n = res.byAge[g[0]] || 0; grid.appendChild(tile(g[1], String(n), 'ages ' + g[2], n ? '' : 'tb-zero')); });
           // live countdown to opening night: Mon, Jan 11, 2027, 6:00 PM Eastern (= 23:00 UTC)
           var OPEN = Date.UTC(2027, 0, 11, 23, 0, 0), ENDS = Date.UTC(2027, 0, 12, 2, 0, 0);
-          var cd = tile('Countdown to opening night', '', 'Mon, Jan 11, 2027 \u00b7 6:00 PM', 'tb-count tb-countdown');
+          var cd = tile('Countdown to opening night', '', 'Mon, Jan 11 \u00b7 6 PM', 'tb-count tb-countdown');
           var cdv = cd.querySelector('.tb-value'), clk = mk('span', 'tb-clock', ''); cd.insertBefore(clk, cd.querySelector('.tb-sub'));
           var pad = function (n) { return (n < 10 ? '0' : '') + n; };
           var tick = function () {

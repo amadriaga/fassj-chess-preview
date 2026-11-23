@@ -772,3 +772,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tb-sub { margin-top: auto; min-height: 1.3em; }
 .tb-clock { display: block; text-align: center; font-variant-numeric: tabular-nums; font-size: .78rem; letter-spacing: .04em; color: #8fd19e; margin: -2px 0 4px; }
 .tb-countdown .tb-value { font-size: 1.35rem; }
+.tb-sub { text-align: center; }
