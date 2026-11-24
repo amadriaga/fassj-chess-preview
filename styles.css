@@ -928,3 +928,11 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .inv-paid { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
 .inv-paid input, .inv-paid select { font: inherit; font-size: .9rem; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; max-width: 100%; }
 .invite-body { white-space: pre-wrap; font-family: inherit; font-size: .92rem; line-height: 1.5; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: #fff; overflow-wrap: anywhere; }
+/* spec §83: attachment chip in the email preview, like an email client */
+.mail-atts { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; }
+.mail-att-label { margin: 0 0 6px; font-size: .85rem; color: var(--muted); }
+.mail-att { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; font-size: .9rem; cursor: pointer; text-align: left; }
+.mail-att:hover { border-color: var(--ink); }
+.mail-att-ico { flex: none; font-size: .7rem; font-weight: 700; color: #fff; background: #c5221f; border-radius: 3px; padding: 3px 5px; }
+.mail-att-name { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.mail-att-size { flex: none; color: var(--muted); }

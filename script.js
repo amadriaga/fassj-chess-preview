@@ -933,11 +933,30 @@
           card.appendChild(st);
           var prev = document.createElement('div'); prev.className = 'tdoc-preview'; prev.hidden = true;
           var hd = document.createElement('dl'); hd.className = 'tdoc-head';
-          [['From', em.from], ['To', em.to.join(', ')], ['Cc', em.cc.join(', ')], ['Subject', em.subject], ['Attachment', em.attachment ? em.attachment.name + ' (' + em.attachment.size + ')' : 'None: the document PDF is missing in Trustee documents']].forEach(function (kv) {
+          [['From', em.from], ['To', em.to.join(', ')], ['Cc', em.cc.join(', ')], ['Subject', em.subject]].forEach(function (kv) {
             var dt = document.createElement('dt'); dt.textContent = kv[0]; var dd = document.createElement('dd'); dd.textContent = kv[1]; hd.appendChild(dt); hd.appendChild(dd);
           });
           var fr = document.createElement('iframe'); fr.className = 'tdoc-body'; fr.title = 'Email preview'; fr.setAttribute('sandbox', ''); fr.srcdoc = em.html;
           prev.appendChild(hd); prev.appendChild(fr);
+          // attachment chip, like an email client: opens the exact PDF that will be attached (spec §83)
+          var att = document.createElement('div'); att.className = 'mail-atts';
+          if (em.attachment) {
+            var chip = document.createElement('button'); chip.type = 'button'; chip.className = 'mail-att';
+            chip.innerHTML = '<span class="mail-att-ico" aria-hidden="true">PDF</span><span class="mail-att-name"></span><span class="mail-att-size"></span>';
+            chip.querySelector('.mail-att-name').textContent = em.attachment.name; chip.querySelector('.mail-att-size').textContent = em.attachment.size;
+            chip.title = 'Open the attachment';
+            chip.addEventListener('click', function () {
+              chip.disabled = true; say(tdMsg, 'Opening the attachment\u2026', true);
+              post({ form: 'officer_trustee_doc', token: tok(), id: em.id }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(tdMsg, r.error);
+                var a = document.createElement('a'); a.href = URL.createObjectURL(b64Blob(r.data, r.mime)); a.target = '_blank'; a.rel = 'noopener';
+                document.body.appendChild(a); a.click(); a.remove(); say(tdMsg, '');
+              }).catch(function () { say(tdMsg, 'Couldn\u2019t open the attachment.'); }).then(function () { chip.disabled = false; });
+            });
+            var al = document.createElement('p'); al.className = 'mail-att-label'; al.textContent = '1 attachment'; att.appendChild(al); att.appendChild(chip);
+          } else { var na = document.createElement('p'); na.className = 'form-msg'; na.textContent = 'No attachment: the document PDF is missing in Trustee documents, so Send will refuse.'; att.appendChild(na); }
+          prev.appendChild(att);
           var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-outline'; view.textContent = 'View email';
           view.addEventListener('click', function () { prev.hidden = !prev.hidden; view.textContent = prev.hidden ? 'View email' : 'Hide email'; });
           var send = document.createElement('button'); send.type = 'button'; send.className = 'btn btn-sm btn-primary'; send.textContent = 'Send email';
