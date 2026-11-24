@@ -902,3 +902,12 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .cstrip--msg { --c1: #0f1b2d; --c2: #2a4270; } .cstrip--fb { --c1: #1d4f91; --c2: #3a73c4; } .cstrip--pin { --c1: #9a7428; --c2: #d4b06a; }
 .cstrip--pin .cstrip-body b, .cstrip--pin .cstrip-body span { color: #0f1b2d; } .cstrip--pin .cstrip-body span { border-top-color: rgba(15,27,45,.25); }
 .contact-cta .cstrip { margin: 8px 0 18px; }
+
+/* Trustees tab (spec §80) */
+.trustee-card { margin-bottom: 18px; }
+.trustee-who { margin: 6px 0 12px; padding-left: 1.1em; font-size: .9rem; color: var(--muted); }
+.trustee-item { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 0 0 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+.trustee-item legend { font-weight: 600; padding: 0 4px; }
+.trustee-note { flex: 1 1 100%; }
+.trustee-consent { display: block; margin: 12px 0 8px; }
+.trustee-sig { width: 100%; max-width: 420px; display: block; margin: 0 0 12px; font-family: var(--serif); font-size: 1.05rem; }

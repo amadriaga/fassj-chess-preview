@@ -18,7 +18,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/styles.css?v=92b25319c4">
+  <link rel="stylesheet" href="/styles.css?v=26cf3105ea">
 </head>
 <body>
   <div style="background:#b8913a;color:#0f1b2d;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:7px 16px">Welcome to the Official SJFACC interim website &mdash; fully operational &middot; <a href="/register.html" style="color:#0f1b2d;text-decoration:underline">Registration is now open! &rarr;</a></div>
@@ -99,6 +99,7 @@
               <button class="tab" role="tab" id="tab-documents" aria-controls="documents" aria-selected="false">Board documents</button>
               <button class="tab" role="tab" id="tab-contest" aria-controls="contest" aria-selected="false">T-shirt contest</button>
               <button class="tab" role="tab" id="tab-officers" aria-controls="officers" aria-selected="false">Officers</button>
+              <button class="tab" role="tab" id="tab-trustees" aria-controls="trustees" aria-selected="false" hidden>Trustees</button>
               <button class="tab" role="tab" id="tab-admin" aria-controls="admin" aria-selected="false" hidden>Admin</button>
             </div>
             <div class="tab-panel" id="registrations" role="tabpanel" aria-labelledby="tab-registrations">
@@ -121,6 +122,11 @@
               <div class="entry-list" id="entry-list"><p class="note">Loading&hellip;</p></div>
               <p class="officer-msg" id="entry-msg" role="status"></p>
             </div>
+            </div>
+            <div class="tab-panel" id="trustees" role="tabpanel" aria-labelledby="tab-trustees" hidden>
+              <p class="note" style="margin:0 0 12px">For SJFACC trustees only. Read each document, choose Approve or Revise for every decision, then sign by typing your full name. Your signature, the date and time are saved with a PDF record.</p>
+              <p class="form-msg" id="trustee-msg" role="status"></p>
+              <div id="trustee-list"><p class="note">Loading&hellip;</p></div>
             </div>
             <div class="tab-panel" id="admin" role="tabpanel" aria-labelledby="tab-admin" hidden>
               <div class="entries-review">
@@ -210,10 +216,10 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; <span data-year>2026</span> South Jersey Filipino-American Chess Community, Inc.</span>
-        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 244 · Nov 24, 2026</span></span>
+        <span><a href="/privacy.html">Privacy &amp; Disclaimer</a> · <a href="/site-info.html">Website info</a> · <span class="build" data-build>Build 245 · Nov 24, 2026</span></span>
       </div>
     </div>
   </footer>
-  <script src="/script.js?v=723440eff1"></script>
+  <script src="/script.js?v=8c7129f6ba"></script>
 </body>
 </html>

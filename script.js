@@ -203,6 +203,85 @@
         say(omsg, '');
       }).catch(function () { say(omsg, 'Couldn’t open the PDF. Please try again.'); }).then(function () { btn.disabled = false; });
     };
+    // spec §80: trustee approvals with a typed electronic signature (tab shown only to trustees and owners)
+    var loadTrustees = function () {
+      var tlist = document.getElementById('trustee-list'), tmsg = document.getElementById('trustee-msg'), ttab = document.getElementById('tab-trustees');
+      if (!tlist || !ttab) return;
+      post({ form: 'officer_trustee_docs', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) { ttab.hidden = true; return; }
+        ttab.hidden = false; tlist.innerHTML = '';
+        if (!res.docs.length) { var none = document.createElement('p'); none.className = 'note'; none.textContent = 'No trustee documents yet.'; tlist.appendChild(none); return; }
+        res.docs.forEach(function (d) {
+          var card = document.createElement('div'); card.className = 'doc-card-o doc-body trustee-card';
+          var h = document.createElement('b'); h.className = 'doc-title'; h.textContent = d.title; card.appendChild(h);
+          if (d.about) { var ab = document.createElement('p'); ab.className = 'doc-about'; ab.textContent = d.about; card.appendChild(ab); }
+          var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-primary'; view.textContent = 'View the document';
+          view.addEventListener('click', function () {
+            view.disabled = true; say(tmsg, 'Opening…', true);
+            post({ form: 'officer_trustee_doc', token: tok(), id: d.id }).then(function (r) {
+              if (r.signedOut) return signOut(r.error);
+              if (!r.ok) return say(tmsg, r.error);
+              var a = document.createElement('a'); a.href = URL.createObjectURL(b64Blob(r.data, r.mime)); a.target = '_blank'; a.rel = 'noopener';
+              document.body.appendChild(a); a.click(); a.remove(); say(tmsg, '');
+            }).catch(function () { say(tmsg, 'Couldn’t open the document. Please try again.'); }).then(function () { view.disabled = false; });
+          });
+          var acts = document.createElement('p'); acts.className = 'officer-actions'; acts.appendChild(view); card.appendChild(acts);
+          var st = document.createElement('div'); st.className = 'trustee-status';
+          var badge = document.createElement('p'); badge.className = 'vote-result ' + (d.full ? 'r-approved' : 'r-open');
+          badge.textContent = d.full ? 'Fully approved by all trustees' : 'Waiting for trustees: ' + d.trustees.filter(function (t) { return t.signed; }).length + ' of ' + d.trustees.length + ' signed';
+          st.appendChild(badge);
+          var ul = document.createElement('ul'); ul.className = 'trustee-who';
+          d.trustees.forEach(function (t) {
+            var li = document.createElement('li'), ap = d.items.filter(function (it) { return t.decisions[it.id] === 'Approve'; }).length;
+            li.textContent = t.name + ': ' + (t.signed ? 'signed ' + t.when + ' · ' + ap + ' of ' + d.items.length + ' approved' : 'not signed yet');
+            ul.appendChild(li);
+          });
+          st.appendChild(ul); card.appendChild(st);
+          if (res.trustee) {
+            var mine = (d.mine && d.mine.signed) ? d.mine.decisions : {};
+            var form = document.createElement('form'); form.className = 'trustee-form';
+            var hh = document.createElement('p'); hh.className = 'vote-head'; hh.textContent = d.mine && d.mine.signed ? 'Your decisions (you can sign again to change them)' : 'Your decisions'; form.appendChild(hh);
+            d.items.forEach(function (it) {
+              var row = document.createElement('fieldset'); row.className = 'trustee-item';
+              var lg = document.createElement('legend'); lg.textContent = it.label; row.appendChild(lg);
+              var note = document.createElement('input'); note.type = 'text'; note.name = 'note-' + it.id; note.placeholder = 'What should change?'; note.className = 'trustee-note'; note.hidden = mine[it.id] !== 'Revise';
+              ['Approve', 'Revise'].forEach(function (c) {
+                var lab = document.createElement('label'), r = document.createElement('input');
+                r.type = 'radio'; r.name = 'dec-' + it.id; r.value = c; r.checked = mine[it.id] === c;
+                r.addEventListener('change', function () { note.hidden = c !== 'Revise'; });
+                lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + c)); row.appendChild(lab);
+              });
+              row.appendChild(note); form.appendChild(row);
+            });
+            var cons = document.createElement('label'); cons.className = 'trustee-consent';
+            var cb = document.createElement('input'); cb.type = 'checkbox'; cb.name = 'consent';
+            cons.appendChild(cb); cons.appendChild(document.createTextNode(' I agree that typing my name below is my electronic signature.'));
+            form.appendChild(cons);
+            var sig = document.createElement('input'); sig.type = 'text'; sig.name = 'signature'; sig.autocomplete = 'name'; sig.className = 'trustee-sig';
+            sig.placeholder = 'Type your full name: ' + res.name; form.appendChild(sig);
+            var go = document.createElement('button'); go.type = 'submit'; go.className = 'btn btn-primary'; go.textContent = 'Sign and submit'; form.appendChild(go);
+            var fm = document.createElement('p'); fm.className = 'form-msg'; fm.setAttribute('role', 'status'); form.appendChild(fm);
+            form.addEventListener('submit', function (e) {
+              e.preventDefault();
+              var dec = {}, notes = {};
+              d.items.forEach(function (it) {
+                var c = form.querySelector('input[name="dec-' + it.id + '"]:checked'); if (c) dec[it.id] = c.value;
+                var n = form.querySelector('input[name="note-' + it.id + '"]'); if (n && n.value.trim()) notes[it.id] = n.value.trim();
+              });
+              go.disabled = true; say(fm, 'Signing…', true);
+              post({ form: 'officer_trustee_sign', token: tok(), id: d.id, decisions: JSON.stringify(dec), notes: JSON.stringify(notes), consent: cb.checked ? 'yes' : '', signature: sig.value }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(fm, r.error);
+                say(fm, 'Signed. Your decisions and signature were saved with a PDF record.', true); loadTrustees();
+              }).catch(function () { say(fm, 'Couldn’t save. Please try again.'); }).then(function () { go.disabled = false; });
+            });
+            card.appendChild(form);
+          }
+          tlist.appendChild(card);
+        });
+      }).catch(function () { ttab.hidden = true; });
+    };
     var load = function () {
       post({ form: 'officer_forms', token: tok() }).then(function (res) {
         if (res.signedOut) return signOut(res.error);
@@ -220,6 +299,7 @@
         if (has('documents')) loadDocs();
         if (has('officers')) { loadRequests(); loadOfficers(); }
         if (res.owner) { loadAdmin(); loadSignIns(); }
+        loadTrustees();   // spec §80
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = 'No signed forms yet.'; obody.appendChild(p0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
