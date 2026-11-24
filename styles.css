@@ -937,3 +937,9 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .mail-att-name { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
 .mail-att-size { flex: none; color: var(--muted); }
 .admin-top .admin-remove { margin-left: auto; }
+
+/* spec §88: 3-D corporate emblem, lower right of "Our mission" (About page) */
+.mission-col { display: flex; flex-direction: column; align-items: flex-end; gap: 28px; }
+.mission-col .card { align-self: stretch; }
+.corp-emblem { width: 210px; height: auto; filter: drop-shadow(0 8px 14px rgba(15,27,45,.35)); }
+@media (max-width: 860px) { .corp-emblem { width: 160px; } }

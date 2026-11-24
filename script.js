@@ -126,7 +126,7 @@
           var tile = function (label, value, sub, cls) { var t = mk('div', 'tb-tile' + (cls ? ' ' + cls : '')); t.appendChild(mk('span', 'tb-label', label)); t.appendChild(mk('b', 'tb-value', value)); t.appendChild(mk('small', 'tb-sub', sub || '\u00a0')); return t; };   // every tile keeps the bottom line, for symmetry
           tally.innerHTML = '';
           var brand = mk('div', 'tb-brand'), lg = document.createElement('img');   // Alex: club logo, then "2027 Founders' Cup"
-          lg.src = '/assets/logo-512.webp?v=5'; lg.width = 64; lg.height = 64; lg.alt = 'SJFACC crest'; lg.className = 'tb-logo';
+          lg.src = '/assets/logo-512.webp?v=6'; lg.width = 64; lg.height = 64; lg.alt = 'SJFACC crest'; lg.className = 'tb-logo';
           brand.appendChild(lg); brand.appendChild(mk('h4', 'tb-title', '2027 Founders\u2019 Cup')); brand.appendChild(mk('p', 'tb-date', 'January 11, 2027')); brand.appendChild(mk('p', 'tb-kicker', 'Founding Season Tally'));
           tally.appendChild(brand);
           // four corner pins: bevelled 3D gold stars (Alex)
@@ -1463,7 +1463,7 @@
   var api = main.getAttribute('data-approve-api'), box = document.getElementById('nt-sheets'), msg = document.getElementById('nt-msg'), extra = document.getElementById('nt-extra'), tags = [];
   var tok = ''; try { tok = sessionStorage.getItem('fassjOfficer') || ''; } catch (e) {}
   var el = function (tag, cls, text) { var x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; };
-  var top = function (t, group) { var d = el('div', 'nt-top'), im = document.createElement('img'); im.src = '/assets/logo-512.webp?v=5'; im.alt = ''; d.appendChild(im); d.appendChild(el('span', '', 'SJFACC')); if (group) d.appendChild(el('em', '', group)); t.appendChild(d); };
+  var top = function (t, group) { var d = el('div', 'nt-top'), im = document.createElement('img'); im.src = '/assets/logo-512.webp?v=6'; im.alt = ''; d.appendChild(im); d.appendChild(el('span', '', 'SJFACC')); if (group) d.appendChild(el('em', '', group)); t.appendChild(d); };
   var render = function () {
     box.innerHTML = '';
     var items = tags.slice(); while (items.length % 8) items.push(null);
