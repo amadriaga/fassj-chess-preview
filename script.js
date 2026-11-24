@@ -215,6 +215,7 @@
         res.docs.forEach(function (d) {
           var card = document.createElement('div'); card.className = 'doc-card-o doc-body trustee-card';
           var h = document.createElement('b'); h.className = 'doc-title'; h.textContent = d.title; card.appendChild(h);
+          if (d.docno) { var mt = document.createElement('p'); mt.className = 'trustee-meta'; mt.textContent = 'Last update: ' + d.updated + ' · Document No.: ' + d.docno + ' · Version: ' + d.version; card.appendChild(mt); }   // same header as the PDF (spec §80/§82)
           if (d.about) { var ab = document.createElement('p'); ab.className = 'doc-about'; ab.textContent = d.about; card.appendChild(ab); }
           var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-primary'; view.textContent = 'View the document';
           view.addEventListener('click', function () {
@@ -245,11 +246,12 @@
             d.items.forEach(function (it) {
               var row = document.createElement('fieldset'); row.className = 'trustee-item';
               var lg = document.createElement('legend'); lg.textContent = it.label; row.appendChild(lg);
-              var note = document.createElement('input'); note.type = 'text'; note.name = 'note-' + it.id; note.placeholder = 'What should change?'; note.className = 'trustee-note'; note.hidden = mine[it.id] !== 'Revise';
-              ['Approve', 'Revise'].forEach(function (c) {
+              if (it.detail) { var dt = document.createElement('p'); dt.className = 'trustee-detail'; dt.textContent = it.detail; row.appendChild(dt); }   // what is being approved (spec §80 fix)
+              var note = document.createElement('input'); note.type = 'text'; note.name = 'note-' + it.id; note.placeholder = 'Why, or what should change?'; note.className = 'trustee-note'; note.hidden = !mine[it.id] || mine[it.id] === 'Approve';
+              ['Approve', 'Deny', 'Revise'].forEach(function (c) {   // same choices as the PDF (spec §80, Alex 2026-11-24)
                 var lab = document.createElement('label'), r = document.createElement('input');
                 r.type = 'radio'; r.name = 'dec-' + it.id; r.value = c; r.checked = mine[it.id] === c;
-                r.addEventListener('change', function () { note.hidden = c !== 'Revise'; });
+                r.addEventListener('change', function () { note.hidden = c === 'Approve'; });
                 lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + c)); row.appendChild(lab);
               });
               row.appendChild(note); form.appendChild(row);
