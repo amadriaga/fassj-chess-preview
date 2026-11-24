@@ -860,3 +860,10 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .contest-pass figcaption { font-size: .9rem; color: var(--muted); max-width: 240px; }
 .contest-pass figcaption b { display: block; color: var(--ink); font-family: var(--serif); font-size: 1.1rem; }
 .contest-pass .promo-pic--pass { background: transparent; box-shadow: none; border-radius: 0; max-width: 260px; }
+
+/* No boxes behind the pass pictures; gold prize seal stamped on the 2028 pass (Alex, 2026-11-24) */
+.promo-pass .promo-pic--pass { background: transparent; box-shadow: none; border-radius: 0; }
+.contest-pass { position: relative; }
+.contest-pass .contest-seal { position: absolute; width: 150px; height: auto; left: -46px; bottom: 6px; transform: rotate(-10deg);
+  filter: drop-shadow(0 6px 10px rgba(15,27,45,.35)); pointer-events: none; }
+@media (max-width: 480px) { .contest-pass .contest-seal { width: 124px; left: -8px; } }
