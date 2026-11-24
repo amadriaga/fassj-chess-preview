@@ -864,7 +864,7 @@
             });
             ic.appendChild(document.createTextNode(' ')); ic.appendChild(nk);
             var mv = document.createElement('button'); mv.type = 'button'; mv.className = 'link';   // spec §67: move between the two lists
-            var to = o.group === 'fassj' ? 'club' : 'fassj'; mv.textContent = to === 'fassj' ? 'Move to FASSJ officers' : 'Move to Chess Club officers';
+            var to = o.group === 'fassj' ? 'club' : 'fassj'; mv.textContent = to === 'fassj' ? 'Move to interim officers' : 'Move to club officers';
             mv.addEventListener('click', function () {
               if (!window.confirm(mv.textContent + ': ' + o.name + '?')) return;
               mv.disabled = true;
@@ -905,7 +905,7 @@
           }
         });
         var rest = offs.filter(function (x, i) { return !used[i]; });
-        if (rest.length) { head('Other FASSJ officers with access'); rest.forEach(function (x) { fcomb.appendChild(x.acc); }); }
+        if (rest.length) { head('Other interim officers with access'); rest.forEach(function (x) { fcomb.appendChild(x.acc); }); }
       }).catch(function () {});
     };
     var rbox = document.getElementById('request-review'), rlist = document.getElementById('request-list'), rmsg = document.getElementById('request-msg');
@@ -920,7 +920,7 @@
           var nm = document.createElement('p'), mt = document.createElement('p'); nm.className = 'req-name'; mt.className = 'req-meta';
           mt.textContent = q.name + ' · ' + q.email + (q.position ? ' · ' + q.position : '') + (q.note ? ' · “' + q.note + '”' : '') + ' · asked ' + q.when;
           var gl = document.createElement('p'); gl.className = 'req-meta req-group-line';   // spec §67
-          gl.textContent = 'Goes to: ' + (q.group === 'fassj' ? 'FASSJ officers' : 'SJFACC officers') + (q.rosterMatch && q.chose !== 'fassj' ? ' (name matches the FASSJ list, so placed with FASSJ officers)' : '');
+          gl.textContent = 'Goes to: ' + (q.group === 'fassj' ? 'interim officers' : 'club officers') + (q.rosterMatch && q.chose !== 'fassj' ? ' (name matches the interim officers list, so placed there)' : '');
           txt.appendChild(mt); txt.appendChild(gl);
           if (q.already) { var al = document.createElement('p'); al.className = 'req-already'; al.textContent = q.email + ' is already an active officer of the club.'; card.appendChild(txt); card.appendChild(al); rlist.appendChild(card); return; }
           var qch = roleChooser('documents', false);
@@ -1024,7 +1024,7 @@
               var bin = atob(res.pdf), bytes = new Uint8Array(bin.length);
               for (var k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
               pdfA.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-              pdfA.setAttribute('download', 'FASSJ-Chess-Club-membership-form-' + (res.formId || 'signed') + '.pdf');
+              pdfA.setAttribute('download', 'SJFACC-membership-form-' + (res.formId || 'signed') + '.pdf');
               pdfA.classList.remove('hidden');
             }
             if (idS) idS.textContent = res.formId ? (res.revision ? 'Registration ' + res.formId + ' is updated (revision ' + res.revision + ').' : 'Your form number is ' + res.formId + '.') : '';
