@@ -883,3 +883,7 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 /* Seal on the top-left of the 2028 pass (Alex, 2026-11-24) */
 .contest-pass .contest-seal { right: auto; left: -34px; top: 15%; transform: rotate(-10deg); }
 @media (max-width: 480px) { .contest-pass .contest-seal { right: auto; left: 0; top: 14%; } }
+
+/* Contact is out of the top menu; a button on Register, Membership and Schedule (Alex, 2026-11-24) */
+.contact-cta { margin: 18px 0 0; }
+.roster-side ~ .contact-cta, aside .contact-cta { margin: 0 0 18px; }
