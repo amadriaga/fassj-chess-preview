@@ -853,3 +853,9 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
   .roster-side .roster-scroll .roster-table th { font-size: .58rem; }
   .roster-side .roster-scroll tbody td:first-child { font-size: .52rem; padding-left: 6px; }
 }
+
+/* 2028 Season Pass as the contest prize (replaces the trophy box, Alex 2026-11-24) */
+.contest-pass { margin: 0; display: grid; justify-items: center; gap: 10px; text-align: center; }
+.contest-pass .promo-pic { max-width: 240px; width: 100%; }
+.contest-pass figcaption { font-size: .9rem; color: var(--muted); max-width: 240px; }
+.contest-pass figcaption b { display: block; color: var(--ink); font-family: var(--serif); font-size: 1.1rem; }
