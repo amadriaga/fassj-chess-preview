@@ -933,7 +933,7 @@
           card.appendChild(st);
           var prev = document.createElement('div'); prev.className = 'tdoc-preview'; prev.hidden = true;
           var hd = document.createElement('dl'); hd.className = 'tdoc-head';
-          [['From', em.from], ['To', em.to.join(', ')], ['Cc', em.cc.join(', ')], ['Subject', em.subject]].forEach(function (kv) {
+          [['From', em.from], ['To', em.to.join(', ')], ['Cc', em.cc.join(', ')], ['Subject', em.subject], ['Attachment', em.attachment ? em.attachment.name + ' (' + em.attachment.size + ')' : 'None: the document PDF is missing in Trustee documents']].forEach(function (kv) {
             var dt = document.createElement('dt'); dt.textContent = kv[0]; var dd = document.createElement('dd'); dd.textContent = kv[1]; hd.appendChild(dt); hd.appendChild(dd);
           });
           var fr = document.createElement('iframe'); fr.className = 'tdoc-body'; fr.title = 'Email preview'; fr.setAttribute('sandbox', ''); fr.srcdoc = em.html;
