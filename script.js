@@ -215,7 +215,7 @@
         res.docs.forEach(function (d) {
           var card = document.createElement('div'); card.className = 'doc-card-o doc-body trustee-card';
           var h = document.createElement('b'); h.className = 'doc-title'; h.textContent = d.title; card.appendChild(h);
-          if (d.docno) { var mt = document.createElement('p'); mt.className = 'trustee-meta'; mt.textContent = 'Last update: ' + d.updated + ' · Document No.: ' + d.docno + ' · Version: ' + d.version; card.appendChild(mt); }   // same header as the PDF (spec §80/§82)
+          if (d.docno) { var mt = document.createElement('p'); mt.className = 'trustee-meta'; mt.textContent = 'Last update: ' + d.updated + ' · Document No.: ' + d.docno + (d.alias ? ' · Document alias: ' + d.alias : '') + ' · Version: ' + d.version; card.appendChild(mt); }   // same header as the PDF (spec §80/§82)
           if (d.about) { var ab = document.createElement('p'); ab.className = 'doc-about'; ab.textContent = d.about; card.appendChild(ab); }
           // spec §80: clear steps for trustees (Alex, 2026-11-24)
           var how = document.createElement('ol'); how.className = 'trustee-steps';
