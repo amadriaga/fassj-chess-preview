@@ -872,3 +872,11 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 @media (max-width: 480px) { .contest-pass .contest-seal { right: -6px; left: auto; top: 22%; } }
 .contest-pass .contest-seal { right: -34px; top: 15%; }
 @media (max-width: 480px) { .contest-pass .contest-seal { right: 0; top: 14%; } }
+/* Roster rows: every cell in the LED dot font; Chess experience column removed (Alex, 2026-11-24, spec §76) */
+.roster-side .roster-scroll tbody td { font-family: 'FASSJ Dots', var(--serif); font-size: .7rem; letter-spacing: .02em; font-weight: 400; }
+.roster-side .roster-scroll tbody td:first-child { font-size: .7rem; padding-top: 7px; }
+.roster-side .roster-scroll tbody td:nth-child(2) { color: #fff; }
+.roster-side .roster-scroll tbody td:nth-child(3), .roster-side .roster-scroll tbody td:nth-child(4) { color: #c9d2df; white-space: nowrap; }
+@media (max-width: 420px) {
+  .roster-side .roster-scroll tbody td, .roster-side .roster-scroll tbody td:first-child { font-size: .58rem; letter-spacing: 0; }
+}

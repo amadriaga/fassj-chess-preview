@@ -116,8 +116,8 @@
         body.innerHTML = list.length ? list.map(function (p) {
           var d = document.createElement('tr'), fid = document.createElement('td'), a = document.createElement('td'), g = document.createElement('td'), b = document.createElement('td'), ms = document.createElement('td');
           fid.textContent = p.id || '\u2014'; ms.textContent = String(p.since || '\u2014').replace(/ member$/i, '');   // spec §44: Form ID first, Member since last
-          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = String(p.level || '\u2014').replace(/ player$/i, ''); d.appendChild(fid); d.appendChild(a); d.appendChild(g); d.appendChild(b); d.appendChild(ms); return d.outerHTML;
-        }).join('') : '<tr><td colspan="5">No one has chosen to be listed yet. Be the first!</td></tr>';
+          a.textContent = p.name; var ag = p.age || '', m = /\((?:ages )?([^)]+)\)/.exec(ag); g.textContent = m ? m[1] : (ag || '\u2014'); if (ag) g.title = ag; b.textContent = String(p.level || '\u2014').replace(/ player$/i, ''); d.appendChild(fid); d.appendChild(a); d.appendChild(g); d.appendChild(ms); return d.outerHTML;
+        }).join('') : '<tr><td colspan="4">No one has chosen to be listed yet. Be the first!</td></tr>';
         var tally = document.getElementById('age-tally');   // spec §53: scoreboard-style tally (numbers only, no names)
         if (tally && res.byAge) {
           var groups = [['Early Learners (ages 4–6)', 'Early Learners', '4–6'], ['Elementary / Youth (ages 7–11)', 'Elementary / Youth', '7–11'], ['Middle & High School (ages 12–17)', 'Middle & High School', '12–17'], ['Adult (18+)', 'Adults', '18+']];
