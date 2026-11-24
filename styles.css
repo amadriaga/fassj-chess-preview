@@ -915,3 +915,12 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .trustee-steps li { margin: 0 0 4px; }
 .trustee-consent { display: block; margin: 12px 0 8px; }
 .trustee-sig { width: 100%; max-width: 420px; display: block; margin: 0 0 12px; font-family: var(--serif); font-size: 1.05rem; }
+/* spec §83: Admin sub-tabs and trustee emails */
+.subtabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
+.subtab { font: inherit; font-size: .9rem; font-weight: 600; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); cursor: pointer; }
+.subtab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tdoc-card { margin-bottom: 14px; }
+.tdoc-preview { margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; }
+.tdoc-head { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0 0 8px; font-size: .9rem; }
+.tdoc-head dt { font-weight: 600; } .tdoc-head dd { margin: 0; overflow-wrap: anywhere; min-width: 0; }
+.tdoc-body { width: 100%; height: 520px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }

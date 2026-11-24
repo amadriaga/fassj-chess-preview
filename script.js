@@ -318,7 +318,7 @@
         if (has('contest')) loadEntries();
         if (has('documents')) loadDocs();
         if (has('officers')) { loadRequests(); loadOfficers(); }
-        if (res.owner) { loadAdmin(); loadSignIns(); }
+        if (res.owner) { loadAdmin(); loadSignIns(); loadTrusteeEmails(); }
         loadTrustees();   // spec §80
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = 'No signed forms yet.'; obody.appendChild(p0); return; }
@@ -822,6 +822,56 @@
       }).catch(function () {});
     };
     var sbody = document.getElementById('signin-list');   // spec §63: recent sign-ins (owners)
+    // spec §83: Admin sub-tabs
+    Array.prototype.forEach.call(document.querySelectorAll('#admin .subtab'), function (b) {
+      b.addEventListener('click', function () {
+        Array.prototype.forEach.call(document.querySelectorAll('#admin .subtab'), function (x) { x.setAttribute('aria-selected', String(x === b)); });
+        Array.prototype.forEach.call(document.querySelectorAll('#admin .admin-sub'), function (sec) { sec.hidden = sec.id !== b.getAttribute('data-sub'); });
+      });
+    });
+    // spec §83: trustee emails: View email (exactly as sent) and Send email (typed SEND confirmation)
+    var tdList = document.getElementById('tdoc-list'), tdMsg = document.getElementById('tdoc-msg');
+    var loadTrusteeEmails = function () {
+      if (!tdList) return;
+      post({ form: 'admin_trustee_emails', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        tdList.innerHTML = '';
+        if (!res.ok) { say(tdMsg, res.error); return; }
+        if (!res.emails.length) { var n0 = document.createElement('p'); n0.className = 'note'; n0.textContent = 'No trustee emails yet.'; tdList.appendChild(n0); return; }
+        res.emails.forEach(function (em) {
+          var card = document.createElement('div'); card.className = 'doc-card-o doc-body tdoc-card';
+          var h = document.createElement('b'); h.className = 'doc-title'; h.textContent = em.title + (em.alias ? ' (' + em.alias + ')' : ''); card.appendChild(h);
+          var mt = document.createElement('p'); mt.className = 'trustee-meta'; mt.textContent = 'Document No.: ' + em.docno + ' · Version: ' + em.version; card.appendChild(mt);
+          var sub = document.createElement('p'); sub.innerHTML = '<b>Email:</b> '; sub.appendChild(document.createTextNode(em.subject)); card.appendChild(sub);
+          var st = document.createElement('p'); st.className = 'trustee-meta';
+          st.textContent = em.sent.length ? 'Last sent: ' + em.sent[em.sent.length - 1].when + ' by ' + em.sent[em.sent.length - 1].by + (em.sent.length > 1 ? ' (sent ' + em.sent.length + ' times)' : '') : 'Not sent yet.';
+          card.appendChild(st);
+          var prev = document.createElement('div'); prev.className = 'tdoc-preview'; prev.hidden = true;
+          var hd = document.createElement('dl'); hd.className = 'tdoc-head';
+          [['From', em.from], ['To', em.to.join(', ')], ['Cc', em.cc.join(', ')], ['Subject', em.subject]].forEach(function (kv) {
+            var dt = document.createElement('dt'); dt.textContent = kv[0]; var dd = document.createElement('dd'); dd.textContent = kv[1]; hd.appendChild(dt); hd.appendChild(dd);
+          });
+          var fr = document.createElement('iframe'); fr.className = 'tdoc-body'; fr.title = 'Email preview'; fr.setAttribute('sandbox', ''); fr.srcdoc = em.html;
+          prev.appendChild(hd); prev.appendChild(fr);
+          var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-outline'; view.textContent = 'View email';
+          view.addEventListener('click', function () { prev.hidden = !prev.hidden; view.textContent = prev.hidden ? 'View email' : 'Hide email'; });
+          var send = document.createElement('button'); send.type = 'button'; send.className = 'btn btn-sm btn-primary'; send.textContent = 'Send email';
+          send.addEventListener('click', function () {
+            var last = em.sent.length ? '\n\nAlready sent ' + em.sent.length + ' time(s), last on ' + em.sent[em.sent.length - 1].when + '.' : '';
+            var c = window.prompt('Send "' + em.subject + '"\nfrom ' + em.from + '\nto ' + em.to.join(', ') + '\ncc ' + em.cc.join(', ') + last + '\n\nType SEND to send it now.');
+            if (c === null) return;
+            send.disabled = true; say(tdMsg, 'Sending…', true);
+            post({ form: 'admin_trustee_email_send', token: tok(), id: em.id, confirm: String(c).trim() }).then(function (r) {
+              if (r.signedOut) return signOut(r.error);
+              if (!r.ok) return say(tdMsg, r.error);
+              say(tdMsg, 'Sent ' + r.sent + '.', true); loadTrusteeEmails();
+            }).catch(function () { say(tdMsg, 'Couldn’t send the email. Please try again.'); }).then(function () { send.disabled = false; });
+          });
+          var acts = document.createElement('p'); acts.className = 'officer-actions'; acts.appendChild(view); acts.appendChild(document.createTextNode(' ')); acts.appendChild(send);
+          card.appendChild(acts); card.appendChild(prev); tdList.appendChild(card);
+        });
+      }).catch(function () { say(tdMsg, 'Couldn’t load the trustee emails.'); });
+    };
     var loadSignIns = function () {
       if (!sbody) return;
       post({ form: 'admin_signins', token: tok() }).then(function (res) {
