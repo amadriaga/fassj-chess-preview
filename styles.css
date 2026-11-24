@@ -867,3 +867,6 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .contest-pass .contest-seal { position: absolute; width: 150px; height: auto; left: -46px; bottom: 6px; transform: rotate(-10deg);
   filter: drop-shadow(0 6px 10px rgba(15,27,45,.35)); pointer-events: none; }
 @media (max-width: 480px) { .contest-pass .contest-seal { width: 124px; left: -8px; } }
+/* Seal moved to the top-right, over the lanyard and the pass's corner (Alex, 2026-11-24) */
+.contest-pass .contest-seal { left: auto; bottom: auto; right: -58px; top: 24%; transform: rotate(10deg); }
+@media (max-width: 480px) { .contest-pass .contest-seal { right: -6px; left: auto; top: 22%; } }
