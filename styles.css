@@ -936,3 +936,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .mail-att-ico { flex: none; font-size: .7rem; font-weight: 700; color: #fff; background: #c5221f; border-radius: 3px; padding: 3px 5px; }
 .mail-att-name { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
 .mail-att-size { flex: none; color: var(--muted); }
+.admin-top .admin-remove { margin-left: auto; }

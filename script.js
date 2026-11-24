@@ -807,7 +807,22 @@
           nm.textContent = p.name + ' · ' + p.position;
           var SC = { 'Active': 'r-approved', 'Invitation sent': 'r-revise', 'Request waiting': 'r-revise' };
           st.className = 'vote-result ' + (SC[p.status] || 'r-open'); st.textContent = p.status + (p.roles ? ' · ' + areaText(p.roles) : '');
-          top.appendChild(nm); top.appendChild(st); row.appendChild(top);
+          top.appendChild(nm); top.appendChild(st);
+          if (p.removable) {   // spec §86: Remove (owners only; built-in interim officers and trustees can't be removed)
+            var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn btn-sm btn-outline btn-deny admin-remove'; rm.textContent = 'Remove';
+            rm.addEventListener('click', function () {
+              if (!window.confirm('Remove ' + p.name + ' from this list?' + (p.email ? '\n\nTheir officer sign-in (' + p.email + ') is removed too.' : ''))) return;
+              rm.disabled = true; adminBusy = true;
+              post({ form: 'admin_roster_remove', token: tok(), name: p.name }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(amsg, r.error);
+                say(amsg, p.name + ' removed' + (r.removedSignIn ? ', with their officer sign-in.' : '.'), true);
+                adminBusy = false; loadAdmin(); if (typeof loadOfficers === 'function') loadOfficers();
+              }).catch(function () { say(amsg, 'Couldn\u2019t remove. Please try again.'); }).then(function () { rm.disabled = false; adminBusy = false; });
+            });
+            top.appendChild(rm);
+          }
+          row.appendChild(top);
           if (p.status !== 'Active') {
             var em = document.createElement('input'); em.type = 'email'; em.className = 'admin-email'; em.placeholder = 'Email address'; em.value = p.email || ''; em.defaultValue = p.email || ''; em.setAttribute('aria-label', 'Email for ' + p.name);
             var ch = roleChooser('documents', false), acts = document.createElement('div'); acts.className = 'officer-actions';
