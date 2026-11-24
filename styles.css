@@ -859,3 +859,4 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .contest-pass .promo-pic { max-width: 240px; width: 100%; }
 .contest-pass figcaption { font-size: .9rem; color: var(--muted); max-width: 240px; }
 .contest-pass figcaption b { display: block; color: var(--ink); font-family: var(--serif); font-size: 1.1rem; }
+.contest-pass .promo-pic--pass { background: transparent; box-shadow: none; border-radius: 0; max-width: 260px; }
