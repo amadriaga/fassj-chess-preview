@@ -217,7 +217,25 @@
           var h = document.createElement('b'); h.className = 'doc-title'; h.textContent = d.title; card.appendChild(h);
           if (d.docno) { var mt = document.createElement('p'); mt.className = 'trustee-meta'; mt.textContent = 'Last update: ' + d.updated + ' · Document No.: ' + d.docno + ' · Version: ' + d.version; card.appendChild(mt); }   // same header as the PDF (spec §80/§82)
           if (d.about) { var ab = document.createElement('p'); ab.className = 'doc-about'; ab.textContent = d.about; card.appendChild(ab); }
-          var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-primary'; view.textContent = 'View the document';
+          // spec §80: clear steps for trustees (Alex, 2026-11-24)
+          var how = document.createElement('ol'); how.className = 'trustee-steps';
+          ['View or download the PDF below and read all of it before deciding.',
+           'If anything is unclear, ask Alex Madriaga first. Don\u2019t decide until you understand it.',
+           'Each numbered decision under \u201cYour decisions\u201d is the same number in the PDF\u2019s section 2 table. For each one choose Approve, Deny or Revise. For Deny or Revise, write why or what should change.',
+           'Type your full name to sign, then press \u201cSign and submit\u201d. You can sign again later to change your answers.'
+          ].forEach(function (t) { var li = document.createElement('li'); li.textContent = t; how.appendChild(li); });
+          var hh0 = document.createElement('p'); hh0.className = 'vote-head'; hh0.textContent = 'How to review and sign'; card.appendChild(hh0); card.appendChild(how);
+          var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-primary'; view.textContent = 'View the PDF';
+          var dl = document.createElement('button'); dl.type = 'button'; dl.className = 'btn btn-sm btn-outline'; dl.textContent = 'Download the PDF';
+          dl.addEventListener('click', function () {
+            dl.disabled = true; say(tmsg, 'Preparing the download\u2026', true);
+            post({ form: 'officer_trustee_doc', token: tok(), id: d.id }).then(function (r) {
+              if (r.signedOut) return signOut(r.error);
+              if (!r.ok) return say(tmsg, r.error);
+              var a = document.createElement('a'); a.href = URL.createObjectURL(b64Blob(r.data, r.mime)); a.download = r.name || 'document.pdf';
+              document.body.appendChild(a); a.click(); a.remove(); say(tmsg, '');
+            }).catch(function () { say(tmsg, 'Couldn\u2019t download the document. Please try again.'); }).then(function () { dl.disabled = false; });
+          });
           view.addEventListener('click', function () {
             view.disabled = true; say(tmsg, 'Opening…', true);
             post({ form: 'officer_trustee_doc', token: tok(), id: d.id }).then(function (r) {
@@ -227,7 +245,7 @@
               document.body.appendChild(a); a.click(); a.remove(); say(tmsg, '');
             }).catch(function () { say(tmsg, 'Couldn’t open the document. Please try again.'); }).then(function () { view.disabled = false; });
           });
-          var acts = document.createElement('p'); acts.className = 'officer-actions'; acts.appendChild(view); card.appendChild(acts);
+          var acts = document.createElement('p'); acts.className = 'officer-actions'; acts.appendChild(view); acts.appendChild(document.createTextNode(' ')); acts.appendChild(dl); card.appendChild(acts);
           var st = document.createElement('div'); st.className = 'trustee-status';
           var badge = document.createElement('p'); badge.className = 'vote-result ' + (d.full ? 'r-approved' : 'r-open');
           badge.textContent = d.full ? 'Fully approved by all trustees' : 'Waiting for trustees: ' + d.trustees.filter(function (t) { return t.signed; }).length + ' of ' + d.trustees.length + ' signed';
