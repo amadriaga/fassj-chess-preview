@@ -808,6 +808,13 @@
           var SC = { 'Active': 'r-approved', 'Invitation sent': 'r-revise', 'Request waiting': 'r-revise' };
           st.className = 'vote-result ' + (SC[p.status] || 'r-open'); st.textContent = p.status + (p.roles ? ' · ' + areaText(p.roles) : '');
           top.appendChild(nm); top.appendChild(st);
+          var td = p.trusteeDocs;   // spec §87: trustee-docs marker
+          if (td && td.recipient) {
+            var tb = document.createElement('span');
+            tb.className = 'vote-result ' + (td.unsent.length ? 'r-open' : 'r-approved');
+            tb.textContent = td.sent.length ? 'Trustee docs sent · ' + td.sent.map(function (x) { return x.code + ' (' + x.when + ')'; }).join(', ') + (td.unsent.length ? ' · not yet: ' + td.unsent.join(', ') : '') : 'Trustee docs not sent yet';
+            top.appendChild(tb);
+          }
           if (p.removable) {   // spec §86: Remove (owners only; built-in interim officers and trustees can't be removed)
             var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn btn-sm btn-outline btn-deny admin-remove'; rm.textContent = 'Remove';
             rm.addEventListener('click', function () {
