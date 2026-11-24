@@ -880,3 +880,6 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 @media (max-width: 420px) {
   .roster-side .roster-scroll tbody td, .roster-side .roster-scroll tbody td:first-child { font-size: .58rem; letter-spacing: 0; }
 }
+/* Seal on the top-left of the 2028 pass (Alex, 2026-11-24) */
+.contest-pass .contest-seal { right: auto; left: -34px; top: 15%; transform: rotate(-10deg); }
+@media (max-width: 480px) { .contest-pass .contest-seal { right: auto; left: 0; top: 14%; } }
