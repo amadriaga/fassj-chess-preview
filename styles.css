@@ -924,3 +924,7 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .tdoc-head { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0 0 8px; font-size: .9rem; }
 .tdoc-head dt { font-weight: 600; } .tdoc-head dd { margin: 0; overflow-wrap: anywhere; min-width: 0; }
 .tdoc-body { width: 100%; height: 520px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+/* spec §84: Treasurer tab */
+.inv-paid { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.inv-paid input, .inv-paid select { font: inherit; font-size: .9rem; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; max-width: 100%; }
+.invite-body { white-space: pre-wrap; font-family: inherit; font-size: .92rem; line-height: 1.5; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: #fff; overflow-wrap: anywhere; }

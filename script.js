@@ -203,6 +203,74 @@
         say(omsg, '');
       }).catch(function () { say(omsg, 'Couldn’t open the PDF. Please try again.'); }).then(function () { btn.disabled = false; });
     };
+    // spec §84: Treasurer tab, startup-cost invoices (Treasurer and owners only)
+    var loadTreasurer = function () {
+      var list = document.getElementById('inv-list'), msg = document.getElementById('inv-msg'), tab = document.getElementById('tab-treasurer');
+      if (!list || !tab) return;
+      post({ form: 'treasurer_invoices', token: tok() }).then(function (res) {
+        if (res.signedOut) return signOut(res.error);
+        if (!res.ok) { tab.hidden = true; return; }
+        tab.hidden = false; list.innerHTML = '';
+        var tot = document.createElement('p'); tot.className = 'trustee-meta'; tot.textContent = 'Startup costs: ' + res.total + ', split three ways.'; list.appendChild(tot);
+        res.invoices.forEach(function (iv) {
+          var card = document.createElement('div'); card.className = 'doc-card-o doc-body tdoc-card';
+          var h = document.createElement('b'); h.className = 'doc-title'; h.textContent = iv.number + ' · ' + iv.trustee + ' · ' + iv.share; card.appendChild(h);
+          var st = document.createElement('p'); st.className = 'trustee-meta';
+          st.textContent = (iv.kind === 'Statement' ? 'Paid statement' : 'Invoice') + ' · ' + iv.status + (iv.paidOn ? ' on ' + iv.paidOn : '') + (iv.treatment ? ' · ' + iv.treatment : '')
+            + ' · ' + (iv.signedBy ? 'Signed by ' + iv.signedBy + ' (' + iv.signedAt + ')' : 'Not signed yet: ' + iv.signer + ' signs');
+          card.appendChild(st);
+          var fetchPdf = function (btn, download) {
+            btn.disabled = true; say(msg, 'Preparing the PDF\u2026', true);
+            post({ form: 'treasurer_invoice_pdf', token: tok(), number: iv.number }).then(function (r) {
+              if (r.signedOut) return signOut(r.error);
+              if (!r.ok) return say(msg, r.error);
+              var a = document.createElement('a'); a.href = URL.createObjectURL(b64Blob(r.data, r.mime));
+              if (download) a.download = r.name; else { a.target = '_blank'; a.rel = 'noopener'; }
+              document.body.appendChild(a); a.click(); a.remove(); say(msg, '');
+            }).catch(function () { say(msg, 'Couldn\u2019t make the PDF. Please try again.'); }).then(function () { btn.disabled = false; });
+          };
+          var acts = document.createElement('p'); acts.className = 'officer-actions';
+          var v = document.createElement('button'); v.type = 'button'; v.className = 'btn btn-sm btn-primary'; v.textContent = 'View PDF'; v.addEventListener('click', function () { fetchPdf(v, false); });
+          var dl = document.createElement('button'); dl.type = 'button'; dl.className = 'btn btn-sm btn-outline'; dl.textContent = 'Download PDF'; dl.addEventListener('click', function () { fetchPdf(dl, true); });
+          acts.appendChild(v); acts.appendChild(document.createTextNode(' ')); acts.appendChild(dl);
+          card.appendChild(acts);
+          if (iv.canSign && iv.kind) {   // Sign: designated signer only
+            var sf = document.createElement('form'); sf.className = 'trustee-form';
+            var cl = document.createElement('label'); cl.className = 'trustee-consent'; var cb = document.createElement('input'); cb.type = 'checkbox';
+            cl.appendChild(cb); cl.appendChild(document.createTextNode(' I agree that my typed name is my electronic signature on this ' + (iv.kind === 'Statement' ? 'statement' : 'invoice') + '.')); sf.appendChild(cl);
+            var sg = document.createElement('input'); sg.type = 'text'; sg.className = 'trustee-sig'; sg.placeholder = 'Type your full legal name: ' + res.me; sf.appendChild(sg);
+            var sb = document.createElement('button'); sb.type = 'submit'; sb.className = 'btn btn-sm btn-primary'; sb.textContent = iv.signedBy ? 'Sign again' : 'Sign'; sf.appendChild(sb);
+            sf.addEventListener('submit', function (ev) {
+              ev.preventDefault(); sb.disabled = true;
+              post({ form: 'treasurer_invoice_sign', token: tok(), number: iv.number, consent: cb.checked ? 'yes' : '', signature: sg.value }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(msg, r.error);
+                say(msg, iv.number + ' signed.', true); loadTreasurer();
+              }).catch(function () { say(msg, 'Couldn\u2019t sign. Please try again.'); }).then(function () { sb.disabled = false; });
+            });
+            card.appendChild(sf);
+          }
+          if (iv.kind === 'Invoice') {   // Mark paid
+            var pf = document.createElement('form'); pf.className = 'inv-paid';
+            var pd = document.createElement('input'); pd.type = 'date'; pd.required = true; pd.setAttribute('aria-label', 'Date paid');
+            var zc = document.createElement('input'); zc.type = 'text'; zc.placeholder = 'Zelle confirmation'; zc.setAttribute('aria-label', 'Zelle confirmation');
+            var tr = document.createElement('select'); [['', 'Treatment: decide later'], ['Advance', 'Advance (repaid from dues)'], ['Donation', 'Donation']].forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; if (iv.treatment === o[0]) op.selected = true; tr.appendChild(op); });
+            var pb = document.createElement('button'); pb.type = 'submit'; pb.className = 'btn btn-sm btn-outline'; pb.textContent = iv.status === 'Paid' ? 'Update payment' : 'Mark paid';
+            [pd, zc, tr, pb].forEach(function (el) { pf.appendChild(el); pf.appendChild(document.createTextNode(' ')); });
+            pf.addEventListener('submit', function (ev) {
+              ev.preventDefault(); pb.disabled = true;
+              post({ form: 'treasurer_invoice_paid', token: tok(), number: iv.number, paidOn: pd.value, zelle: zc.value, treatment: tr.value }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(msg, r.error);
+                say(msg, iv.number + ' marked paid.', true); loadTreasurer();
+              }).catch(function () { say(msg, 'Couldn\u2019t save. Please try again.'); }).then(function () { pb.disabled = false; });
+            });
+            card.appendChild(pf);
+          }
+          list.appendChild(card);
+        });
+      }).catch(function () { say(msg, 'Couldn\u2019t load the invoices.'); });
+    };
     // spec §80: trustee approvals with a typed electronic signature (tab shown only to trustees and owners)
     var loadTrustees = function () {
       var tlist = document.getElementById('trustee-list'), tmsg = document.getElementById('trustee-msg'), ttab = document.getElementById('tab-trustees');
@@ -218,13 +286,14 @@
           if (d.docno) { var mt = document.createElement('p'); mt.className = 'trustee-meta'; mt.textContent = 'Last update: ' + d.updated + ' · Document No.: ' + d.docno + (d.alias ? ' · Document alias: ' + d.alias : '') + ' · Version: ' + d.version; card.appendChild(mt); }   // same header as the PDF (spec §80/§82)
           if (d.about) { var ab = document.createElement('p'); ab.className = 'doc-about'; ab.textContent = d.about; card.appendChild(ab); }
           // spec §80: clear steps for trustees (Alex, 2026-11-24)
+          var info = !d.items.length;   // for information only: nothing to sign (spec §83)
           var how = document.createElement('ol'); how.className = 'trustee-steps';
-          ['View or download the PDF below and read all of it before deciding.',
+          (info ? ['View or download the PDF below and read it.', 'If anything looks wrong, tell Alexander Madriaga. There is nothing to sign for this document.'] : ['View or download the PDF below and read all of it before deciding.',
            'If anything is unclear, ask Alex Madriaga first. Don\u2019t decide until you understand it.',
            'Each numbered decision under \u201cYour decisions\u201d is the same number in the PDF\u2019s section 2 table. For each one choose Approve, Deny or Revise. For Deny or Revise, write why or what should change.',
            'Type your full name to sign, then press \u201cSign and submit\u201d. You can sign again later to change your answers.'
-          ].forEach(function (t) { var li = document.createElement('li'); li.textContent = t; how.appendChild(li); });
-          var hh0 = document.createElement('p'); hh0.className = 'vote-head'; hh0.textContent = 'How to review and sign'; card.appendChild(hh0); card.appendChild(how);
+          ]).forEach(function (t) { var li = document.createElement('li'); li.textContent = t; how.appendChild(li); });
+          var hh0 = document.createElement('p'); hh0.className = 'vote-head'; hh0.textContent = info ? 'For your information' : 'How to review and sign'; card.appendChild(hh0); card.appendChild(how);
           var view = document.createElement('button'); view.type = 'button'; view.className = 'btn btn-sm btn-primary'; view.textContent = 'View the PDF';
           var dl = document.createElement('button'); dl.type = 'button'; dl.className = 'btn btn-sm btn-outline'; dl.textContent = 'Download the PDF';
           dl.addEventListener('click', function () {
@@ -256,8 +325,8 @@
             li.textContent = t.name + ': ' + (t.signed ? 'signed ' + t.when + ' · ' + ap + ' of ' + d.items.length + ' approved' : 'not signed yet');
             ul.appendChild(li);
           });
-          st.appendChild(ul); card.appendChild(st);
-          if (res.trustee) {
+          st.appendChild(ul); if (!info) card.appendChild(st);
+          if (res.trustee && !info) {
             var mine = (d.mine && d.mine.signed) ? d.mine.decisions : {};
             var form = document.createElement('form'); form.className = 'trustee-form';
             var hh = document.createElement('p'); hh.className = 'vote-head'; hh.textContent = d.mine && d.mine.signed ? 'Your decisions (you can sign again to change them)' : 'Your decisions'; form.appendChild(hh);
@@ -320,6 +389,7 @@
         if (has('officers')) { loadRequests(); loadOfficers(); }
         if (res.owner) { loadAdmin(); loadSignIns(); loadTrusteeEmails(); }
         loadTrustees();   // spec §80
+        loadTreasurer();  // spec §84
         olog.classList.add('hidden'); opan.classList.remove('hidden'); obody.innerHTML = '';
         if (!res.forms.length) { var p0 = document.createElement('p'); p0.className = 'note'; p0.textContent = 'No signed forms yet.'; obody.appendChild(p0); return; }
         res.forms.sort(function (x, y) { return x.id < y.id ? -1 : x.id > y.id ? 1 : 0; });   // by Form ID, lowest first (spec §43)
@@ -763,8 +833,23 @@
                 adminBusy = false; loadAdmin(); if (typeof loadOfficers === 'function') loadOfficers();
               }).catch(function () { say(amsg, 'Couldn’t send. Please try again.'); }).then(function () { inv.disabled = false; adminBusy = false; });
             });
-            acts.appendChild(sv); acts.appendChild(inv);
-            row.appendChild(em); row.appendChild(ch); row.appendChild(acts);
+            // spec §85: View email = the invitation exactly as it will be sent
+            var vw = document.createElement('button'); vw.type = 'button'; vw.className = 'btn btn-sm btn-outline'; vw.textContent = 'View email';
+            var pv = document.createElement('div'); pv.className = 'tdoc-preview'; pv.hidden = true;
+            vw.addEventListener('click', function () {
+              if (!pv.hidden) { pv.hidden = true; vw.textContent = 'View email'; return; }
+              vw.disabled = true;
+              post({ form: 'admin_invite_preview', token: tok(), name: p.name, email: em.value.trim(), roles: ch.values().roles, site: location.origin }).then(function (r) {
+                if (r.signedOut) return signOut(r.error);
+                if (!r.ok) return say(amsg, r.error);
+                pv.innerHTML = ''; var dl = document.createElement('dl'); dl.className = 'tdoc-head';
+                [['From', r.from], ['To', r.to || '(type the email above)'], ['Subject', r.subject]].forEach(function (kv) { var dt = document.createElement('dt'); dt.textContent = kv[0]; var dd = document.createElement('dd'); dd.textContent = kv[1]; dl.appendChild(dt); dl.appendChild(dd); });
+                var pre = document.createElement('pre'); pre.className = 'invite-body'; pre.textContent = r.body;
+                pv.appendChild(dl); pv.appendChild(pre); pv.hidden = false; vw.textContent = 'Hide email';
+              }).catch(function () { say(amsg, 'Couldn’t load the email. Please try again.'); }).then(function () { vw.disabled = false; });
+            });
+            acts.appendChild(sv); acts.appendChild(vw); acts.appendChild(inv);
+            row.appendChild(em); row.appendChild(ch); row.appendChild(acts); row.appendChild(pv);
             if (p.status === 'Request waiting') { var rn = document.createElement('p'); rn.className = 'vote-who'; rn.textContent = 'They asked through Request access: you can approve it on the Officers tab, or send the invitation here.'; row.appendChild(rn); }
           } else {
             var ae = document.createElement('p'); ae.className = 'vote-who'; ae.textContent = p.email; row.appendChild(ae);
