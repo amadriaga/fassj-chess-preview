@@ -939,7 +939,8 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 .admin-top .admin-remove { margin-left: auto; }
 
 /* spec §88: 3-D corporate emblem, lower right of "Our mission" (About page) */
-.mission-col { display: flex; flex-direction: column; align-items: flex-end; gap: 28px; }
-.mission-col .card { align-self: stretch; }
-.corp-emblem { width: 210px; height: auto; filter: drop-shadow(0 8px 14px rgba(15,27,45,.35)); }
-@media (max-width: 860px) { .corp-emblem { width: 160px; } }
+.mission-col { display: flex; flex-direction: column; gap: 28px; align-self: center; }
+.corp-emblem { float: left; width: 210px; height: auto; margin: 4px 24px 12px 0; filter: drop-shadow(0 8px 14px rgba(15,27,45,.35)); }
+.logo-story p { margin: 0 0 10px; }
+.logo-story .crest-list { margin: 0 0 10px; }
+@media (max-width: 860px) { .corp-emblem { width: 140px; margin-right: 16px; } }
