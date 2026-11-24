@@ -870,3 +870,5 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 /* Seal moved to the top-right, over the lanyard and the pass's corner (Alex, 2026-11-24) */
 .contest-pass .contest-seal { left: auto; bottom: auto; right: -58px; top: 24%; transform: rotate(10deg); }
 @media (max-width: 480px) { .contest-pass .contest-seal { right: -6px; left: auto; top: 22%; } }
+.contest-pass .contest-seal { right: -34px; top: 15%; }
+@media (max-width: 480px) { .contest-pass .contest-seal { right: 0; top: 14%; } }
