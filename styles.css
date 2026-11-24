@@ -887,3 +887,18 @@ main[data-approve-api] .officer-request, main[data-approve-api] .officer-secure 
 /* Contact is out of the top menu; a button on Register, Membership and Schedule (Alex, 2026-11-24) */
 .contact-cta { margin: 18px 0 0; }
 .roster-side ~ .contact-cta, aside .contact-cta { margin: 0 0 18px; }
+
+/* Contact strips: round icon + rounded label, club colours (spec §79, Alex 2026-11-24) */
+.cstrips { display: grid; gap: 14px; margin: 6px 0 22px; }
+.cstrip { position: relative; display: flex; align-items: center; min-height: 64px; max-width: 380px; padding-left: 38px; text-decoration: none; color: #fff; }
+.cstrip-icon { position: absolute; left: 0; top: 50%; width: 72px; height: 72px; margin-top: -36px; border-radius: 50%; display: grid; place-items: center;
+  background: #fff; border: 5px solid var(--c1); box-shadow: 0 4px 10px rgba(15,27,45,.28); z-index: 1; color: var(--c1); }
+.cstrip-icon svg { width: 34px; height: 34px; }
+.cstrip-body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 58px; padding: 8px 18px 8px 48px;
+  border-radius: 0 16px 16px 0; background: linear-gradient(180deg, var(--c2) 0%, var(--c1) 100%); box-shadow: 0 4px 10px rgba(15,27,45,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+.cstrip-body b { font-family: var(--serif); font-size: 1.08rem; letter-spacing: .02em; line-height: 1.15; }
+.cstrip-body span { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,.35); font-size: .82rem; color: rgba(255,255,255,.9); }
+.cstrip:hover .cstrip-body { filter: brightness(1.08); } .cstrip:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 16px; }
+.cstrip--msg { --c1: #0f1b2d; --c2: #2a4270; } .cstrip--fb { --c1: #1d4f91; --c2: #3a73c4; } .cstrip--pin { --c1: #9a7428; --c2: #d4b06a; }
+.cstrip--pin .cstrip-body b, .cstrip--pin .cstrip-body span { color: #0f1b2d; } .cstrip--pin .cstrip-body span { border-top-color: rgba(15,27,45,.25); }
+.contact-cta .cstrip { margin: 8px 0 18px; }
